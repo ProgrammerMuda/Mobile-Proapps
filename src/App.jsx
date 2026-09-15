@@ -28,7 +28,7 @@ import {
 
 function App() {
   const { t } = useLanguage();
-  const [currentScreen, setCurrentScreen] = useState('home'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail'
+  const [currentScreen, setCurrentScreen] = useState('splash'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail'
   const [activeTab, setActiveTab] = useState('home');
   const [userSession, setUserSession] = useState({
     name: 'Ahmad Pratama',
