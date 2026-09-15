@@ -1,0 +1,360 @@
+/* PROAPPS Color Library & Material Design 3 Tokens */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..900;1,300..900&display=swap');
+
+:root {
+  /* ==========================================================================
+     01 Brand Tokens (PROAPPS Color Library)
+     ========================================================================== */
+  --color-primary: #053079;
+  --color-secondary: #09B2FF;
+  --color-selected-background: #EAF7FF;
+
+  /* Aliases */
+  --primary: var(--color-primary);
+  --secondary: var(--color-secondary);
+  --selected-bg: var(--color-selected-background);
+
+  /* ==========================================================================
+     02 Teks dan Ikon (PROAPPS Color Library)
+     ========================================================================== */
+  --color-text-primary: #334155;       /* Slate 700 */
+  --color-text-secondary: #64748B;     /* Slate 500 */
+  --color-text-placeholder: #CBD5E1;   /* Slate 300 */
+  --color-text-on-primary: #FFFFFF;
+  --color-text-on-secondary: #053079;
+
+  /* Text Aliases */
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-placeholder: var(--color-text-placeholder);
+  --text-on-primary: var(--color-text-on-primary);
+  --text-on-secondary: var(--color-text-on-secondary);
+
+  /* ==========================================================================
+     03 Background dan Border (PROAPPS Color Library)
+     ========================================================================== */
+  --color-background-page: #F8FAFC;    /* Slate 50 */
+  --color-background-surface: #FFFFFF;
+  --color-border-default: #E5E7EB;    /* Gray 200 */
+  --color-border-focus: #09B2FF;
+
+  /* Background & Border Aliases */
+  --bg-page: var(--color-background-page);
+  --bg-surface: var(--color-background-surface);
+  --border-default: var(--color-border-default);
+  --border-focus: var(--color-border-focus);
+
+  /* ==========================================================================
+     04 Disabled State Tokens (Slate 200 Background & Slate 500 Text)
+     ========================================================================== */
+  --color-disabled-bg: #E2E8F0;       /* Slate 200 */
+  --color-disabled-text: #64748B;     /* Slate 500 */
+  --color-disabled-border: #E2E8F0;   /* Slate 200 */
+
+  --disabled-bg: var(--color-disabled-bg);
+  --disabled-text: var(--color-disabled-text);
+  --disabled-border: var(--color-disabled-border);
+
+  /* ==========================================================================
+     05 Semantic & Auxiliary Colors (Preline UI Palette)
+     ========================================================================== */
+  
+  /* Blue (Info / Neutral Action) */
+  --color-blue-50: #EFF6FF;
+  --color-blue-100: #DBEAFE;
+  --color-blue-200: #BFDBFE;
+  --color-blue-500: #3B82F6;
+  --color-blue-600: #2563EB;
+  --color-blue-700: #1D4ED8;
+  --color-info: var(--color-blue-600);
+  --color-info-bg: var(--color-blue-50);
+  --color-info-border: var(--color-blue-200);
+  --color-info-text: var(--color-blue-700);
+
+  /* Green (Success) */
+  --color-green-50: #F0FDF4;
+  --color-green-100: #DCFCE7;
+  --color-green-200: #BBF7D0;
+  --color-green-500: #22C55E;
+  --color-green-600: #16A34A;
+  --color-green-700: #15803D;
+  --color-success: var(--color-green-600);
+  --color-success-bg: var(--color-green-50);
+  --color-success-border: var(--color-green-200);
+  --color-success-text: var(--color-green-700);
+
+  /* Red (Danger / Destructive / Error) */
+  --color-red-50: #FEF2F2;
+  --color-red-100: #FEE2E2;
+  --color-red-200: #FECACA;
+  --color-red-500: #EF4444;
+  --color-red-600: #DC2626;
+  --color-red-700: #B91C1C;
+  --color-danger: var(--color-red-600);
+  --color-danger-bg: var(--color-red-50);
+  --color-danger-border: var(--color-red-200);
+  --color-danger-text: var(--color-red-700);
+
+  /* Orange / Amber (Warning / Notice) */
+  --color-orange-50: #FFF7ED;
+  --color-orange-100: #FFEDD5;
+  --color-orange-200: #FED7AA;
+  --color-orange-500: #F97316;
+  --color-orange-600: #EA580C;
+  --color-orange-700: #C2410C;
+
+  --color-amber-50: #FFFBEB;
+  --color-amber-100: #FEF3C7;
+  --color-amber-200: #FDE68A;
+  --color-amber-500: #F59E0B;
+  --color-amber-600: #D97706;
+  --color-amber-700: #B45309;
+  --color-warning: var(--color-amber-600);
+  --color-warning-bg: var(--color-amber-50);
+  --color-warning-border: var(--color-amber-200);
+  --color-warning-text: var(--color-amber-700);
+
+  /* Purple (Accent / Special) */
+  --color-purple-50: #FAF5FF;
+  --color-purple-100: #F3E8FF;
+  --color-purple-200: #E9D5FF;
+  --color-purple-500: #A855F7;
+  --color-purple-600: #9333EA;
+  --color-purple-700: #7E22CE;
+  --color-purple: var(--color-purple-600);
+  --color-purple-bg: var(--color-purple-50);
+  --color-purple-border: var(--color-purple-200);
+  --color-purple-text: var(--color-purple-700);
+
+  /* ==========================================================================
+     06 Concentric Nested Corner Radius System (Multiples of 8 / 4)
+     Rule: Outer 32px -> Card 16px -> Input/Button 8px -> Inner Tag 4px
+     ========================================================================== */
+  --radius-xs: 4px;       /* Micro tags, inner check indicators (inside 8px) */
+  --radius-sm: 8px;       /* Controls: Inputs, Buttons, Inner Tiles (inside 16px) */
+  --radius-md: 16px;      /* Outer Cards, Sections (inside 32px/24px) */
+  --radius-lg: 24px;      /* Dialogs, Modals, Large Cards */
+  --radius-xl: 32px;      /* Major Screen Sheets / Bottom Sheets */
+  --radius-full: 9999px;  /* Pills, Capsules, Circular Avatars */
+
+  /* Aliases mapped to concentric system */
+  --md-shape-xs: var(--radius-xs);
+  --md-shape-sm: var(--radius-sm);
+  --md-shape-md: var(--radius-md);
+  --md-shape-lg: var(--radius-lg);
+  --md-shape-xl: var(--radius-xl);
+  --md-shape-full: var(--radius-full);
+
+  /* ==========================================================================
+     07 Material Design 3 Elevations & States
+     ========================================================================== */
+  --md-elevation-0: none;
+  --md-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.10), 0px 1px 2px 0px rgba(0, 0, 0, 0.18);
+  --md-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.10), 0px 1px 2px 0px rgba(0, 0, 0, 0.18);
+  --md-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.10), 0px 1px 3px 0px rgba(0, 0, 0, 0.18);
+  --md-elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.10), 0px 2px 3px 0px rgba(0, 0, 0, 0.18);
+  --md-elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.10), 0px 4px 4px 0px rgba(0, 0, 0, 0.18);
+
+  /* Typography: Montserrat */
+  --font-sans: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, monospace;
+
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Explicit Placeholder Styling Across All Browsers */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-placeholder) !important; /* #CBD5E1 / Slate-300 */
+  opacity: 1 !important;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: var(--color-text-placeholder) !important;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: var(--color-text-placeholder) !important;
+}
+
+/* Base Form & Interactive Elements */
+input, textarea, select {
+  font-family: inherit;
+  color: var(--text-primary);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm); /* 8px inner control */
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(9, 178, 255, 0.16);
+}
+
+input:disabled, textarea:disabled, select:disabled {
+  background-color: var(--color-disabled-bg) !important;
+  color: var(--color-disabled-text) !important;
+  border-color: var(--color-disabled-border) !important;
+  cursor: not-allowed;
+}
+
+/* Material Ripple Effect Base */
+.md-ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.md-ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: md-ripple-animation 600ms linear;
+  background-color: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+}
+
+@keyframes md-ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   08 Standard & Subtle UI/Chart Animation Keyframes
+   ========================================================================== */
+
+/* Standard Gentle Fade In */
+@keyframes chartFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle Bar Growth */
+@keyframes barGrowVertical {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes barGrowHorizontal {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* Subtle Line Draw & Area Fade */
+@keyframes lineDrawPath {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 400;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes areaFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes dotFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Vertical Bar Grow Animation */
+@keyframes barGrowUp {
+  0% {
+    transform: scaleY(0);
+    opacity: 0.2;
+  }
+  70% {
+    transform: scaleY(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.animate-bar-grow {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: barGrowUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-line-draw {
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: lineDrawPath 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-area-fade {
+  animation: areaFadeIn 1.2s ease-out forwards;
+}
+
+.animate-dot-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: dotFadeIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Bottom Sheet Slide Up */
+@keyframes bottomSheetSlideUp {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+

@@ -1,0 +1,52 @@
+<svg width="400" height="240" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main Header Gradient -->
+    <linearGradient id="profileHeaderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#053079" />
+      <stop offset="50%" stop-color="#0344A8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <!-- Top-Right Cyan Glow -->
+    <radialGradient id="auroraGlowTopRight" cx="100%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#09B2FF" stop-opacity="0.38" />
+      <stop offset="70%" stop-color="#09B2FF" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Bottom-Left Sky Glow -->
+    <radialGradient id="auroraGlowBottomLeft" cx="0%" cy="100%" r="50%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.25" />
+      <stop offset="70%" stop-color="#053079" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Blur Filter -->
+    <filter id="softBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" />
+    </filter>
+
+    <!-- Clip Path for Rounded Bottom Corners (Radius 28px) -->
+    <clipPath id="headerClip">
+      <rect x="0" y="0" width="400" height="240" rx="0" ry="0" />
+    </clipPath>
+  </defs>
+
+  <!-- Background Base with Rounded Bottom -->
+  <path d="M0 0 H400 V212 C400 227.464 387.464 240 372 240 H28 C12.536 240 0 227.464 0 212 Z" fill="url(#profileHeaderGradient)" />
+
+  <!-- Ambient Aurora Glow Orbs -->
+  <rect x="180" y="-40" width="260" height="240" fill="url(#auroraGlowTopRight)" filter="url(#softBlur)" />
+  <rect x="-40" y="80" width="220" height="200" fill="url(#auroraGlowBottomLeft)" filter="url(#softBlur)" />
+
+  <!-- Stepped Concentric Circles Anchored at Top-Right Corner (400, 0) -->
+  <g id="concentric-stepped-circles">
+    <circle cx="400" cy="0" r="350" fill="#09B2FF" fill-opacity="0.05" />
+    <circle cx="400" cy="0" r="280" fill="#09B2FF" fill-opacity="0.09" />
+    <circle cx="400" cy="0" r="215" fill="#09B2FF" fill-opacity="0.15" />
+    <circle cx="400" cy="0" r="160" fill="#09B2FF" fill-opacity="0.22" />
+    <circle cx="400" cy="0" r="115" fill="#09B2FF" fill-opacity="0.32" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="1" />
+    <circle cx="400" cy="0" r="78" fill="#FFFFFF" fill-opacity="0.25" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="1" />
+    <circle cx="400" cy="0" r="48" fill="#FFFFFF" fill-opacity="0.45" stroke="#FFFFFF" stroke-opacity="0.40" stroke-width="1" />
+    <circle cx="400" cy="0" r="26" fill="#FFFFFF" fill-opacity="0.70" />
+    <circle cx="400" cy="0" r="12" fill="#FFFFFF" fill-opacity="0.95" />
+  </g>
+</svg>

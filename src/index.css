@@ -1,0 +1,13 @@
+@import './styles/theme.css';
+
+input::placeholder {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #94A3B8;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: none;
+}
