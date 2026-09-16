@@ -204,9 +204,9 @@ export const TENANT_DASHBOARD_MENU_ITEMS = [
     category: 'Security',
   },
   {
-    id: 'votings',
-    title: 'Votings',
-    icon: votingsImg,
+    id: 'tenant-unit',
+    title: 'Tenant\nUnit',
+    icon: tenantUnitImg,
     category: 'Resident',
   },
   {

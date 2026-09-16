@@ -49,6 +49,7 @@ function App() {
   const [unitFloorFilter, setUnitFloorFilter] = useState('ALL');
   const [isUnitFilterModalOpen, setIsUnitFilterModalOpen] = useState(false);
   const [unitDetailTab, setUnitDetailTab] = useState('unit-info');
+  const [selectedTenantUnits, setSelectedTenantUnits] = useState(null);
 
   const [financialPeriod, setFinancialPeriod] = useState('This month');
   const [isFinancialPickerOpen, setIsFinancialPickerOpen] = useState(false);
@@ -212,8 +213,10 @@ function App() {
 
       {currentScreen === 'tenant-unit' && (
         <TenantUnitView
-          onSelectTower={(tower) => {
+          user={userSession}
+          onSelectTower={(tower, tenantUnits) => {
             setSelectedTower(tower);
+            setSelectedTenantUnits(tenantUnits || null);
             setUnitSearchQuery('');
             setUnitStatusFilter('ALL');
             setUnitFloorFilter('ALL');
@@ -226,6 +229,7 @@ function App() {
       {currentScreen === 'unit-tower' && (
         <UnitTowerView
           tower={selectedTower}
+          tenantUnits={selectedTenantUnits}
           searchQuery={unitSearchQuery}
           statusFilter={unitStatusFilter}
           setStatusFilter={setUnitStatusFilter}

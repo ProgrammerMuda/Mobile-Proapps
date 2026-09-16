@@ -237,6 +237,7 @@ export const getTowerUnitsData = (towerCode = 'A') => {
  */
 export const UnitTowerView = ({
   tower = { name: 'Tower A', id: 'tower-a' },
+  tenantUnits = null,
   searchQuery: controlledSearchQuery,
   statusFilter: controlledStatusFilter,
   setStatusFilter: controlledSetStatusFilter,
@@ -261,9 +262,11 @@ export const UnitTowerView = ({
   const setIsFilterModalOpen = controlledSetIsFilterModalOpen || setInternalIsFilterModalOpen;
 
   const towerUnits = useMemo(() => {
+    // If tenantUnits provided (tenant role), use those directly
+    if (tenantUnits && tenantUnits.length > 0) return tenantUnits;
     const code = tower?.name ? tower.name.replace('Tower', '').trim() : 'A';
     return getTowerUnitsData(code);
-  }, [tower]);
+  }, [tower, tenantUnits]);
 
   // Distinct floors list (1 to 20)
   const availableFloors = useMemo(() => {

@@ -77,8 +77,28 @@ export const TenantUnitHeader = ({ onBack }) => {
  * Tenant Unit Main View (BM Exclusive)
  * Renders Site summary card and Tower Cards matching the exact specification.
  */
-export const TenantUnitView = ({ onSelectTower }) => {
+export const TenantUnitView = ({ onSelectTower, user }) => {
   const { t } = useLanguage();
+
+  const isTenant = user?.roleCode === 'TENANT';
+
+  // Mock: Budi Santoso's units (5 in Tower A, 3 in Tower C, 1 in Tower D)
+  const TENANT_UNITS_MOCK = [
+    // Tower A (5 units)
+    { towerId: 'tower-a', towerName: 'Tower A', unitNo: 'A0101', floor: '1', ownerName: 'Budi Santoso', residentType: 'Owner', residentName: 'Budi Santoso', status: 'Occupied' },
+    { towerId: 'tower-a', towerName: 'Tower A', unitNo: 'A0205', floor: '2', ownerName: 'Budi Santoso', residentType: 'Renter', residentName: 'Hendra Wijaya', status: 'Occupied' },
+    { towerId: 'tower-a', towerName: 'Tower A', unitNo: 'A0512', floor: '5', ownerName: 'Budi Santoso', residentType: 'Owner', residentName: 'Budi Santoso', status: 'Occupied' },
+    { towerId: 'tower-a', towerName: 'Tower A', unitNo: 'A0808', floor: '8', ownerName: 'Budi Santoso', residentType: 'Renter', residentName: 'Siti Rahma', status: 'Occupied' },
+    { towerId: 'tower-a', towerName: 'Tower A', unitNo: 'A1002', floor: '10', ownerName: 'Budi Santoso', residentType: 'Vacant', residentName: '-', status: 'Vacant' },
+
+    // Tower C (3 units)
+    { towerId: 'tower-c', towerName: 'Tower C', unitNo: 'C0301', floor: '3', ownerName: 'Budi Santoso', residentType: 'Renter', residentName: 'Rina Haryanto', status: 'Occupied' },
+    { towerId: 'tower-c', towerName: 'Tower C', unitNo: 'C0705', floor: '7', ownerName: 'Budi Santoso', residentType: 'Renter', residentName: 'Dewi Lestari', status: 'Occupied' },
+    { towerId: 'tower-c', towerName: 'Tower C', unitNo: 'C1208', floor: '12', ownerName: 'Budi Santoso', residentType: 'Vacant', residentName: '-', status: 'Vacant' },
+
+    // Tower D (1 unit)
+    { towerId: 'tower-d', towerName: 'Tower D', unitNo: 'D1203', floor: '12', ownerName: 'Budi Santoso', residentType: 'Owner', residentName: 'Budi Santoso', status: 'Occupied' },
+  ];
 
   const towersData = [
     {
@@ -133,15 +153,64 @@ export const TenantUnitView = ({ onSelectTower }) => {
     },
   ];
 
-  // Aggregated Site Totals
+  // Tenant calculations
+  const tenantTotalUnits = TENANT_UNITS_MOCK.length;
+  const tenantOwnerUnits = TENANT_UNITS_MOCK.filter((u) => u.residentType === 'Owner').length;
+  const tenantRenterUnits = TENANT_UNITS_MOCK.filter((u) => u.residentType === 'Renter').length;
+  const tenantVacantUnits = TENANT_UNITS_MOCK.filter((u) => u.status === 'Vacant' || u.residentType === 'Vacant').length;
+  const tenantOccupiedUnits = tenantTotalUnits - tenantVacantUnits;
+  const tenantOccupiedPct = tenantTotalUnits > 0 ? Math.round((tenantOccupiedUnits / tenantTotalUnits) * 100) : 0;
+  const tenantOwnerPct = tenantTotalUnits > 0 ? (tenantOwnerUnits / tenantTotalUnits) * 100 : 0;
+  const tenantRenterPct = tenantTotalUnits > 0 ? (tenantRenterUnits / tenantTotalUnits) * 100 : 0;
+
+  // Site totals for BM
   const siteTotalUnits = 596;
   const siteOccupiedUnits = 477;
   const siteVacantUnits = 119;
   const siteOccupiedPct = 80;
+  const siteOwnerPct = 45.6;
+  const siteRenterPct = 34.4;
+
+  // Resolved values for Top Hero Card
+  const heroTotalUnits = isTenant ? tenantTotalUnits : siteTotalUnits;
+  const heroOccupiedUnits = isTenant ? tenantOccupiedUnits : siteOccupiedUnits;
+  const heroVacantUnits = isTenant ? tenantVacantUnits : siteVacantUnits;
+  const heroOccupiedPct = isTenant ? tenantOccupiedPct : siteOccupiedPct;
+  const heroOwnerPct = isTenant ? tenantOwnerPct : siteOwnerPct;
+  const heroRenterPct = isTenant ? tenantRenterPct : siteRenterPct;
+
+  // For tenant: only show towers where they have units, with stats based ONLY on their own units
+  const visibleTowers = isTenant
+    ? towersData
+        .filter((t) => TENANT_UNITS_MOCK.some((u) => u.towerId === t.id))
+        .map((t) => {
+          const myUnits = TENANT_UNITS_MOCK.filter((u) => u.towerId === t.id);
+          const myTotal = myUnits.length;
+          const myOwner = myUnits.filter((u) => u.residentType === 'Owner').length;
+          const myRenter = myUnits.filter((u) => u.residentType === 'Renter').length;
+          const myVacant = myUnits.filter((u) => u.status === 'Vacant' || u.residentType === 'Vacant').length;
+          const myOccupied = myTotal - myVacant;
+          const myOccupiedPct = myTotal > 0 ? Math.round((myOccupied / myTotal) * 100) : 0;
+
+          return {
+            ...t,
+            totalUnits: myTotal,
+            occupiedUnits: myOccupied,
+            occupiedPct: myOccupiedPct,
+            ownerUnits: myOwner,
+            renterUnits: myRenter,
+            vacantUnits: myVacant,
+          };
+        })
+    : towersData;
 
   const handleTowerClick = (tower) => {
     if (onSelectTower) {
-      onSelectTower(tower);
+      // For tenant: pass only their units in that tower
+      const tenantUnits = isTenant
+        ? TENANT_UNITS_MOCK.filter((u) => u.towerId === tower.id)
+        : null;
+      onSelectTower(tower, tenantUnits);
     } else {
       alert(t('tenantUnit.viewingUnitsAlert', { tower: tower.name }));
     }
@@ -160,7 +229,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
         userSelect: 'none',
       }}
     >
-      {/* 1. Top Hero Card: Apartemen Paladian Park Site Summary */}
+      {/* 1. Top Hero Card: Site Summary / Tenant Portfolio Summary */}
       <div
         style={{
           background: 'linear-gradient(135deg, #053079 0%, #0344A8 55%, #0284C7 100%)',
@@ -204,7 +273,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
                 }}
               >
                 <Buildings size={12} weight="fill" />
-                <span>{t('tenantUnit.site')}</span>
+                <span>{isTenant ? t('tenantUnit.myPortfolio') : t('tenantUnit.site')}</span>
               </div>
 
               <div
@@ -221,7 +290,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
                   color: '#FFFFFF',
                 }}
               >
-                <span>{t('tenantUnit.towersCount', { count: towersData.length })}</span>
+                <span>{t('tenantUnit.towersCount', { count: visibleTowers.length })}</span>
               </div>
             </div>
             <h2
@@ -263,7 +332,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
                 flexShrink: 0,
               }}
             />
-            <span>{t('tenantUnit.occupiedPct', { pct: siteOccupiedPct })}</span>
+            <span>{t('tenantUnit.occupiedPct', { pct: heroOccupiedPct })}</span>
           </div>
         </div>
 
@@ -281,7 +350,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
           >
             <span>{t('tenantUnit.occupancyRate')}</span>
             <span style={{ fontWeight: 700 }}>
-              {siteOccupiedUnits} / {siteTotalUnits} {t('tenantUnit.unitsLabel')}
+              {heroOccupiedUnits} / {heroTotalUnits} {t('tenantUnit.unitsLabel')}
             </span>
           </div>
 
@@ -296,18 +365,18 @@ export const TenantUnitView = ({ onSelectTower }) => {
               display: 'flex',
             }}
           >
-            {/* Owner Segment (Green) - 272/596 -> 45.6% */}
+            {/* Owner Segment (Green) */}
             <div
               style={{
-                width: '45.6%',
+                width: `${heroOwnerPct}%`,
                 height: '100%',
                 backgroundColor: '#10B981',
               }}
             />
-            {/* Renter Segment (Cyan) - 205/596 -> 34.4% */}
+            {/* Renter Segment (Cyan) */}
             <div
               style={{
-                width: '34.4%',
+                width: `${heroRenterPct}%`,
                 height: '100%',
                 backgroundColor: '#38BDF8',
               }}
@@ -345,7 +414,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
                 letterSpacing: '-0.3px',
               }}
             >
-              {siteTotalUnits}
+              {heroTotalUnits}
             </div>
             <div
               style={{
@@ -379,7 +448,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
                 letterSpacing: '-0.3px',
               }}
             >
-              {siteOccupiedUnits}
+              {heroOccupiedUnits}
             </div>
             <div
               style={{
@@ -413,7 +482,7 @@ export const TenantUnitView = ({ onSelectTower }) => {
                 letterSpacing: '-0.3px',
               }}
             >
-              {siteVacantUnits}
+              {heroVacantUnits}
             </div>
             <div
               style={{
@@ -446,9 +515,9 @@ export const TenantUnitView = ({ onSelectTower }) => {
 
       {/* 3. Tower Cards List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        {towersData.map((tower) => {
-          const ownerPct = (tower.ownerUnits / tower.totalUnits) * 100;
-          const renterPct = (tower.renterUnits / tower.totalUnits) * 100;
+        {visibleTowers.map((tower) => {
+          const ownerPct = tower.totalUnits > 0 ? (tower.ownerUnits / tower.totalUnits) * 100 : 0;
+          const renterPct = tower.totalUnits > 0 ? (tower.renterUnits / tower.totalUnits) * 100 : 0;
 
           return (
             <div
@@ -511,7 +580,9 @@ export const TenantUnitView = ({ onSelectTower }) => {
                         fontWeight: 400,
                       }}
                     >
-                      {t('tenantUnit.totalUnitsSubtitle', { count: tower.totalUnits })}
+                      {isTenant
+                        ? t('tenantUnit.myUnitsSubtitle', { count: tower.totalUnits })
+                        : t('tenantUnit.totalUnitsSubtitle', { count: tower.totalUnits })}
                     </span>
                   </div>
                 </div>

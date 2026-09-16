@@ -128,9 +128,10 @@ export const translations = {
     'overview.unitAlert': 'Viewing Tenant Unit details',
     'overview.packageAlert': 'Viewing Package details',
 
-    // Tenant Unit View (BM)
+    // Tenant Unit View (BM & Tenant)
     'tenantUnit.title': 'Tenant Unit',
     'tenantUnit.site': 'Site',
+    'tenantUnit.myPortfolio': 'My Units',
     'tenantUnit.siteName': 'Apartemen Paladian Park',
     'tenantUnit.occupiedPct': '{pct}% Occupied',
     'tenantUnit.totalUnits': 'Total Units',
@@ -139,6 +140,7 @@ export const translations = {
     'tenantUnit.towerList': 'Tower List',
     'tenantUnit.towersCount': '{count} Towers',
     'tenantUnit.totalUnitsSubtitle': '{count} Total Units',
+    'tenantUnit.myUnitsSubtitle': '{count} Unit',
     'tenantUnit.occupancyRate': 'Occupancy Rate',
     'tenantUnit.unitsOccupied': '/ {total} Units Occupied',
     'tenantUnit.owner': 'Owner',
@@ -458,9 +460,10 @@ export const translations = {
     'overview.unitAlert': 'Melihat Detail Unit Penghuni',
     'overview.packageAlert': 'Melihat Detail Paket',
 
-    // Tenant Unit View (BM)
+    // Tenant Unit View (BM & Tenant)
     'tenantUnit.title': 'Tenant Unit',
     'tenantUnit.site': 'Site',
+    'tenantUnit.myPortfolio': 'Unit Saya',
     'tenantUnit.siteName': 'Apartemen Paladian Park',
     'tenantUnit.occupiedPct': '{pct}% Terisi',
     'tenantUnit.totalUnits': 'Total Unit',
@@ -469,6 +472,7 @@ export const translations = {
     'tenantUnit.towerList': 'Daftar Tower',
     'tenantUnit.towersCount': '{count} Tower',
     'tenantUnit.totalUnitsSubtitle': '{count} Total Unit',
+    'tenantUnit.myUnitsSubtitle': '{count} Unit',
     'tenantUnit.occupancyRate': 'Tingkat Hunian',
     'tenantUnit.unitsOccupied': '/ {total} Unit Terisi',
     'tenantUnit.owner': 'Pemilik',
