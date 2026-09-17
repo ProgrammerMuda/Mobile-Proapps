@@ -81,6 +81,9 @@ export const OverviewHeader = () => {
 export const OverviewReportView = ({ user, onNavigateDetails }) => {
   const { t } = useLanguage();
   const isTenant = user?.roleCode === 'TENANT';
+  const isEngineering = user?.roleCode === 'ENG';
+  const isHousekeeping = user?.roleCode === 'HK';
+  const isSecurity = user?.roleCode === 'SEC';
   const [utilityPeriod, setUtilityPeriod] = useState('Jul 2026');
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [tempYear, setTempYear] = useState(2026);
@@ -107,6 +110,23 @@ export const OverviewReportView = ({ user, onNavigateDetails }) => {
       alert(t('overview.detailsAlert', { section }));
     }
   };
+
+  // If user is Engineering, Housekeeping, or Security, render empty overview container
+  if (isEngineering || isHousekeeping || isSecurity) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: '100%',
+          backgroundColor: '#F8FAFC',
+          fontFamily: 'var(--font-sans)',
+          boxSizing: 'border-box',
+          userSelect: 'none',
+        }}
+      />
+    );
+  }
 
   // If user is Tenant, render Tenant Overview Report matching design
   if (isTenant) {

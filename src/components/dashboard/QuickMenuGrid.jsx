@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../../context/LanguageContext';
-import { X, MagnifyingGlass, FunnelSimple } from '@phosphor-icons/react';
+import { X, MagnifyingGlass, FunnelSimple, Wrench } from '@phosphor-icons/react';
 
 // Import 3D Icons
 import billingPaymentImg from '../../assets/menu-icons/billing-payment-3d.png';
@@ -298,14 +298,140 @@ export const TENANT_CATEGORIZED_FEATURES = [
   },
 ];
 
+// 6 Items for Engineering Dashboard:
+// Work Attendance, Work Order, Scan Meter, Inspection, Asset Management, Incidental Report
+export const ENGINEERING_DASHBOARD_MENU_ITEMS = [
+  {
+    id: 'attendance',
+    title: 'Work\nAttendance',
+    icon: attendanceImg,
+    category: 'Operations',
+  },
+  {
+    id: 'work-order',
+    title: 'Work\nOrder',
+    icon: workOrderImg,
+    category: 'Operations',
+  },
+  {
+    id: 'scan-meter',
+    title: 'Scan\nMeter',
+    icon: scanMeterImg,
+    category: 'Operations',
+  },
+  {
+    id: 'inspection',
+    title: 'Inspection',
+    icon: inspectionImg,
+    category: 'Operations',
+  },
+  {
+    id: 'asset',
+    title: 'Asset\nManagement',
+    icon: assetImg,
+    category: 'Operations',
+  },
+  {
+    id: 'incident-report',
+    title: 'Incidental\nReport',
+    icon: incidentReportImg,
+    category: 'Operations',
+  },
+];
+
+// Categorized Full Features for Engineering "All Menu" Bottom Sheet
+export const ENGINEERING_CATEGORIZED_FEATURES = [
+  {
+    id: 'operations-management',
+    name: 'Operations & Engineering Management',
+    items: [
+      { id: 'attendance', title: 'Work\nAttendance', icon: attendanceImg, desc: 'Staff shift clock-in & attendance tracking' },
+      { id: 'work-order', title: 'Work\nOrder', icon: workOrderImg, desc: 'Technician tasks & internal work orders' },
+      { id: 'scan-meter', title: 'Scan\nMeter', icon: scanMeterImg, desc: 'Utility meter barcode scanning & OCR' },
+      { id: 'inspection', title: 'Inspection', icon: inspectionImg, desc: 'Routine facility & building checks' },
+      { id: 'asset', title: 'Asset\nManagement', icon: assetImg, desc: 'Building asset management & tagging' },
+      { id: 'incident-report', title: 'Incidental\nReport', icon: incidentReportImg, desc: 'Emergency reports & incident logging' },
+    ],
+  },
+];
+
+// 5 Items for Housekeeping Dashboard:
+// Work Attendance, Work Order, Inspection, Asset Management, Incidental Report
+export const HOUSEKEEPING_DASHBOARD_MENU_ITEMS = [
+  {
+    id: 'attendance',
+    title: 'Work\nAttendance',
+    icon: attendanceImg,
+    category: 'Operations',
+  },
+  {
+    id: 'work-order',
+    title: 'Work\nOrder',
+    icon: workOrderImg,
+    category: 'Operations',
+  },
+  {
+    id: 'inspection',
+    title: 'Inspection',
+    icon: inspectionImg,
+    category: 'Operations',
+  },
+  {
+    id: 'asset',
+    title: 'Asset\nManagement',
+    icon: assetImg,
+    category: 'Operations',
+  },
+  {
+    id: 'incident-report',
+    title: 'Incidental\nReport',
+    icon: incidentReportImg,
+    category: 'Operations',
+  },
+];
+
+// Categorized Full Features for Housekeeping "All Menu" Bottom Sheet
+export const HOUSEKEEPING_CATEGORIZED_FEATURES = [
+  {
+    id: 'operations-management',
+    name: 'Operations & Housekeeping Management',
+    items: [
+      { id: 'attendance', title: 'Work\nAttendance', icon: attendanceImg, desc: 'Staff shift clock-in & attendance tracking' },
+      { id: 'work-order', title: 'Work\nOrder', icon: workOrderImg, desc: 'Cleaning tasks & internal work orders' },
+      { id: 'inspection', title: 'Inspection', icon: inspectionImg, desc: 'Routine cleanliness & area checks' },
+      { id: 'asset', title: 'Asset\nManagement', icon: assetImg, desc: 'Housekeeping asset management & inventory' },
+      { id: 'incident-report', title: 'Incidental\nReport', icon: incidentReportImg, desc: 'Emergency reports & incident logging' },
+    ],
+  },
+];
+
 export const CATEGORIZED_FEATURES = BM_CATEGORIZED_FEATURES;
 
-export const QuickMenuGrid = ({ onMenuItemClick, isTenant = false }) => {
+export const QuickMenuGrid = ({ onMenuItemClick, isTenant = false, isEngineering = false, isHousekeeping = false, isSecurity = false, roleCode }) => {
   const { t } = useLanguage();
   const [isAllMenuOpen, setIsAllMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const currentMenuItems = isTenant ? TENANT_DASHBOARD_MENU_ITEMS : BM_DASHBOARD_MENU_ITEMS;
-  const currentCategories = isTenant ? TENANT_CATEGORIZED_FEATURES : BM_CATEGORIZED_FEATURES;
+
+  const effectiveIsEng = isEngineering || roleCode === 'ENG';
+  const effectiveIsHk = isHousekeeping || roleCode === 'HK';
+  const effectiveIsSec = isSecurity || roleCode === 'SEC';
+
+  let currentMenuItems = BM_DASHBOARD_MENU_ITEMS;
+  let currentCategories = BM_CATEGORIZED_FEATURES;
+
+  if (effectiveIsSec) {
+    currentMenuItems = [];
+    currentCategories = [];
+  } else if (effectiveIsHk) {
+    currentMenuItems = HOUSEKEEPING_DASHBOARD_MENU_ITEMS;
+    currentCategories = HOUSEKEEPING_CATEGORIZED_FEATURES;
+  } else if (effectiveIsEng) {
+    currentMenuItems = ENGINEERING_DASHBOARD_MENU_ITEMS;
+    currentCategories = ENGINEERING_CATEGORIZED_FEATURES;
+  } else if (isTenant) {
+    currentMenuItems = TENANT_DASHBOARD_MENU_ITEMS;
+    currentCategories = TENANT_CATEGORIZED_FEATURES;
+  }
 
   const handleClick = (item) => {
     if (item.isLauncher) {
@@ -341,87 +467,147 @@ export const QuickMenuGrid = ({ onMenuItemClick, isTenant = false }) => {
 
   return (
     <>
-      {/* 3-Row × 4-Column Grid on Dashboard */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '10px',
-          width: '100%',
-          boxSizing: 'border-box',
-        }}
-        className="quick-menu-grid"
-      >
-        {currentMenuItems.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => handleClick(item)}
-            className="quick-menu-card"
+      {/* 3-Row × 4-Column Grid on Dashboard or Clean Empty State for Engineering */}
+      {currentMenuItems.length === 0 ? (
+        <div
+          style={{
+            backgroundColor: '#F8FAFC',
+            border: '1px dashed #CBD5E1',
+            borderRadius: '16px',
+            padding: '32px 16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            gap: '12px',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div
             style={{
-              backgroundColor: '#F8FAFC',
-              borderRadius: '16px',
-              border: '1px solid #F1F5F9',
-              padding: '10px 4px 10px 4px',
+              width: '52px',
+              height: '52px',
+              borderRadius: '50%',
+              backgroundColor: '#EAF7FF',
+              border: '1px solid #BAE6FD',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'flex-start',
-              gap: '6px',
-              cursor: 'pointer',
-              transition: 'transform 0.15s ease',
-              outline: 'none',
-              userSelect: 'none',
-              minHeight: '102px',
-              boxSizing: 'border-box',
-              boxShadow: 'none',
+              justifyContent: 'center',
+              color: '#09B2FF',
+              boxShadow: '0 2px 8px rgba(9, 178, 255, 0.15)',
             }}
           >
-            {/* 3D Icon Graphic */}
-            <div
+            <Wrench size={24} weight="fill" />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <h3
               style={{
-                width: '54px',
-                height: '54px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                fontSize: '0.9375rem',
+                fontWeight: 700,
+                color: '#1E293B',
+                margin: 0,
+                letterSpacing: '-0.2px',
               }}
             >
-              <img
-                src={item.icon}
-                alt={item.title.replace('\n', ' ')}
+              {t('dashboard.noMenuTitle')}
+            </h3>
+            <p
+              style={{
+                fontSize: '0.8125rem',
+                color: '#64748B',
+                margin: 0,
+                lineHeight: 1.4,
+                maxWidth: '240px',
+              }}
+            >
+              {t('dashboard.noMenuDesc')}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '10px',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+          className="quick-menu-grid"
+        >
+          {currentMenuItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleClick(item)}
+              className="quick-menu-card"
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderRadius: '16px',
+                border: '1px solid #F1F5F9',
+                padding: '10px 4px 10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: '6px',
+                cursor: 'pointer',
+                transition: 'transform 0.15s ease',
+                outline: 'none',
+                userSelect: 'none',
+                minHeight: '102px',
+                boxSizing: 'border-box',
+                boxShadow: 'none',
+              }}
+            >
+              {/* 3D Icon Graphic */}
+              <div
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.07))',
+                  width: '54px',
+                  height: '54px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
                 }}
-              />
-            </div>
+              >
+                <img
+                  src={item.icon}
+                  alt={item.title.replace('\n', ' ')}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.07))',
+                  }}
+                />
+              </div>
 
-            {/* Label (2 lines allowed, centered) */}
-            <span
-              style={{
-                fontSize: '0.6875rem',
-                fontWeight: 600,
-                color: '#334155',
-                textAlign: 'center',
-                lineHeight: 1.18,
-                whiteSpace: 'pre-line',
-                fontFamily: 'var(--font-sans)',
-                letterSpacing: '-0.15px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '26px',
-              }}
-            >
-              {getLocalizedTitle(item.id, item.title, t)}
-            </span>
-          </button>
-        ))}
-      </div>
+              {/* Label (2 lines allowed, centered) */}
+              <span
+                style={{
+                  fontSize: '0.6875rem',
+                  fontWeight: 600,
+                  color: '#334155',
+                  textAlign: 'center',
+                  lineHeight: 1.18,
+                  whiteSpace: 'pre-line',
+                  fontFamily: 'var(--font-sans)',
+                  letterSpacing: '-0.15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '26px',
+                }}
+              >
+                {getLocalizedTitle(item.id, item.title, t)}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Modern Organized All Menu Bottom Sheet (Portal to Android Device Frame) */}
       {isAllMenuOpen && (

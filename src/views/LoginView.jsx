@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { MaterialButton } from '../components/common/MaterialButton';
-import { LogoHeader } from '../components/common/Logo';
 import { findAccount } from '../models/accounts';
+import loginHeaderBgImg from '../assets/login-header-bg.jpg';
+import logoHeaderPillImg from '../assets/logo-header-pill.png';
 import {
   Eye,
   EyeSlash,
@@ -38,18 +39,6 @@ export const LoginView = ({ onLoginSuccess, onForgotPassword }) => {
     }
   };
 
-  const getRoleIcon = (code) => {
-    switch (code) {
-      case 'BM': return Buildings;
-      case 'TR': return Users;
-      case 'TENANT': return House;
-      case 'ENG': return Wrench;
-      case 'HK': return Broom;
-      case 'SEC': return ShieldCheck;
-      default: return Users;
-    }
-  };
-
   return (
     <div
       style={{
@@ -61,64 +50,62 @@ export const LoginView = ({ onLoginSuccess, onForgotPassword }) => {
         userSelect: 'none',
       }}
     >
-      {/* Top Blue Header with Starry Sky & Balanced Logo Pill */}
+      {/* Top Skyline Image Header with Centered Logo */}
       <div
         className="login-header-container"
         style={{
           position: 'relative',
-          minHeight: '230px',
-          padding: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height: '245px',
+          width: '100%',
           overflow: 'hidden',
-          background: 'linear-gradient(180deg, #02388A 0%, #0352BC 55%, #09B2FF 100%)',
+          backgroundColor: '#02388A',
           zIndex: 10,
           boxSizing: 'border-box',
         }}
       >
-        {/* Subtle Background Grid Overlay */}
+        <img
+          src={loginHeaderBgImg}
+          alt="Login Skyline Header"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center bottom',
+            display: 'block',
+          }}
+        />
+
+        {/* Soft Vignette Overlay */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `
-              linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-            `,
-            backgroundSize: '24px 24px',
-            opacity: 0.7,
-            pointerEvents: 'none',
+            background: 'linear-gradient(180deg, rgba(2, 56, 138, 0) 0%, rgba(2, 56, 138, 0.08) 55%, rgba(2, 56, 138, 0.7) 100%)',
           }}
         />
 
-        {/* Subtle Starry Sparkles */}
-        <div className="star star-1" style={{ top: '15%', left: '15%' }} />
-        <div className="star star-2" style={{ top: '22%', right: '18%' }} />
-        <div className="star star-3" style={{ top: '38%', left: '12%' }} />
-        <div className="star star-4" style={{ top: '65%', right: '14%' }} />
-        <div className="star star-5" style={{ top: '18%', right: '42%' }} />
-        <div className="star star-6" style={{ top: '55%', left: '26%' }} />
-        <div className="star star-7" style={{ top: '32%', right: '28%' }} />
-
-        {/* Hugged Pill Badge with the horizontal header logo */}
+        {/* Top Centered Logo Pill */}
         <div
           style={{
-            display: 'inline-flex',
+            position: 'absolute',
+            top: '80px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 20,
+            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 'fit-content',
-            height: 'fit-content',
-            padding: '6px 18px',
-            borderRadius: 'var(--radius-full)',
-            backgroundColor: '#FFFFFF',
-            boxShadow: '0 10px 24px -2px rgba(0, 0, 0, 0.24), 0 4px 8px -1px rgba(0, 0, 0, 0.12)',
-            zIndex: 15,
-            transform: 'translateY(-10px)',
           }}
         >
-          <LogoHeader width={138} style={{ display: 'block' }} />
+          <img
+            src={logoHeaderPillImg}
+            alt="PROAPPS"
+            style={{
+              width: '148px',
+              height: 'auto',
+              display: 'block',
+            }}
+          />
         </div>
       </div>
 
@@ -134,7 +121,7 @@ export const LoginView = ({ onLoginSuccess, onForgotPassword }) => {
           flexDirection: 'column',
           justifyContent: 'space-between',
           gap: '16px',
-          boxShadow: '0 -10px 30px rgba(0, 0, 0, 0.12)',
+          boxShadow: 'none',
           marginTop: '-44px',
           position: 'relative',
           zIndex: 20,
@@ -166,8 +153,6 @@ export const LoginView = ({ onLoginSuccess, onForgotPassword }) => {
               Enter your credentials to log in
             </p>
           </div>
-
-
 
           {/* Error Message Alert Banner */}
           {errorMessage && (
@@ -363,21 +348,6 @@ export const LoginView = ({ onLoginSuccess, onForgotPassword }) => {
           20%, 60% { transform: translateX(-4px); }
           40%, 80% { transform: translateX(4px); }
         }
-
-        .star {
-          position: absolute;
-          background-color: #FFFFFF;
-          border-radius: 50%;
-          pointer-events: none;
-          opacity: 0.75;
-        }
-        .star-1 { width: 3px; height: 3px; opacity: 0.9; }
-        .star-2 { width: 2px; height: 2px; opacity: 0.7; }
-        .star-3 { width: 2.5px; height: 2.5px; opacity: 0.85; }
-        .star-4 { width: 2px; height: 2px; opacity: 0.6; }
-        .star-5 { width: 3px; height: 3px; opacity: 0.8; }
-        .star-6 { width: 1.5px; height: 1.5px; opacity: 0.75; }
-        .star-7 { width: 2px; height: 2px; opacity: 0.7; }
       `}</style>
     </div>
   );

@@ -72,7 +72,11 @@ function App() {
     setCurrentScreen('login');
   };
 
-  const handleSwitchRole = () => {
+  const handleSwitchRole = (targetAccount) => {
+    if (targetAccount && targetAccount.roleCode) {
+      setUserSession(targetAccount);
+      return;
+    }
     const isTenant = userSession?.roleCode === 'TENANT';
     setUserSession({
       name: isTenant ? 'Ahmad Pratama' : 'Budi Santoso',

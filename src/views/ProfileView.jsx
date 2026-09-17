@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useLanguage } from '../context/LanguageContext';
 import avatarUserImg from '../assets/avatar-user.jpg';
 import logoutIllustrationImg from '../assets/logout-illustration.jpg';
+import { DEMO_ACCOUNTS } from '../models/accounts';
 import {
   UserCircle,
   ShieldStar,
@@ -21,6 +22,7 @@ import {
   Camera,
   MapPin,
   Buildings,
+  Wrench,
 } from '@phosphor-icons/react';
 
 /**
@@ -34,9 +36,23 @@ export const ProfileView = ({
 }) => {
   const { language, setLanguage, t } = useLanguage();
   const isTenant = user?.roleCode === 'TENANT';
+  const isEngineering = user?.roleCode === 'ENG';
+  const isHousekeeping = user?.roleCode === 'HK';
+  const isSecurity = user?.roleCode === 'SEC';
+
+  let roleBadgeLabel = t('profile.bmRole');
+  if (isTenant) {
+    roleBadgeLabel = t('profile.tenantRole');
+  } else if (isEngineering) {
+    roleBadgeLabel = t('profile.engRole');
+  } else if (isHousekeeping) {
+    roleBadgeLabel = t('profile.hkRole');
+  } else if (isSecurity) {
+    roleBadgeLabel = t('profile.secRole');
+  }
 
   // Modals & Dynamic States
-  const [activeModal, setActiveModal] = useState(null); // 'account-info' | 'account-security' | 'language' | 'app-icon' | 'device-permissions' | 'privacy-policy' | 'rate-proapps' | 'logout'
+  const [activeModal, setActiveModal] = useState(null); // 'account-info' | 'account-security' | 'switch-role' | 'language' | 'app-icon' | 'device-permissions' | 'privacy-policy' | 'rate-proapps' | 'logout'
   const [selectedAppIcon, setSelectedAppIcon] = useState('classic'); // 'classic' | 'cyan' | 'dark'
   const [starRating, setStarRating] = useState(5);
   const [ratingSubmitted, setRatingSubmitted] = useState(false);
@@ -49,9 +65,9 @@ export const ProfileView = ({
 
   // Profile data
   const [profileData, setProfileData] = useState({
-    name: user?.name || (isTenant ? 'Budi Santoso' : 'Ahmad Pratama'),
-    email: user?.email || (isTenant ? 'budi.santoso@gmail.com' : 'ahmad.pratama@proapps.id'),
-    phone: isTenant ? '+62 812-3456-7890' : '+62 811-9876-5432',
+    name: user?.name || (isTenant ? 'Budi Santoso' : (isEngineering ? 'Dedi Kurniawan' : 'Ahmad Pratama')),
+    email: user?.email || (isTenant ? 'budi.santoso@gmail.com' : (isEngineering ? 'eng@proapps.id' : 'ahmad.pratama@proapps.id')),
+    phone: isTenant ? '+62 812-3456-7890' : (isEngineering ? '+62 812-3456-704' : '+62 811-9876-5432'),
     property: 'Apartement A',
   });
 
@@ -81,6 +97,13 @@ export const ProfileView = ({
           title: t('profile.accountSecurity'),
           icon: ShieldStar,
           action: () => setActiveModal('account-security'),
+        },
+        {
+          id: 'switch-role',
+          title: t('profile.switchRole'),
+          icon: ArrowsClockwise,
+          badge: user?.roleCode || 'BM',
+          action: () => setActiveModal('switch-role'),
         },
       ],
     },
@@ -330,7 +353,7 @@ export const ProfileView = ({
                     display: 'inline-block',
                   }}
                 >
-                  {isTenant ? t('profile.tenantRole') : t('profile.bmRole')}
+                  {roleBadgeLabel}
                 </span>
               </div>
 
@@ -503,6 +526,148 @@ export const ProfileView = ({
         const modalTarget = typeof document !== 'undefined' ? document.getElementById('phone-screen-container') : null;
         const modalElement = (
           <>
+            {/* MODAL: Switch Role Demo Account */}
+            {activeModal === 'switch-role' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(15, 23, 42, 0.75)',
+                  backdropFilter: 'blur(6px)',
+                  WebkitBackdropFilter: 'blur(6px)',
+                  zIndex: 9999,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '20px',
+                  boxSizing: 'border-box',
+                }}
+                onClick={() => setActiveModal(null)}
+              >
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '24px',
+                    padding: '20px',
+                    width: '100%',
+                    maxWidth: '340px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                    position: 'relative',
+                    maxHeight: '82%',
+                    overflowY: 'auto',
+                    boxSizing: 'border-box',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <ArrowsClockwise size={20} color="#053079" weight="bold" />
+                      <h3 style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#1E293B', margin: 0 }}>
+                        {t('profile.switchRoleTitle')}
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveModal(null)}
+                      style={{
+                        background: '#F1F5F9',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '28px',
+                        height: '28px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        color: '#64748B',
+                      }}
+                    >
+                      <X size={14} weight="bold" />
+                    </button>
+                  </div>
+
+                  <p style={{ fontSize: '0.8125rem', color: '#64748B', margin: '0 0 2px 0', lineHeight: 1.35 }}>
+                    {t('profile.switchRoleDesc')}
+                  </p>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {DEMO_ACCOUNTS.map((acc) => {
+                      const isSelected = user?.roleCode === acc.roleCode;
+                      return (
+                        <button
+                          key={acc.id}
+                          type="button"
+                          onClick={() => {
+                            if (onSwitchRole) {
+                              onSwitchRole(acc);
+                            }
+                            setActiveModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px 12px',
+                            borderRadius: '12px',
+                            border: isSelected ? '1.5px solid var(--color-primary)' : '1px solid #E2E8F0',
+                            backgroundColor: isSelected ? 'var(--color-selected-background)' : '#FFFFFF',
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1E293B' }}>
+                                {acc.name}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: '0.625rem',
+                                  fontWeight: 700,
+                                  backgroundColor: isSelected ? 'var(--color-primary)' : '#E2E8F0',
+                                  color: isSelected ? '#FFFFFF' : '#475569',
+                                  padding: '1px 6px',
+                                  borderRadius: '4px',
+                                }}
+                              >
+                                {acc.roleCode}
+                              </span>
+                            </div>
+                            <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                              {acc.unitOrDept}
+                            </span>
+                          </div>
+
+                          {isSelected && (
+                            <div
+                              style={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                backgroundColor: 'var(--color-primary)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                              }}
+                            >
+                              <Check size={12} weight="bold" color="#FFFFFF" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* MODAL 1: Account Info */}
             {activeModal === 'account-info' && (
               <div

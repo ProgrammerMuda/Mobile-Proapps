@@ -59,7 +59,7 @@ export const DEMO_ACCOUNTS = [
     email: 'eng@proapps.id',
     phone: '08123456704',
     password: 'password',
-    unitOrDept: 'Engineering & Maintenance',
+    unitOrDept: 'Engineering',
     badgeColor: 'orange',
     description: 'Work order perbaikan, pencatatan meteran listrik/air, dan inspeksi preventif AC/Genset.',
     permissions: ['work_orders', 'preventive_maintenance', 'meter_reading', 'equipment_logs'],
@@ -72,7 +72,7 @@ export const DEMO_ACCOUNTS = [
     email: 'hk@proapps.id',
     phone: '08123456705',
     password: 'password',
-    unitOrDept: 'Housekeeping & Cleanliness',
+    unitOrDept: 'Housekeeping',
     badgeColor: 'amber',
     description: 'Jadwal kebersihan area publik, checklist toilet/lobby, dan stok chemical.',
     permissions: ['cleaning_schedule', 'area_checklist', 'waste_management', 'chemical_stock'],
@@ -85,7 +85,7 @@ export const DEMO_ACCOUNTS = [
     email: 'security@proapps.id',
     phone: '08123456706',
     password: 'password',
-    unitOrDept: 'Security & Safety Office',
+    unitOrDept: 'Security',
     badgeColor: 'red',
     description: 'Log pengunjung (visitor), buku patroli digital, laporan insiden, dan akses gerbang.',
     permissions: ['visitor_logs', 'patrol_records', 'incident_reports', 'gate_control'],
@@ -97,7 +97,10 @@ export const findAccount = (identifier, password) => {
   const cleanPass = (password || '').trim();
   return DEMO_ACCOUNTS.find(
     (acc) =>
-      (acc.email.toLowerCase() === cleanId || acc.phone === cleanId || acc.roleCode.toLowerCase() === cleanId) &&
+      (acc.email.toLowerCase() === cleanId ||
+       (acc.roleCode === 'SEC' && cleanId === 'sec@proapps.id') ||
+       acc.phone === cleanId ||
+       acc.roleCode.toLowerCase() === cleanId) &&
       (!cleanPass || cleanPass === acc.password || cleanPass === 'password' || cleanPass === 'password123')
   );
 };

@@ -21,8 +21,23 @@ export const BMDashboardView = ({ user, onLogout, onNavigateToOverview, onNaviga
   };
 
   const isTenant = bmUser?.roleCode === 'TENANT';
+  const isEngineering = bmUser?.roleCode === 'ENG';
+  const isHousekeeping = bmUser?.roleCode === 'HK';
+  const isSecurity = bmUser?.roleCode === 'SEC';
   const currentHeaderImg = isTenant ? tenantHeaderImg : bmHeaderImg;
-  const userSubtitle = isTenant ? t('dashboard.tenant') : (bmUser.unitOrDept ? (bmUser.unitOrDept === 'Building Management' ? t('dashboard.bm') : bmUser.unitOrDept) : t('dashboard.bm'));
+  
+  let userSubtitle = t('dashboard.bm');
+  if (isTenant) {
+    userSubtitle = t('dashboard.tenant');
+  } else if (isEngineering) {
+    userSubtitle = t('dashboard.engineering');
+  } else if (isHousekeeping) {
+    userSubtitle = t('dashboard.housekeeping');
+  } else if (isSecurity) {
+    userSubtitle = t('dashboard.security');
+  } else if (bmUser.unitOrDept) {
+    userSubtitle = bmUser.unitOrDept === 'Building Management' ? t('dashboard.bm') : bmUser.unitOrDept;
+  }
 
   return (
     <div
@@ -184,6 +199,10 @@ export const BMDashboardView = ({ user, onLogout, onNavigateToOverview, onNaviga
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
           <QuickMenuGrid
             isTenant={isTenant}
+            isEngineering={isEngineering}
+            isHousekeeping={isHousekeeping}
+            isSecurity={isSecurity}
+            roleCode={bmUser?.roleCode}
             onMenuItemClick={(item) => {
               if (item.id === 'tenant-unit' && onNavigateMenu) {
                 onNavigateMenu('tenant-unit');
