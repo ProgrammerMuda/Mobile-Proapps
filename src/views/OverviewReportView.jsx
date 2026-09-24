@@ -1486,14 +1486,11 @@ const EngineeringOverviewContent = ({ t, onNavigateDetails }) => {
             onClick={() => handleViewDetails('Home Service')}
             style={{
               cursor: 'pointer',
-              backgroundColor: '#F8FAFC',
-              borderRadius: '14px',
-              border: '1px solid #E2E8F0',
-              padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '16px',
+              padding: '4px 0',
             }}
           >
             {/* Left Donut SVG with Center Label */}
@@ -1650,6 +1647,8 @@ const EngineeringOverviewContent = ({ t, onNavigateDetails }) => {
             </div>
           </div>
 
+          <div style={{ height: '1px', backgroundColor: '#F1F5F9', width: '100%' }} />
+
           {/* Weekly Activity Trend (Survey vs Layanan / Works) */}
           <div
             onClick={() => handleViewDetails('Home Service')}
@@ -1657,15 +1656,11 @@ const EngineeringOverviewContent = ({ t, onNavigateDetails }) => {
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
-              backgroundColor: '#F8FAFC',
-              borderRadius: '14px',
-              border: '1px solid #E2E8F0',
-              padding: '14px 14px 10px 14px',
+              gap: '8px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>
                 {language === 'id' ? 'Tren Aktivitas Mingguan' : 'Weekly Activity Trend'}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.6875rem', fontWeight: 600 }}>
@@ -4036,14 +4031,11 @@ const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
             onClick={() => handleViewDetails('Home Service')}
             style={{
               cursor: 'pointer',
-              backgroundColor: '#F8FAFC',
-              borderRadius: '14px',
-              border: '1px solid #E2E8F0',
-              padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '16px',
+              padding: '4px 0',
             }}
           >
             {/* Left Donut SVG with Center Label */}
@@ -4200,6 +4192,8 @@ const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
             </div>
           </div>
 
+          <div style={{ height: '1px', backgroundColor: '#F1F5F9', width: '100%' }} />
+
           {/* Weekly Activity Trend (Survey vs Layanan / Works) */}
           <div
             onClick={() => handleViewDetails('Home Service')}
@@ -4207,15 +4201,11 @@ const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px',
-              backgroundColor: '#F8FAFC',
-              borderRadius: '14px',
-              border: '1px solid #E2E8F0',
-              padding: '14px 14px 10px 14px',
+              gap: '8px',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>
                 {language === 'id' ? 'Tren Aktivitas Mingguan' : 'Weekly Activity Trend'}
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.6875rem', fontWeight: 600 }}>
