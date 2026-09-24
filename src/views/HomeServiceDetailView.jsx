@@ -1121,12 +1121,9 @@ export const HomeServiceDetailView = ({
             </div>
           </div>
 
-          {/* Right: Satisfaction % & Review Count */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', zIndex: 1 }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1 }}>
-              98% {language === 'id' ? 'Puas' : 'Satisfied'}
-            </span>
-            <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#FEF3C7', lineHeight: 1 }}>
+          {/* Right: Review Count */}
+          <div style={{ display: 'flex', alignItems: 'center', zIndex: 1 }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.2px', whiteSpace: 'nowrap' }}>
               12 {language === 'id' ? 'Ulasan' : 'Reviews'}
             </span>
           </div>
