@@ -1486,11 +1486,14 @@ const EngineeringOverviewContent = ({ t, onNavigateDetails }) => {
             onClick={() => handleViewDetails('Home Service')}
             style={{
               cursor: 'pointer',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '16px',
-              padding: '4px 0',
             }}
           >
             {/* Left Donut SVG with Center Label */}
@@ -1646,8 +1649,6 @@ const EngineeringOverviewContent = ({ t, onNavigateDetails }) => {
               </div>
             </div>
           </div>
-
-          <div style={{ height: '1px', backgroundColor: '#F1F5F9', width: '100%' }} />
 
           {/* Weekly Activity Trend (Survey vs Layanan / Works) */}
           <div
@@ -4031,11 +4032,14 @@ const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
             onClick={() => handleViewDetails('Home Service')}
             style={{
               cursor: 'pointer',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              padding: '14px 16px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '16px',
-              padding: '4px 0',
             }}
           >
             {/* Left Donut SVG with Center Label */}
@@ -4191,8 +4195,6 @@ const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
               </div>
             </div>
           </div>
-
-          <div style={{ height: '1px', backgroundColor: '#F1F5F9', width: '100%' }} />
 
           {/* Weekly Activity Trend (Survey vs Layanan / Works) */}
           <div
