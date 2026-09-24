@@ -613,7 +613,7 @@ export const QuickMenuGrid = ({ onMenuItemClick, isTenant = false, isEngineering
       {isAllMenuOpen && (
         (() => {
           const modalTarget = typeof document !== 'undefined'
-            ? document.querySelector('.android-device-screen') || document.body
+            ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
             : null;
 
           const modalElement = (

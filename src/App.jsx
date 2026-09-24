@@ -16,6 +16,12 @@ import {
   RequestDetailHeader,
   AttendanceDetailView,
   AttendanceDetailHeader,
+  MonthlyAttendanceDetailView,
+  MonthlyAttendanceDetailHeader,
+  WorkOrderDetailView,
+  WorkOrderDetailHeader,
+  HomeServiceDetailView,
+  HomeServiceDetailHeader,
   TenantUnitView,
   TenantUnitHeader,
   UnitTowerView,
@@ -28,7 +34,7 @@ import {
 
 function App() {
   const { t } = useLanguage();
-  const [currentScreen, setCurrentScreen] = useState('splash'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail'
+  const [currentScreen, setCurrentScreen] = useState('splash'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail'
   const [activeTab, setActiveTab] = useState('home');
   const [userSession, setUserSession] = useState({
     name: 'Ahmad Pratama',
@@ -55,8 +61,17 @@ function App() {
   const [isFinancialPickerOpen, setIsFinancialPickerOpen] = useState(false);
   const [requestPeriod, setRequestPeriod] = useState('Last 7 days');
   const [isRequestPickerOpen, setIsRequestPickerOpen] = useState(false);
-  const [attendanceDate, setAttendanceDate] = useState(new Date(2026, 6, 7));
+  const [attendanceDate, setAttendanceDate] = useState(new Date(2026, 8, 24));
   const [isAttendancePickerOpen, setIsAttendancePickerOpen] = useState(false);
+  const [monthlyAttendanceMonth, setMonthlyAttendanceMonth] = useState(8); // 0-indexed (8 = September)
+  const [monthlyAttendanceYear, setMonthlyAttendanceYear] = useState(2026);
+  const [isMonthlyAttendancePickerOpen, setIsMonthlyAttendancePickerOpen] = useState(false);
+  const [workOrderMonth, setWorkOrderMonth] = useState(8); // 8 = September
+  const [workOrderYear, setWorkOrderYear] = useState(2026);
+  const [isWorkOrderPickerOpen, setIsWorkOrderPickerOpen] = useState(false);
+  const [homeServiceMonth, setHomeServiceMonth] = useState(8); // 8 = September
+  const [homeServiceYear, setHomeServiceYear] = useState(2026);
+  const [isHomeServicePickerOpen, setIsHomeServicePickerOpen] = useState(false);
 
   const handleSplashFinish = () => {
     setCurrentScreen('login');
@@ -100,6 +115,60 @@ function App() {
     const next = new Date(attendanceDate);
     next.setDate(next.getDate() + 1);
     setAttendanceDate(next);
+  };
+
+  const handlePrevAttendanceMonth = () => {
+    if (monthlyAttendanceMonth === 0) {
+      setMonthlyAttendanceMonth(11);
+      setMonthlyAttendanceYear((y) => y - 1);
+    } else {
+      setMonthlyAttendanceMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextAttendanceMonth = () => {
+    if (monthlyAttendanceMonth === 11) {
+      setMonthlyAttendanceMonth(0);
+      setMonthlyAttendanceYear((y) => y + 1);
+    } else {
+      setMonthlyAttendanceMonth((m) => m + 1);
+    }
+  };
+
+  const handlePrevWorkOrderMonth = () => {
+    if (workOrderMonth === 0) {
+      setWorkOrderMonth(11);
+      setWorkOrderYear((y) => y - 1);
+    } else {
+      setWorkOrderMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextWorkOrderMonth = () => {
+    if (workOrderMonth === 11) {
+      setWorkOrderMonth(0);
+      setWorkOrderYear((y) => y + 1);
+    } else {
+      setWorkOrderMonth((m) => m + 1);
+    }
+  };
+
+  const handlePrevHomeServiceMonth = () => {
+    if (homeServiceMonth === 0) {
+      setHomeServiceMonth(11);
+      setHomeServiceYear((y) => y - 1);
+    } else {
+      setHomeServiceMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextHomeServiceMonth = () => {
+    if (homeServiceMonth === 11) {
+      setHomeServiceMonth(0);
+      setHomeServiceYear((y) => y + 1);
+    } else {
+      setHomeServiceMonth((m) => m + 1);
+    }
   };
 
   const isBMUser = userSession?.roleCode === 'BM';
@@ -159,6 +228,33 @@ function App() {
             onNextDay={handleNextAttendanceDay}
             onOpenPicker={() => setIsAttendancePickerOpen(true)}
           />
+        ) : currentScreen === 'monthly-attendance' ? (
+          <MonthlyAttendanceDetailHeader
+            onBack={() => setCurrentScreen('overview')}
+            selectedMonth={monthlyAttendanceMonth}
+            selectedYear={monthlyAttendanceYear}
+            onPrevMonth={handlePrevAttendanceMonth}
+            onNextMonth={handleNextAttendanceMonth}
+            onOpenPicker={() => setIsMonthlyAttendancePickerOpen(true)}
+          />
+        ) : currentScreen === 'work-order-detail' ? (
+          <WorkOrderDetailHeader
+            onBack={() => setCurrentScreen('overview')}
+            selectedMonth={workOrderMonth}
+            selectedYear={workOrderYear}
+            onPrevMonth={handlePrevWorkOrderMonth}
+            onNextMonth={handleNextWorkOrderMonth}
+            onOpenPicker={() => setIsWorkOrderPickerOpen(true)}
+          />
+        ) : currentScreen === 'home-service-detail' ? (
+          <HomeServiceDetailHeader
+            onBack={() => setCurrentScreen('overview')}
+            selectedMonth={homeServiceMonth}
+            selectedYear={homeServiceYear}
+            onPrevMonth={handlePrevHomeServiceMonth}
+            onNextMonth={handleNextHomeServiceMonth}
+            onOpenPicker={() => setIsHomeServicePickerOpen(true)}
+          />
         ) : null
       }
       bottomNav={
@@ -210,6 +306,10 @@ function App() {
           onNavigateMenu={(menuId) => {
             if (menuId === 'tenant-unit') {
               setCurrentScreen('tenant-unit');
+            } else if (menuId === 'work-order') {
+              setCurrentScreen('work-order-detail');
+            } else if (menuId === 'home-service') {
+              setCurrentScreen('home-service-detail');
             }
           }}
         />
@@ -268,8 +368,16 @@ function App() {
               setCurrentScreen('financial-detail');
             } else if (secLower === 'tenant requests') {
               setCurrentScreen('request-detail');
-            } else if (secLower === 'employee attendance') {
-              setCurrentScreen('attendance-detail');
+            } else if (secLower === 'monthly attendance' || secLower === 'employee attendance') {
+              if (userSession?.roleCode === 'BM') {
+                setCurrentScreen('attendance-detail');
+              } else {
+                setCurrentScreen('monthly-attendance');
+              }
+            } else if (secLower === 'work order' || secLower === 'my work orders') {
+              setCurrentScreen('work-order-detail');
+            } else if (secLower === 'home service' || secLower === 'home services' || secLower === 'my home services') {
+              setCurrentScreen('home-service-detail');
             } else {
               alert(t('overview.detailsAlert', { section }));
             }
@@ -313,6 +421,45 @@ function App() {
           onDateChange={setAttendanceDate}
           isPickerOpen={isAttendancePickerOpen}
           setIsPickerOpen={setIsAttendancePickerOpen}
+        />
+      )}
+
+      {currentScreen === 'monthly-attendance' && (
+        <MonthlyAttendanceDetailView
+          selectedMonth={monthlyAttendanceMonth}
+          selectedYear={monthlyAttendanceYear}
+          onMonthChange={(m, y) => {
+            setMonthlyAttendanceMonth(m);
+            setMonthlyAttendanceYear(y);
+          }}
+          isPickerOpen={isMonthlyAttendancePickerOpen}
+          setIsPickerOpen={setIsMonthlyAttendancePickerOpen}
+        />
+      )}
+
+      {currentScreen === 'work-order-detail' && (
+        <WorkOrderDetailView
+          selectedMonth={workOrderMonth}
+          selectedYear={workOrderYear}
+          onMonthChange={(m, y) => {
+            setWorkOrderMonth(m);
+            setWorkOrderYear(y);
+          }}
+          isPickerOpen={isWorkOrderPickerOpen}
+          setIsPickerOpen={setIsWorkOrderPickerOpen}
+        />
+      )}
+
+      {currentScreen === 'home-service-detail' && (
+        <HomeServiceDetailView
+          selectedMonth={homeServiceMonth}
+          selectedYear={homeServiceYear}
+          onMonthChange={(m, y) => {
+            setHomeServiceMonth(m);
+            setHomeServiceYear(y);
+          }}
+          isPickerOpen={isHomeServicePickerOpen}
+          setIsPickerOpen={setIsHomeServicePickerOpen}
         />
       )}
     </AndroidMobileFrame>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { MaterialButton } from './MaterialButton';
 
 /**
@@ -16,11 +17,20 @@ export const MaterialDialog = ({
 }) => {
   if (!open) return null;
 
-  return (
+  const modalTarget = typeof document !== 'undefined'
+    ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+    : null;
+
+  const modalElement = (
     <div
       style={{
-        position: 'fixed',
-        inset: 0,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: '100%',
         backgroundColor: 'rgba(15, 23, 42, 0.45)',
         backdropFilter: 'blur(4px)',
         display: 'flex',
@@ -79,4 +89,6 @@ export const MaterialDialog = ({
       </div>
     </div>
   );
+
+  return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
 };

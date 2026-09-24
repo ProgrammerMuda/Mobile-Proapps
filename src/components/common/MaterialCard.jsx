@@ -18,8 +18,8 @@ export const MaterialCard = ({
     case 'elevated':
       cardStyles = {
         backgroundColor: 'var(--color-background-surface)',
-        boxShadow: 'var(--md-elevation-1)',
-        border: 'none',
+        boxShadow: 'none',
+        border: '1px solid var(--color-border-default)',
       };
       break;
     case 'outlined':

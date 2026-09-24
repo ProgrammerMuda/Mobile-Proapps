@@ -11,3 +11,6 @@ export * from './TenantUnitView';
 export * from './UnitTowerView';
 export * from './UnitDetailView';
 export * from './ProfileView';
+export * from './MonthlyAttendanceDetailView';
+export * from './WorkOrderDetailView';
+export * from './HomeServiceDetailView';

@@ -135,7 +135,7 @@ export const HomeView = ({ activeTab = 'components', onReplaySplash, onLogout, c
           borderRadius: 'var(--radius-md)', /* 16px */
           backgroundColor: 'var(--color-primary)',
           color: 'var(--color-text-on-primary)',
-          boxShadow: 'var(--md-elevation-2)',
+          boxShadow: 'none',
           display: 'flex',
           flexDirection: 'column',
           gap: '12px',

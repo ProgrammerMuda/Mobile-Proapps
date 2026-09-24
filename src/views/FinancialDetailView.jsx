@@ -835,7 +835,7 @@ export const FinancialDetailView = ({
       {/* Filter Bottom Sheet Modal inside Phone Frame Portal */}
       {isPickerOpen && (() => {
         const modalTarget = typeof document !== 'undefined'
-          ? document.querySelector('.android-device-screen') || document.body
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
           : null;
 
         const modalElement = (

@@ -18,6 +18,24 @@ import {
   Package,
   UsersThree,
   User,
+  CalendarCheck,
+  CalendarBlank,
+  Wrench,
+  ClipboardText,
+  CheckCircle,
+  MapPin,
+  Plus,
+  SunDim,
+  SignIn,
+  Fingerprint,
+  Timer,
+  SealCheck,
+  HourglassMedium,
+  Star,
+  ChatTeardropText,
+  Door,
+  Cube,
+  MagnifyingGlass,
 } from '@phosphor-icons/react';
 
 const MONTHS = [
@@ -71,6 +89,5475 @@ export const OverviewHeader = () => {
 };
 
 /**
+ * Engineering Specific Overview Sub-Component
+ */
+const YEARLY_ATTENDANCE_DATA = {
+  2026: {
+    totalWorkDays: 203,
+    avgAttendance: '97.0%',
+    totalOnTime: 191,
+    totalLate: 6,
+    totalLeave: 6,
+    totalAlpha: 0,
+    months: [
+      { month: 'Sep 2026', attendancePct: '96%', onTime: 22, late: 1, leave: 1, alpha: 0, totalDays: 24, isCurrent: true },
+      { month: 'Agu 2026', attendancePct: '100%', onTime: 22, late: 0, leave: 0, alpha: 0, totalDays: 22 },
+      { month: 'Jul 2026', attendancePct: '96%', onTime: 22, late: 1, leave: 1, alpha: 0, totalDays: 24 },
+      { month: 'Jun 2026', attendancePct: '100%', onTime: 22, late: 0, leave: 0, alpha: 0, totalDays: 22 },
+      { month: 'Mei 2026', attendancePct: '95.5%', onTime: 20, late: 1, leave: 1, alpha: 0, totalDays: 22 },
+      { month: 'Apr 2026', attendancePct: '95.7%', onTime: 21, late: 1, leave: 1, alpha: 0, totalDays: 23 },
+      { month: 'Mar 2026', attendancePct: '100%', onTime: 23, late: 0, leave: 0, alpha: 0, totalDays: 23 },
+      { month: 'Feb 2026', attendancePct: '95.2%', onTime: 19, late: 1, leave: 1, alpha: 0, totalDays: 21 },
+      { month: 'Jan 2026', attendancePct: '95.5%', onTime: 20, late: 1, leave: 1, alpha: 0, totalDays: 22 },
+    ],
+  },
+  2025: {
+    totalWorkDays: 261,
+    avgAttendance: '97.7%',
+    totalOnTime: 247,
+    totalLate: 8,
+    totalLeave: 6,
+    totalAlpha: 0,
+    months: [
+      { month: 'Des 2025', attendancePct: '100%', onTime: 22, late: 0, leave: 0, alpha: 0, totalDays: 22 },
+      { month: 'Nov 2025', attendancePct: '95.7%', onTime: 21, late: 1, leave: 1, alpha: 0, totalDays: 23 },
+      { month: 'Okt 2025', attendancePct: '100%', onTime: 23, late: 0, leave: 0, alpha: 0, totalDays: 23 },
+      { month: 'Sep 2025', attendancePct: '95.5%', onTime: 20, late: 1, leave: 1, alpha: 0, totalDays: 22 },
+      { month: 'Agu 2025', attendancePct: '100%', onTime: 22, late: 0, leave: 0, alpha: 0, totalDays: 22 },
+      { month: 'Jul 2025', attendancePct: '95.7%', onTime: 21, late: 1, leave: 1, alpha: 0, totalDays: 23 },
+      { month: 'Jun 2025', attendancePct: '100%', onTime: 21, late: 0, leave: 0, alpha: 0, totalDays: 21 },
+      { month: 'Mei 2025', attendancePct: '95.2%', onTime: 19, late: 1, leave: 1, alpha: 0, totalDays: 21 },
+      { month: 'Apr 2025', attendancePct: '100%', onTime: 22, late: 0, leave: 0, alpha: 0, totalDays: 22 },
+      { month: 'Mar 2025', attendancePct: '95.7%', onTime: 21, late: 1, leave: 1, alpha: 0, totalDays: 23 },
+      { month: 'Feb 2025', attendancePct: '100%', onTime: 20, late: 0, leave: 0, alpha: 0, totalDays: 20 },
+      { month: 'Jan 2025', attendancePct: '95.5%', onTime: 20, late: 1, leave: 1, alpha: 0, totalDays: 22 },
+    ],
+  },
+};
+
+const EngineeringOverviewContent = ({ t, onNavigateDetails }) => {
+  const { language } = useLanguage();
+  const [clockedIn, setClockedIn] = useState(true);
+  const [isYearlyModalOpen, setIsYearlyModalOpen] = useState(false);
+  const [selectedYear, setSelectedYear] = useState(2026);
+  const [isWoMonthPickerOpen, setIsWoMonthPickerOpen] = useState(false);
+  const [woSelectedMonth, setWoSelectedMonth] = useState(8); // 8 = September
+  const [woSelectedYear, setWoSelectedYear] = useState(2026);
+  const [woPickerTempMonth, setWoPickerTempMonth] = useState(8);
+  const [woPickerTempYear, setWoPickerTempYear] = useState(2026);
+
+  const [isInspMonthPickerOpen, setIsInspMonthPickerOpen] = useState(false);
+  const [inspSelectedMonth, setInspSelectedMonth] = useState(8); // 8 = September
+  const [inspSelectedYear, setInspSelectedYear] = useState(2026);
+  const [inspPickerTempMonth, setInspPickerTempMonth] = useState(8);
+  const [inspPickerTempYear, setInspPickerTempYear] = useState(2026);
+
+  const [isHsMonthPickerOpen, setIsHsMonthPickerOpen] = useState(false);
+  const [hsSelectedMonth, setHsSelectedMonth] = useState(8); // 8 = September
+  const [hsSelectedYear, setHsSelectedYear] = useState(2026);
+  const [hsPickerTempMonth, setHsPickerTempMonth] = useState(8);
+  const [hsPickerTempYear, setHsPickerTempYear] = useState(2026);
+
+  const [isMeterMonthPickerOpen, setIsMeterMonthPickerOpen] = useState(false);
+  const [meterSelectedMonth, setMeterSelectedMonth] = useState(8); // 8 = September
+  const [meterSelectedYear, setMeterSelectedYear] = useState(2026);
+  const [meterPickerTempMonth, setMeterPickerTempMonth] = useState(8);
+  const [meterPickerTempYear, setMeterPickerTempYear] = useState(2026);
+
+  const [isUnrecordedModalOpen, setIsUnrecordedModalOpen] = useState(false);
+  const [unrecordedFilterTab, setUnrecordedFilterTab] = useState('ALL'); // 'ALL' | 'WATER' | 'ELECTRIC'
+  const [unrecordedSearchQuery, setUnrecordedSearchQuery] = useState('');
+
+  const SAMPLE_UNRECORDED_UNITS = [
+    { id: '1', unit: 'Tower A - Unit 08A', floor: 'Lantai 8', type: 'water', meterType: 'Water Meter', meterNo: 'WM-A0801', lastReading: '124.5 m³' },
+    { id: '2', unit: 'Tower A - Unit 12B', floor: 'Lantai 12', type: 'electric', meterType: 'Electric Meter', meterNo: 'EM-A1202', lastReading: '1,450 kWh' },
+    { id: '3', unit: 'Tower B - Unit 03C', floor: 'Lantai 3', type: 'water', meterType: 'Water Meter', meterNo: 'WM-B0303', lastReading: '88.2 m³' },
+    { id: '4', unit: 'Tower B - Unit 07D', floor: 'Lantai 7', type: 'electric', meterType: 'Electric Meter', meterNo: 'EM-B0704', lastReading: '2,110 kWh' },
+    { id: '5', unit: 'Tower C - Unit 15A', floor: 'Lantai 15', type: 'water', meterType: 'Water Meter', meterNo: 'WM-C1501', lastReading: '205.1 m³' },
+    { id: '6', unit: 'Tower C - Unit 18B', floor: 'Lantai 18', type: 'electric', meterType: 'Electric Meter', meterNo: 'EM-C1802', lastReading: '980 kWh' },
+    { id: '7', unit: 'Tower A - Unit 22C', floor: 'Lantai 22', type: 'water', meterType: 'Water Meter', meterNo: 'WM-A2203', lastReading: '143.0 m³' },
+    { id: '8', unit: 'Tower B - Unit 10A', floor: 'Lantai 10', type: 'electric', meterType: 'Electric Meter', meterNo: 'EM-B1001', lastReading: '1,720 kWh' },
+  ];
+
+  const WO_MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const WO_MONTHS_ID = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const currentWoMonthName = language === 'id' ? WO_MONTHS_ID[woSelectedMonth] : WO_MONTHS_EN[woSelectedMonth];
+  const currentHsMonthName = language === 'id' ? WO_MONTHS_ID[hsSelectedMonth] : WO_MONTHS_EN[hsSelectedMonth];
+  const currentInspMonthName = language === 'id' ? WO_MONTHS_ID[inspSelectedMonth] : WO_MONTHS_EN[inspSelectedMonth];
+  const currentMeterMonthName = language === 'id' ? WO_MONTHS_ID[meterSelectedMonth] : WO_MONTHS_EN[meterSelectedMonth];
+
+  const handleViewDetails = (section) => {
+    if (onNavigateDetails) {
+      onNavigateDetails(section);
+    } else {
+      alert(t('overview.detailsAlert', { section }));
+    }
+  };
+
+  const currentYearData = YEARLY_ATTENDANCE_DATA[selectedYear] || YEARLY_ATTENDANCE_DATA[2026];
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100%',
+        backgroundColor: '#F8FAFC',
+        fontFamily: 'var(--font-sans)',
+        padding: '16px',
+        gap: '16px',
+        boxSizing: 'border-box',
+        userSelect: 'none',
+        paddingBottom: '40px',
+      }}
+    >
+      {/* =========================================================================
+          SECTION 1: Shift Hari Ini (Today Shift)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.eng.todayShift')}
+          </h2>
+          <span
+            style={{
+              backgroundColor: '#DCFCE7',
+              color: '#16A34A',
+              fontSize: '0.6875rem',
+              fontWeight: 700,
+              padding: '3px 8px',
+              borderRadius: '9999px',
+            }}
+          >
+            {t('overview.eng.onTime')}
+          </span>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>
+            {t('overview.eng.shiftTime')}
+          </div>
+
+          {/* 2 Side-by-Side Clock Cards (Clock In vs Clock Out) */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+            }}
+          >
+            {/* Card Masuk / Clock In */}
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderRadius: '12px',
+                padding: '10px 12px',
+                border: '1px solid #F1F5F9',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                {t('overview.eng.clockIn')}
+              </span>
+              <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.3px' }}>
+                07:52 <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#64748B' }}>WIB</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                <SealCheck size={14} weight="fill" color="#16A34A" />
+                <span style={{ fontSize: '0.6875rem', color: '#16A34A', fontWeight: 600 }}>
+                  {t('overview.eng.recorded')}
+                </span>
+              </div>
+            </div>
+
+            {/* Card Keluar / Clock Out (Empty -- : -- if haven't gone home) */}
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderRadius: '12px',
+                padding: '10px 12px',
+                border: '1px solid #F1F5F9',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                {t('overview.eng.clockOut')}
+              </span>
+              <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: !clockedIn ? '#1E293B' : '#94A3B8', letterSpacing: '-0.3px' }}>
+                {!clockedIn ? (
+                  <>17:01 <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#64748B' }}>WIB</span></>
+                ) : (
+                  '-- : --'
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                {!clockedIn ? (
+                  <>
+                    <SealCheck size={14} weight="fill" color="#16A34A" />
+                    <span style={{ fontSize: '0.6875rem', color: '#16A34A', fontWeight: 600 }}>
+                      {t('overview.eng.recorded')}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <HourglassMedium size={14} weight="fill" color="#94A3B8" />
+                    <span style={{ fontSize: '0.6875rem', color: '#94A3B8', fontWeight: 600 }}>
+                      {t('overview.eng.notRecorded')}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          SECTION 2: Rekap Presensi Bulanan (Monthly Attendance)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.eng.monthlyAttendanceTitle')}
+          </h2>
+
+          <button
+            type="button"
+            onClick={() => handleViewDetails('Employee attendance')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#02388A',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px',
+              cursor: 'pointer',
+              padding: 0,
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            <span>{t('overview.viewDetails')}</span>
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>
+            {language === 'id' ? 'Bulan Ini (September 2026)' : 'This Month (September 2026)'}
+          </div>
+
+          {/* Hero Fill Attendance Rate Banner */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #02388A 0%, #0052CC 60%, #0284C7 100%)',
+              borderRadius: '14px',
+              padding: '13px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Subtle background glow effect */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '90px',
+                height: '90px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(2, 56, 138, 0) 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CalendarBlank size={18} weight="fill" color="#38BDF8" />
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.1px' }}>
+                  {t('overview.eng.attendancePct')}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: '#FFFFFF',
+                    fontSize: '0.6875rem',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  23/24 {language === 'id' ? 'Hari' : 'Days'}
+                </span>
+                <span
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                    letterSpacing: '-0.5px',
+                  }}
+                >
+                  96%
+                </span>
+              </div>
+            </div>
+
+            {/* Glowing White Progress Bar on Semi-transparent Track */}
+            <div
+              style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                borderRadius: '9999px',
+                overflow: 'hidden',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              <div
+                style={{
+                  width: '96%',
+                  height: '100%',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '9999px',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* 4 Day Count KPI Metrics Micro-Cards */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '8px',
+            }}
+          >
+            {/* On Time */}
+            <div
+              style={{
+                backgroundColor: '#F0FDF4',
+                border: '1px solid #DCFCE7',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>22</span>
+              <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{t('overview.eng.onTime')}</span>
+            </div>
+
+            {/* Late */}
+            <div
+              style={{
+                backgroundColor: '#FFFBEB',
+                border: '1px solid #FEF3C7',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>1</span>
+              <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{t('overview.eng.late')}</span>
+            </div>
+
+            {/* Leave */}
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>1</span>
+              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{t('overview.eng.leaveDays')}</span>
+            </div>
+
+            {/* Alpha */}
+            <div
+              style={{
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FEE2E2',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>0</span>
+              <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>{t('overview.eng.alpha')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Yearly Attendance Breakdown Bottom Sheet Modal */}
+      {isYearlyModalOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsYearlyModalOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {t('overview.eng.yearlyAttendanceTitle')}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {t('overview.eng.annualSummary')}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsYearlyModalOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Year Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '6px 10px',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setSelectedYear((y) => (y === 2026 ? 2025 : y))}
+                  disabled={selectedYear === 2025}
+                  style={{
+                    backgroundColor: selectedYear === 2025 ? '#F1F5F9' : '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px',
+                    width: '30px',
+                    height: '30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: selectedYear === 2025 ? 'default' : 'pointer',
+                    color: selectedYear === 2025 ? '#94A3B8' : '#02388A',
+                  }}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                  {selectedYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedYear((y) => (y === 2025 ? 2026 : y))}
+                  disabled={selectedYear === 2026}
+                  style={{
+                    backgroundColor: selectedYear === 2026 ? '#F1F5F9' : '#FFFFFF',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '8px',
+                    width: '30px',
+                    height: '30px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: selectedYear === 2026 ? 'default' : 'pointer',
+                    color: selectedYear === 2026 ? '#94A3B8' : '#02388A',
+                  }}
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+
+              {/* Annual Aggregate KPI Card (4 Metric Columns + Progress Footer) */}
+              <div
+                style={{
+                  backgroundColor: '#EFF6FF',
+                  borderRadius: '14px',
+                  padding: '12px',
+                  border: '1px solid #DBEAFE',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gap: '6px',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#16A34A' }}>
+                      {currentYearData.totalOnTime}
+                    </div>
+                    <div style={{ fontSize: '0.625rem', color: '#166534', marginTop: '2px', fontWeight: 600 }}>
+                      {t('overview.eng.onTime')}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#D97706' }}>
+                      {currentYearData.totalLate}
+                    </div>
+                    <div style={{ fontSize: '0.625rem', color: '#9A3412', marginTop: '2px', fontWeight: 600 }}>
+                      {t('overview.eng.late')}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#64748B' }}>
+                      {currentYearData.totalLeave}
+                    </div>
+                    <div style={{ fontSize: '0.625rem', color: '#475569', marginTop: '2px', fontWeight: 600 }}>
+                      {t('overview.eng.leaveDays')}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#DC2626' }}>
+                      {currentYearData.totalAlpha}
+                    </div>
+                    <div style={{ fontSize: '0.625rem', color: '#991B1B', marginTop: '2px', fontWeight: 600 }}>
+                      {t('overview.eng.alpha')}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '10px',
+                    padding: '8px 10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#1E40AF' }}>
+                      {t('overview.eng.avgAttendance')} ({selectedYear})
+                    </span>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#02388A' }}>
+                      {currentYearData.avgAttendance}
+                    </span>
+                  </div>
+                  <div style={{ width: '100%', height: '5px', backgroundColor: '#E2E8F0', borderRadius: '9999px', overflow: 'hidden' }}>
+                    <div style={{ width: currentYearData.avgAttendance, height: '100%', backgroundColor: '#02388A', borderRadius: '9999px' }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Monthly Breakdown List */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', maxHeight: '42vh', paddingRight: '2px' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B' }}>
+                  {t('overview.eng.monthlyBreakdown')} ({selectedYear})
+                </span>
+
+                {currentYearData.months.map((item, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      backgroundColor: item.isCurrent ? '#F0F9FF' : '#F8FAFC',
+                      borderRadius: '12px',
+                      padding: '10px 12px',
+                      border: item.isCurrent ? '1.5px solid #BAE6FD' : '1px solid #E2E8F0',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '6px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
+                          {item.month}
+                        </span>
+                        {item.isCurrent && (
+                          <span
+                            style={{
+                              backgroundColor: '#E0F2FE',
+                              color: '#0284C7',
+                              fontSize: '0.625rem',
+                              fontWeight: 700,
+                              padding: '1px 6px',
+                              borderRadius: '9999px',
+                            }}
+                          >
+                            Bulan Ini
+                          </span>
+                        )}
+                      </div>
+                      <span
+                        style={{
+                          fontSize: '0.8125rem',
+                          fontWeight: 800,
+                          color: parseFloat(item.attendancePct) >= 98 ? '#16A34A' : '#02388A',
+                        }}
+                      >
+                        {item.attendancePct}
+                      </span>
+                    </div>
+
+                    {/* Metric mini row with Alpha */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
+                      <span>
+                        <strong style={{ color: '#16A34A' }}>{item.onTime}</strong> {t('overview.eng.onTime')}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        <strong style={{ color: item.late > 0 ? '#D97706' : '#64748B' }}>{item.late}</strong> {t('overview.eng.late')}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        <strong style={{ color: '#64748B' }}>{item.leave}</strong> {t('overview.eng.leaveDays')}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        <strong style={{ color: item.alpha > 0 ? '#DC2626' : '#64748B' }}>{item.alpha}</strong> {t('overview.eng.alpha')}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        {item.totalDays} {t('overview.eng.totalWorkDays')}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+
+      {/* =========================================================================
+          SECTION 3: Perintah Kerja (Work Order)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.eng.woTitle')}
+          </h2>
+          <button
+            type="button"
+            onClick={() => {
+              setWoPickerTempMonth(woSelectedMonth);
+              setWoPickerTempYear(woSelectedYear);
+              setIsWoMonthPickerOpen(true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+              boxShadow: 'none',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            <span>{currentWoMonthName} {woSelectedYear}</span>
+            <CaretDown size={14} weight="bold" color="#053079" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+
+        {/* 3 Activity Performance Metrics (Summary Badges) */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '8px',
+            textAlign: 'center',
+          }}
+        >
+          {/* 1. Total Request */}
+          <div
+            onClick={() => handleViewDetails('My Work Orders')}
+            style={{
+              backgroundColor: '#F8FAFC',
+              borderRadius: '12px',
+              padding: '8px 4px',
+              border: '1px solid #E2E8F0',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px',
+            }}
+          >
+            <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+              22
+            </div>
+            <div style={{ fontSize: '0.625rem', color: '#334155', fontWeight: 700, lineHeight: 1.2 }}>
+              <div>Total</div>
+              <div>{language === 'id' ? 'Request' : 'Requests'}</div>
+            </div>
+          </div>
+
+          {/* 2. Survey yang Telah Dilakukan (Biru) */}
+          <div
+            onClick={() => handleViewDetails('My Work Orders')}
+            style={{
+              backgroundColor: '#EFF6FF',
+              borderRadius: '12px',
+              padding: '8px 4px',
+              border: '1px solid #DBEAFE',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px',
+            }}
+          >
+            <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1D4ED8', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+              8
+            </div>
+            <div style={{ fontSize: '0.625rem', color: '#1E40AF', fontWeight: 700, lineHeight: 1.2 }}>
+              <div>{language === 'id' ? 'Survey yang' : 'Surveys'}</div>
+              <div>{language === 'id' ? 'Telah Dilakukan' : 'Conducted'}</div>
+            </div>
+          </div>
+
+          {/* 3. Pekerjaan yang Telah Dilakukan */}
+          <div
+            onClick={() => handleViewDetails('My Work Orders')}
+            style={{
+              backgroundColor: '#F0FDF4',
+              borderRadius: '12px',
+              padding: '8px 4px',
+              border: '1px solid #DCFCE7',
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px',
+            }}
+          >
+            <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#15803D', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+              14
+            </div>
+            <div style={{ fontSize: '0.625rem', color: '#166534', fontWeight: 700, lineHeight: 1.2 }}>
+              <div>{language === 'id' ? 'Pekerjaan yang' : 'Works'}</div>
+              <div>{language === 'id' ? 'Telah Dilakukan' : 'Executed'}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Dual Line / Area Chart (Same style as Tenant Requests) */}
+        <div
+          onClick={() => handleViewDetails('My Work Orders')}
+          style={{
+            cursor: 'pointer',
+            marginTop: '2px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>
+              {language === 'id' ? 'Tren Aktivitas Mingguan' : 'Weekly Activity Trend'}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.6875rem', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#1D4ED8' }}>
+                <span style={{ width: '10px', height: '3px', backgroundColor: '#2563EB', borderRadius: '2px' }} />
+                <span>Survey</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#15803D' }}>
+                <span style={{ width: '10px', height: '3px', backgroundColor: '#16A34A', borderRadius: '2px' }} />
+                <span>{language === 'id' ? 'Pekerjaan' : 'Work'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ width: '100%', position: 'relative' }}>
+            <svg
+              viewBox="0 0 340 160"
+              style={{
+                width: '100%',
+                height: 'auto',
+                display: 'block',
+                overflow: 'visible',
+                animation: 'chartFadeIn 0.35s ease-out',
+              }}
+            >
+              <defs>
+                <linearGradient id="woSurveyGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#2563EB" stopOpacity="0.01" />
+                </linearGradient>
+                <linearGradient id="woWorkGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#16A34A" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="#16A34A" stopOpacity="0.01" />
+                </linearGradient>
+              </defs>
+
+              {/* Y-Axis Grid Lines & Labels */}
+              {[
+                { val: '6', y: 22 },
+                { val: '4', y: 56 },
+                { val: '2', y: 90 },
+                { val: '0', y: 124 },
+              ].map((grid) => (
+                <g key={grid.val}>
+                  <text
+                    x="18"
+                    y={grid.y + 4}
+                    fontSize="10"
+                    fontWeight="500"
+                    fill="#94A3B8"
+                    textAnchor="end"
+                  >
+                    {grid.val}
+                  </text>
+                  <line
+                    x1="28"
+                    y1={grid.y}
+                    x2="330"
+                    y2={grid.y}
+                    stroke="#E2E8F0"
+                    strokeDasharray="3 3"
+                    strokeWidth="1"
+                  />
+                </g>
+              ))}
+
+              {/* Work Area Under Line (Green) */}
+              <path
+                d="M 55,73 L 135,56 L 215,56 L 295,73 L 295,124 L 55,124 Z"
+                fill="url(#woWorkGrad)"
+                style={{ animation: 'areaFadeIn 0.4s ease-out' }}
+              />
+
+              {/* Work Connecting Line (Green) */}
+              <path
+                d="M 55,73 L 135,56 L 215,56 L 295,73"
+                fill="none"
+                stroke="#16A34A"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+
+              {/* Survey Area Under Line (Blue) */}
+              <path
+                d="M 55,107 L 135,73 L 215,90 L 295,90 L 295,124 L 55,124 Z"
+                fill="url(#woSurveyGrad)"
+                style={{ animation: 'areaFadeIn 0.4s ease-out' }}
+              />
+
+              {/* Survey Connecting Line (Blue) */}
+              <path
+                d="M 55,107 L 135,73 L 215,90 L 295,90"
+                fill="none"
+                stroke="#2563EB"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+
+              {/* Data Points & Values for Work (Green) */}
+              {[
+                { x: 55, y: 73, val: '3' },
+                { x: 135, y: 56, val: '4' },
+                { x: 215, y: 56, val: '4' },
+                { x: 295, y: 73, val: '3' },
+              ].map((pt, i) => (
+                <g key={`work-${i}`}>
+                  <text
+                    x={pt.x}
+                    y={pt.y - 8}
+                    fontSize="11"
+                    fontWeight="700"
+                    fill="#15803D"
+                    textAnchor="middle"
+                  >
+                    {pt.val}
+                  </text>
+                  <circle
+                    cx={pt.x}
+                    cy={pt.y}
+                    r="4"
+                    fill="#FFFFFF"
+                    stroke="#16A34A"
+                    strokeWidth="2.5"
+                  />
+                </g>
+              ))}
+
+              {/* Data Points & Values for Survey (Blue) */}
+              {[
+                { x: 55, y: 107, val: '1' },
+                { x: 135, y: 73, val: '3' },
+                { x: 215, y: 90, val: '2' },
+                { x: 295, y: 90, val: '2' },
+              ].map((pt, i) => (
+                <g key={`survey-${i}`}>
+                  <text
+                    x={pt.x}
+                    y={pt.y + 15}
+                    fontSize="11"
+                    fontWeight="700"
+                    fill="#1D4ED8"
+                    textAnchor="middle"
+                  >
+                    {pt.val}
+                  </text>
+                  <circle
+                    cx={pt.x}
+                    cy={pt.y}
+                    r="4"
+                    fill="#FFFFFF"
+                    stroke="#2563EB"
+                    strokeWidth="2.5"
+                  />
+                </g>
+              ))}
+
+              {/* X-Axis Labels */}
+              {[
+                { x: 55, label: language === 'id' ? 'Mg 1' : 'W1' },
+                { x: 135, label: language === 'id' ? 'Mg 2' : 'W2' },
+                { x: 215, label: language === 'id' ? 'Mg 3' : 'W3' },
+                { x: 295, label: language === 'id' ? 'Mg 4' : 'W4' },
+              ].map((axis, i) => (
+                <text
+                  key={`axis-${i}`}
+                  x={axis.x}
+                  y="146"
+                  fontSize="10"
+                  fontWeight="600"
+                  fill="#64748B"
+                  textAnchor="middle"
+                >
+                  {axis.label}
+                </text>
+              ))}
+            </svg>
+          </div>
+        </div>
+
+        {/* View All Work Orders Button */}
+        <button
+          type="button"
+          onClick={() => handleViewDetails('Work Order')}
+          style={{
+            width: '100%',
+            height: '38px',
+            backgroundColor: '#FFFFFF',
+            color: '#02388A',
+            borderRadius: '10px',
+            border: '1px solid #E2E8F0',
+            fontSize: '0.8125rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            marginTop: '2px',
+          }}
+        >
+          {t('overview.eng.viewAllWo')}
+          <CaretRight size={14} weight="bold" />
+        </button>
+      </div>
+    </div>
+
+      {/* Work Order Month Picker Bottom Sheet Modal */}
+      {isWoMonthPickerOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsWoMonthPickerOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {language === 'id' ? 'Pilih Periode Work Order' : 'Select Work Order Period'}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Pilih bulan dan tahun' : 'Choose month and year'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsWoMonthPickerOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Year Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '6px 12px',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setWoPickerTempYear((y) => y - 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                  {woPickerTempYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setWoPickerTempYear((y) => y + 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+
+              {/* 12 Month Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                }}
+              >
+                {(language === 'id' ? WO_MONTHS_ID : WO_MONTHS_EN).map((mName, idx) => {
+                  const isSelected = woPickerTempMonth === idx;
+                  return (
+                    <button
+                      key={mName}
+                      type="button"
+                      onClick={() => setWoPickerTempMonth(idx)}
+                      style={{
+                        padding: '10px 4px',
+                        borderRadius: '10px',
+                        border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                        color: isSelected ? '#02388A' : '#334155',
+                        fontSize: '0.8125rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {mName}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Apply Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setWoSelectedMonth(woPickerTempMonth);
+                  setWoSelectedYear(woPickerTempYear);
+                  setIsWoMonthPickerOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '4px',
+                }}
+              >
+                {language === 'id' ? 'Terapkan Periode' : 'Apply Period'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+
+      {/* =========================================================================
+          SECTION: Home Service (Under Work Order)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.hk.hsTitle')}
+          </h2>
+          <button
+            type="button"
+            onClick={() => {
+              setHsPickerTempMonth(hsSelectedMonth);
+              setHsPickerTempYear(hsSelectedYear);
+              setIsHsMonthPickerOpen(true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+              boxShadow: 'none',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            <span>{currentHsMonthName} {hsSelectedYear}</span>
+            <CaretDown size={14} weight="bold" color="#053079" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          {/* Donut Chart Breakdown for Home Service */}
+          <div
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              cursor: 'pointer',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              padding: '14px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+            }}
+          >
+            {/* Left Donut SVG with Center Label */}
+            <div
+              style={{
+                position: 'relative',
+                width: '110px',
+                height: '110px',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <svg
+                width="110"
+                height="110"
+                viewBox="0 0 120 120"
+                style={{
+                  transform: 'rotate(-90deg)',
+                  overflow: 'visible',
+                }}
+              >
+                {/* Background Ring */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="46"
+                  fill="none"
+                  stroke="#E2E8F0"
+                  strokeWidth="12"
+                />
+                {/* Works Executed Segment (66.7% - Green #16A34A) */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="46"
+                  fill="none"
+                  stroke="#16A34A"
+                  strokeWidth="12"
+                  strokeDasharray={`${(12 / 18) * 289.03} 289.03`}
+                  strokeDashoffset="0"
+                  strokeLinecap="round"
+                />
+                {/* Surveys Conducted Segment (33.3% - Blue #2563EB) */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="46"
+                  fill="none"
+                  stroke="#2563EB"
+                  strokeWidth="12"
+                  strokeDasharray={`${(6 / 18) * 289.03} 289.03`}
+                  strokeDashoffset={-((12 / 18) * 289.03)}
+                  strokeLinecap="round"
+                />
+              </svg>
+
+              {/* Center Text */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'none',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
+                    color: '#0F172A',
+                    lineHeight: 1,
+                    letterSpacing: '-0.3px',
+                  }}
+                >
+                  18
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.625rem',
+                    fontWeight: 600,
+                    color: '#64748B',
+                    marginTop: '2px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.3px',
+                  }}
+                >
+                  Total
+                </span>
+              </div>
+            </div>
+
+            {/* Right Breakdown Details */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Works / Layanan Item */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: '#16A34A',
+                      display: 'inline-block',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1E293B', lineHeight: 1.2 }}>
+                      {language === 'id' ? 'Pekerjaan yang Dilakukan' : 'Works Executed'}
+                    </div>
+                    <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
+                      66.7% {language === 'id' ? 'dari total' : 'of total'}
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#15803D' }}>
+                  12
+                </span>
+              </div>
+
+              <div style={{ height: '1px', backgroundColor: '#E2E8F0', width: '100%' }} />
+
+              {/* Surveys Item */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: '#2563EB',
+                      display: 'inline-block',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1E293B', lineHeight: 1.2 }}>
+                      {language === 'id' ? 'Survey yang Dilakukan' : 'Surveys Conducted'}
+                    </div>
+                    <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
+                      33.3% {language === 'id' ? 'dari total' : 'of total'}
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#1D4ED8' }}>
+                  6
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Weekly Activity Trend (Survey vs Layanan / Works) */}
+          <div
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              padding: '14px 14px 10px 14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>
+                {language === 'id' ? 'Tren Aktivitas Mingguan' : 'Weekly Activity Trend'}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.6875rem', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#1D4ED8' }}>
+                  <span style={{ width: '10px', height: '3px', backgroundColor: '#2563EB', borderRadius: '2px' }} />
+                  <span>Survey</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#15803D' }}>
+                  <span style={{ width: '10px', height: '3px', backgroundColor: '#16A34A', borderRadius: '2px' }} />
+                  <span>{language === 'id' ? 'Pekerjaan' : 'Work'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', position: 'relative' }}>
+              <svg
+                viewBox="0 0 340 160"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  overflow: 'visible',
+                  animation: 'chartFadeIn 0.35s ease-out',
+                }}
+              >
+                <defs>
+                  <linearGradient id="engHsSurveyGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#2563EB" stopOpacity="0.01" />
+                  </linearGradient>
+                  <linearGradient id="engHsWorkGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#16A34A" stopOpacity="0.22" />
+                    <stop offset="100%" stopColor="#16A34A" stopOpacity="0.01" />
+                  </linearGradient>
+                </defs>
+
+                {/* Y-Axis Grid Lines & Labels */}
+                {[
+                  { val: '6', y: 22 },
+                  { val: '4', y: 56 },
+                  { val: '2', y: 90 },
+                  { val: '0', y: 124 },
+                ].map((grid) => (
+                  <g key={grid.val}>
+                    <text
+                      x="18"
+                      y={grid.y + 4}
+                      fontSize="10"
+                      fontWeight="500"
+                      fill="#94A3B8"
+                      textAnchor="end"
+                    >
+                      {grid.val}
+                    </text>
+                    <line
+                      x1="28"
+                      y1={grid.y}
+                      x2="330"
+                      y2={grid.y}
+                      stroke="#E2E8F0"
+                      strokeDasharray="3 3"
+                      strokeWidth="1"
+                    />
+                  </g>
+                ))}
+
+                {/* Work Area Under Line (Green) */}
+                <path
+                  d="M 55,73 L 135,73 L 215,56 L 295,90 L 295,124 L 55,124 Z"
+                  fill="url(#engHsWorkGrad)"
+                  style={{ animation: 'areaFadeIn 0.4s ease-out' }}
+                />
+
+                {/* Work Connecting Line (Green) */}
+                <path
+                  d="M 55,73 L 135,73 L 215,56 L 295,90"
+                  fill="none"
+                  stroke="#16A34A"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Survey Area Under Line (Blue) */}
+                <path
+                  d="M 55,107 L 135,90 L 215,107 L 295,90 L 295,124 L 55,124 Z"
+                  fill="url(#engHsSurveyGrad)"
+                  style={{ animation: 'areaFadeIn 0.4s ease-out' }}
+                />
+
+                {/* Survey Connecting Line (Blue) */}
+                <path
+                  d="M 55,107 L 135,90 L 215,107 L 295,90"
+                  fill="none"
+                  stroke="#2563EB"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Data Points & Values for Work (Green) */}
+                {[
+                  { x: 55, y: 73, val: '3' },
+                  { x: 135, y: 73, val: '3' },
+                  { x: 215, y: 56, val: '4' },
+                  { x: 295, y: 90, val: '2' },
+                ].map((pt, i) => (
+                  <g key={`hs-work-${i}`}>
+                    <text
+                      x={pt.x}
+                      y={pt.y - 8}
+                      fontSize="11"
+                      fontWeight="700"
+                      fill="#15803D"
+                      textAnchor="middle"
+                    >
+                      {pt.val}
+                    </text>
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r="4"
+                      fill="#FFFFFF"
+                      stroke="#16A34A"
+                      strokeWidth="2.5"
+                    />
+                  </g>
+                ))}
+
+                {/* Data Points & Values for Survey (Blue) */}
+                {[
+                  { x: 55, y: 107, val: '1' },
+                  { x: 135, y: 90, val: '2' },
+                  { x: 215, y: 107, val: '1' },
+                  { x: 295, y: 90, val: '2' },
+                ].map((pt, i) => (
+                  <g key={`hs-survey-${i}`}>
+                    <text
+                      x={pt.x}
+                      y={pt.y + 15}
+                      fontSize="11"
+                      fontWeight="700"
+                      fill="#1D4ED8"
+                      textAnchor="middle"
+                    >
+                      {pt.val}
+                    </text>
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r="4"
+                      fill="#FFFFFF"
+                      stroke="#2563EB"
+                      strokeWidth="2.5"
+                    />
+                  </g>
+                ))}
+
+                {/* X-Axis Labels */}
+                {[
+                  { x: 55, label: language === 'id' ? 'Mg 1' : 'W1' },
+                  { x: 135, label: language === 'id' ? 'Mg 2' : 'W2' },
+                  { x: 215, label: language === 'id' ? 'Mg 3' : 'W3' },
+                  { x: 295, label: language === 'id' ? 'Mg 4' : 'W4' },
+                ].map((axis, i) => (
+                  <text
+                    key={`hs-axis-${i}`}
+                    x={axis.x}
+                    y="142"
+                    fontSize="10"
+                    fontWeight="600"
+                    fill="#64748B"
+                    textAnchor="middle"
+                  >
+                    {axis.label}
+                  </text>
+                ))}
+              </svg>
+            </div>
+          </div>
+
+          {/* Customer Satisfaction & Review Summary - Rich Fill Card */}
+          <div
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+              borderRadius: '12px',
+              padding: '10px 14px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(180, 83, 9, 0.18)',
+              color: '#FFFFFF',
+              position: 'relative',
+              overflow: 'hidden',
+              gap: '12px',
+            }}
+          >
+            {/* Background Glow Effect */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '70px',
+                height: '70px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            {/* Left: Star Icon + Score & Stars + Subtitle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', zIndex: 1 }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                }}
+              >
+                <Star size={18} weight="fill" color="#FEF08A" />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1, letterSpacing: '-0.3px' }}>
+                    4.9
+                  </span>
+                  <div style={{ display: 'flex', gap: '2px' }}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} size={11} weight="fill" color="#FDE047" />
+                    ))}
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#FEF3C7', lineHeight: 1 }}>
+                  {language === 'id' ? 'Rating Kepuasan Tenant' : 'Tenant Satisfaction'}
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Satisfaction % & Review Count */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', zIndex: 1 }}>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1 }}>
+                98% {language === 'id' ? 'Puas' : 'Satisfied'}
+              </span>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#FEF3C7', lineHeight: 1 }}>
+                12 {language === 'id' ? 'Ulasan' : 'Reviews'}
+              </span>
+            </div>
+          </div>
+
+          {/* View All Home Services Button */}
+          <button
+            type="button"
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              width: '100%',
+              height: '38px',
+              backgroundColor: '#FFFFFF',
+              color: '#02388A',
+              borderRadius: '10px',
+              border: '1px solid #E2E8F0',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              marginTop: '2px',
+            }}
+          >
+            {language === 'id' ? 'Lihat Semua Home Service' : 'View All Home Services'}
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+      </div>
+
+      {/* Home Service Month Picker Bottom Sheet Modal */}
+      {isHsMonthPickerOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsHsMonthPickerOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {language === 'id' ? 'Pilih Periode Home Service' : 'Select Home Service Period'}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Pilih bulan dan tahun' : 'Choose month and year'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsHsMonthPickerOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Year Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '6px 12px',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setHsPickerTempYear((y) => y - 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                  {hsPickerTempYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setHsPickerTempYear((y) => y + 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+
+              {/* 12 Month Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                }}
+              >
+                {(language === 'id' ? WO_MONTHS_ID : WO_MONTHS_EN).map((mName, idx) => {
+                  const isSelected = hsPickerTempMonth === idx;
+                  return (
+                    <button
+                      key={mName}
+                      type="button"
+                      onClick={() => setHsPickerTempMonth(idx)}
+                      style={{
+                        padding: '10px 4px',
+                        borderRadius: '10px',
+                        border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                        color: isSelected ? '#02388A' : '#334155',
+                        fontSize: '0.8125rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {mName}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Apply Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setHsSelectedMonth(hsPickerTempMonth);
+                  setHsSelectedYear(hsPickerTempYear);
+                  setIsHsMonthPickerOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '4px',
+                  boxShadow: 'none',
+                }}
+              >
+                {language === 'id' ? 'Terapkan' : 'Apply'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+
+      {/* =========================================================================
+          SECTION 4: Jadwal Inspeksi Rutin (Bulanan & Tren Mingguan)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.eng.inspectionTitle')}
+          </h2>
+          <button
+            type="button"
+            onClick={() => {
+              setInspPickerTempMonth(inspSelectedMonth);
+              setInspPickerTempYear(inspSelectedYear);
+              setIsInspMonthPickerOpen(true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+              boxShadow: 'none',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            <span>{currentInspMonthName} {inspSelectedYear}</span>
+            <CaretDown size={14} weight="bold" color="#053079" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          {/* 3 Activity Performance Metrics (Summary Badges) */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '8px',
+              textAlign: 'center',
+            }}
+          >
+            {/* 1. Total Jadwal Inspeksi */}
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderRadius: '12px',
+                padding: '8px 4px',
+                border: '1px solid #E2E8F0',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+                24
+              </div>
+              <div style={{ fontSize: '0.625rem', color: '#334155', fontWeight: 700, lineHeight: 1.2 }}>
+                <div>Total</div>
+                <div>{language === 'id' ? 'Jadwal' : 'Schedules'}</div>
+              </div>
+            </div>
+
+            {/* 2. Selesai / Completed (Hijau) */}
+            <div
+              style={{
+                backgroundColor: '#F0FDF4',
+                borderRadius: '12px',
+                padding: '8px 4px',
+                border: '1px solid #DCFCE7',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#15803D', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+                20
+              </div>
+              <div style={{ fontSize: '0.625rem', color: '#166534', fontWeight: 700, lineHeight: 1.2 }}>
+                <div>{language === 'id' ? 'Inspeksi' : 'Inspections'}</div>
+                <div>{language === 'id' ? 'Selesai' : 'Completed'}</div>
+              </div>
+            </div>
+
+            {/* 3. Belum Dikerjakan / Pending (Orange) */}
+            <div
+              style={{
+                backgroundColor: '#FFF7ED',
+                borderRadius: '12px',
+                padding: '8px 4px',
+                border: '1px solid #FFEDD5',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#C2410C', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+                4
+              </div>
+              <div style={{ fontSize: '0.625rem', color: '#9A3412', fontWeight: 700, lineHeight: 1.2 }}>
+                <div>{language === 'id' ? 'Inspeksi' : 'Inspections'}</div>
+                <div>{language === 'id' ? 'Pending' : 'Pending'}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Dynamic Grouped Bar Chart for Weekly Inspections (Green Selesai vs Orange Pending) */}
+          <div style={{ marginTop: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>
+                {language === 'id' ? 'Tren Inspeksi Mingguan' : 'Weekly Inspection Trend'}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.6875rem', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#15803D' }}>
+                  <span style={{ width: '8px', height: '8px', backgroundColor: '#16A34A', borderRadius: '2px' }} />
+                  <span>{language === 'id' ? 'Selesai' : 'Completed'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#C2410C' }}>
+                  <span style={{ width: '8px', height: '8px', backgroundColor: '#F97316', borderRadius: '2px' }} />
+                  <span>{language === 'id' ? 'Pending' : 'Pending'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', position: 'relative' }}>
+              <svg
+                viewBox="0 0 340 160"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  overflow: 'visible',
+                  animation: 'chartFadeIn 0.35s ease-out',
+                }}
+              >
+                {/* Y-Axis Grid Lines & Labels */}
+                {[
+                  { val: '8', y: 24 },
+                  { val: '6', y: 49 },
+                  { val: '4', y: 74 },
+                  { val: '2', y: 99 },
+                  { val: '0', y: 124 },
+                ].map((grid) => (
+                  <g key={grid.val}>
+                    <text
+                      x="18"
+                      y={grid.y + 4}
+                      fontSize="10"
+                      fontWeight="500"
+                      fill="#94A3B8"
+                      textAnchor="end"
+                    >
+                      {grid.val}
+                    </text>
+                    <line
+                      x1="28"
+                      y1={grid.y}
+                      x2="330"
+                      y2={grid.y}
+                      stroke="#E2E8F0"
+                      strokeDasharray="3 3"
+                      strokeWidth="1"
+                    />
+                  </g>
+                ))}
+
+                {/* Grouped Bars per Week */}
+                {[
+                  {
+                    week: language === 'id' ? 'Mg 1' : 'W1',
+                    centerX: 70,
+                    complete: { val: 5, x: 54, y: 61.5, height: 62.5 },
+                    pending: { val: 0, x: 72, y: 124, height: 0 },
+                  },
+                  {
+                    week: language === 'id' ? 'Mg 2' : 'W2',
+                    centerX: 140,
+                    complete: { val: 6, x: 124, y: 49, height: 75 },
+                    pending: { val: 1, x: 142, y: 111.5, height: 12.5 },
+                  },
+                  {
+                    week: language === 'id' ? 'Mg 3' : 'W3',
+                    centerX: 210,
+                    complete: { val: 5, x: 194, y: 61.5, height: 62.5 },
+                    pending: { val: 1, x: 212, y: 111.5, height: 12.5 },
+                  },
+                  {
+                    week: language === 'id' ? 'Mg 4' : 'W4',
+                    centerX: 280,
+                    complete: { val: 4, x: 264, y: 74, height: 50 },
+                    pending: { val: 2, x: 282, y: 99, height: 25 },
+                  },
+                ].map((item, idx) => (
+                  <g key={item.week}>
+                    {/* Complete Bar (Green) */}
+                    {item.complete.height > 0 && (
+                      <rect
+                        x={item.complete.x}
+                        y={item.complete.y}
+                        width="14"
+                        height={item.complete.height}
+                        rx="3"
+                        ry="3"
+                        fill="#16A34A"
+                        className="animate-bar-grow"
+                        style={{ animationDelay: `${0.05 + idx * 0.05}s` }}
+                      />
+                    )}
+                    <text
+                      x={item.complete.x + 7}
+                      y={item.complete.y - 4}
+                      fontSize="10"
+                      fontWeight="700"
+                      fill="#15803D"
+                      textAnchor="middle"
+                    >
+                      {item.complete.val}
+                    </text>
+
+                    {/* Pending Bar (Orange) */}
+                    {item.pending.height > 0 ? (
+                      <rect
+                        x={item.pending.x}
+                        y={item.pending.y}
+                        width="14"
+                        height={item.pending.height}
+                        rx="3"
+                        ry="3"
+                        fill="#F97316"
+                        className="animate-bar-grow"
+                        style={{ animationDelay: `${0.08 + idx * 0.05}s` }}
+                      />
+                    ) : (
+                      <rect
+                        x={item.pending.x}
+                        y={122}
+                        width="14"
+                        height="2"
+                        rx="1"
+                        ry="1"
+                        fill="#FED7AA"
+                      />
+                    )}
+                    <text
+                      x={item.pending.x + 7}
+                      y={item.pending.val === 0 ? 116 : item.pending.y - 4}
+                      fontSize="10"
+                      fontWeight="700"
+                      fill="#C2410C"
+                      textAnchor="middle"
+                    >
+                      {item.pending.val}
+                    </text>
+
+                    {/* X-Axis Label */}
+                    <text
+                      x={item.centerX}
+                      y="144"
+                      fontSize="11"
+                      fontWeight="600"
+                      fill="#64748B"
+                      textAnchor="middle"
+                    >
+                      {item.week}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </div>
+
+          {/* 2 Categorical Breakdown Cards (Complete - Green vs Pending - Orange) with Asset, Floor, Room */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+            }}
+          >
+            {/* Card 1: Selesai / Complete (Hijau Solid Fill) */}
+            <div
+              style={{
+                backgroundColor: '#16A34A',
+                borderRadius: '14px',
+                padding: '12px 12px',
+                border: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                boxShadow: '0 2px 8px rgba(22, 163, 74, 0.18)',
+              }}
+            >
+              {/* Header Selesai */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <CheckCircle size={16} weight="fill" color="#FFFFFF" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF' }}>
+                    {t('overview.eng.inspectedDone')}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: '1.1875rem',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                  }}
+                >
+                  20
+                </span>
+              </div>
+
+              {/* Divider */}
+              <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.22)' }} />
+
+              {/* Breakdown List: Asset, Floor, Room */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {/* Asset */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Wrench size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catAsset')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    8
+                  </span>
+                </div>
+
+                {/* Floor */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Buildings size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catFloor')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    7
+                  </span>
+                </div>
+
+                {/* Room */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Door size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catRoom')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    5
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Belum Dikerjakan / Pending (Orange Solid Fill) */}
+            <div
+              style={{
+                backgroundColor: '#F97316',
+                borderRadius: '14px',
+                padding: '12px 12px',
+                border: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.18)',
+              }}
+            >
+              {/* Header Pending */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Clock size={16} weight="fill" color="#FFFFFF" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF' }}>
+                    {t('overview.eng.inspectedPending')}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: '1.1875rem',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                  }}
+                >
+                  4
+                </span>
+              </div>
+
+              {/* Divider */}
+              <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.22)' }} />
+
+              {/* Breakdown List: Asset, Floor, Room */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {/* Asset */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Wrench size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catAsset')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    1
+                  </span>
+                </div>
+
+                {/* Floor */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Buildings size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catFloor')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    2
+                  </span>
+                </div>
+
+                {/* Room */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Door size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catRoom')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    1
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* View All Button */}
+          <button
+            type="button"
+            onClick={() => alert('Opening all inspection schedules')}
+            style={{
+              width: '100%',
+              height: '38px',
+              backgroundColor: '#FFFFFF',
+              color: '#02388A',
+              borderRadius: '10px',
+              border: '1px solid #E2E8F0',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              marginTop: '2px',
+            }}
+          >
+            {t('overview.eng.viewAllInspections')}
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+      </div>
+
+      {/* Inspection Month Picker Modal */}
+      {isInspMonthPickerOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsInspMonthPickerOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {language === 'id' ? 'Pilih Periode Inspeksi' : 'Select Inspection Period'}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Pilih bulan dan tahun' : 'Choose month and year'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsInspMonthPickerOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Year Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '6px 12px',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setInspPickerTempYear((y) => y - 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                  {inspPickerTempYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setInspPickerTempYear((y) => y + 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+
+              {/* 12 Month Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                }}
+              >
+                {(language === 'id' ? WO_MONTHS_ID : WO_MONTHS_EN).map((mName, idx) => {
+                  const isSelected = inspPickerTempMonth === idx;
+                  return (
+                    <button
+                      key={mName}
+                      type="button"
+                      onClick={() => setInspPickerTempMonth(idx)}
+                      style={{
+                        padding: '10px 4px',
+                        borderRadius: '10px',
+                        border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                        color: isSelected ? '#02388A' : '#334155',
+                        fontSize: '0.8125rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {mName}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Apply Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setInspSelectedMonth(inspPickerTempMonth);
+                  setInspSelectedYear(inspPickerTempYear);
+                  setIsInspMonthPickerOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '4px',
+                }}
+              >
+                {language === 'id' ? 'Terapkan Periode' : 'Apply Period'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          SECTION 5: Progres Scan Meter Utilitas (Utility Meter Scanning Progress - Matches BM)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.eng.meterTitle')}
+          </h2>
+
+          {/* Month Selector Pill */}
+          <button
+            type="button"
+            onClick={() => {
+              setMeterPickerTempMonth(meterSelectedMonth);
+              setMeterPickerTempYear(meterSelectedYear);
+              setIsMeterMonthPickerOpen(true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+              boxShadow: 'none',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            <span>{`${currentMeterMonthName} ${meterSelectedYear}`}</span>
+            <CaretDown size={14} weight="bold" color="#053079" />
+          </button>
+        </div>
+
+        {/* Card 1: Water Meter */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E2E8F0',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            boxShadow: 'none',
+          }}
+        >
+          {/* Top Info */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Drop size={18} weight="fill" color="#09B2FF" />
+              <span style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#334155' }}>
+                {t('overview.waterMeter')}
+              </span>
+            </div>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#053079' }}>
+              {t('overview.scanned', { count: 824, total: 952 })}
+            </span>
+          </div>
+
+          {/* Progress Bar (86.5% scanned) */}
+          <div
+            style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#F1F5F9',
+              borderRadius: '9999px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: '86.5%',
+                height: '100%',
+                backgroundColor: '#09B2FF',
+                borderRadius: '9999px',
+                transition: 'width 0.4s ease-out',
+              }}
+            />
+          </div>
+
+          {/* Bottom Status */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 500, color: '#64748B' }}>
+              {t('overview.notRecordedYet', { count: 128 })}
+            </span>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#10B981' }}>
+              86.5%
+            </span>
+          </div>
+        </div>
+
+        {/* Card 2: Electric Meter */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            border: '1px solid #E2E8F0',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            boxShadow: 'none',
+          }}
+        >
+          {/* Top Info */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Lightning size={18} weight="fill" color="#EAB308" />
+              <span style={{ fontSize: '0.9375rem', fontWeight: 600, color: '#334155' }}>
+                {t('overview.electricMeter')}
+              </span>
+            </div>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#053079' }}>
+              {t('overview.scanned', { count: 946, total: '1.080' })}
+            </span>
+          </div>
+
+          {/* Progress Bar (87.6% scanned) */}
+          <div
+            style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#F1F5F9',
+              borderRadius: '9999px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: '87.6%',
+                height: '100%',
+                backgroundColor: '#EAB308',
+                borderRadius: '9999px',
+                transition: 'width 0.4s ease-out',
+              }}
+            />
+          </div>
+
+          {/* Bottom Status */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 500, color: '#64748B' }}>
+              {t('overview.notRecordedYet', { count: 134 })}
+            </span>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#10B981' }}>
+              87.6%
+            </span>
+          </div>
+        </div>
+
+        {/* Show Unrecorded Utility Button */}
+        <button
+          type="button"
+          onClick={() => setIsUnrecordedModalOpen(true)}
+          style={{
+            width: '100%',
+            height: '38px',
+            backgroundColor: '#FFFFFF',
+            color: '#02388A',
+            borderRadius: '10px',
+            border: '1px solid #E2E8F0',
+            fontSize: '0.8125rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            marginTop: '2px',
+          }}
+        >
+          {t('overview.eng.showUnrecordedUtility')}
+          <CaretRight size={14} weight="bold" />
+        </button>
+      </div>
+
+      {/* Unrecorded Utility Bottom Sheet Modal */}
+      {isUnrecordedModalOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const filteredUnits = SAMPLE_UNRECORDED_UNITS.filter((item) => {
+          const matchTab = unrecordedFilterTab === 'ALL'
+            ? true
+            : unrecordedFilterTab === 'WATER'
+            ? item.type === 'water'
+            : item.type === 'electric';
+          const matchQuery = unrecordedSearchQuery.trim() === ''
+            ? true
+            : item.unit.toLowerCase().includes(unrecordedSearchQuery.toLowerCase()) ||
+              item.floor.toLowerCase().includes(unrecordedSearchQuery.toLowerCase()) ||
+              item.meterNo.toLowerCase().includes(unrecordedSearchQuery.toLowerCase());
+          return matchTab && matchQuery;
+        });
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsUnrecordedModalOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {language === 'id' ? 'Utilitas Belum Dicatat' : 'Unrecorded Utility'}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {`${currentMeterMonthName} ${meterSelectedYear} • 262 ${language === 'id' ? 'Unit Belum Dicatat' : 'Pending Units'}`}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsUnrecordedModalOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Filter Tabs */}
+              <div
+                style={{
+                  display: 'flex',
+                  backgroundColor: '#F1F5F9',
+                  padding: '4px',
+                  borderRadius: '10px',
+                  gap: '4px',
+                }}
+              >
+                {[
+                  { key: 'ALL', label: language === 'id' ? 'Semua (262)' : 'All (262)' },
+                  { key: 'WATER', label: language === 'id' ? 'Air (128)' : 'Water (128)' },
+                  { key: 'ELECTRIC', label: language === 'id' ? 'Listrik (134)' : 'Electric (134)' },
+                ].map((tab) => {
+                  const isActive = unrecordedFilterTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => setUnrecordedFilterTab(tab.key)}
+                      style={{
+                        flex: 1,
+                        padding: '6px 8px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        backgroundColor: isActive ? '#FFFFFF' : 'transparent',
+                        color: isActive ? '#053079' : '#64748B',
+                        fontWeight: isActive ? 700 : 500,
+                        fontSize: '0.75rem',
+                        cursor: 'pointer',
+                        boxShadow: isActive ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Search Bar */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '10px',
+                  border: '1px solid #E2E8F0',
+                  padding: '8px 12px',
+                  gap: '8px',
+                }}
+              >
+                <MagnifyingGlass size={16} color="#94A3B8" weight="bold" />
+                <input
+                  type="text"
+                  value={unrecordedSearchQuery}
+                  onChange={(e) => setUnrecordedSearchQuery(e.target.value)}
+                  placeholder={language === 'id' ? 'Cari unit, lantai, no. meter...' : 'Search unit, floor, meter no...'}
+                  style={{
+                    border: 'none',
+                    outline: 'none',
+                    backgroundColor: 'transparent',
+                    fontSize: '0.8125rem',
+                    color: '#1E293B',
+                    width: '100%',
+                    fontFamily: 'var(--font-sans)',
+                  }}
+                />
+                {unrecordedSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setUnrecordedSearchQuery('')}
+                    style={{
+                      border: 'none',
+                      background: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      color: '#94A3B8',
+                      display: 'flex',
+                    }}
+                  >
+                    <X size={14} weight="bold" />
+                  </button>
+                )}
+              </div>
+
+              {/* Unit List */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  maxHeight: '260px',
+                  overflowY: 'auto',
+                  paddingRight: '2px',
+                }}
+              >
+                {filteredUnits.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '24px 0', color: '#94A3B8', fontSize: '0.8125rem' }}>
+                    {language === 'id' ? 'Tidak ada unit ditemukan' : 'No units found'}
+                  </div>
+                ) : (
+                  filteredUnits.map((item) => {
+                    const isWater = item.type === 'water';
+                    return (
+                      <div
+                        key={item.id}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '10px 12px',
+                          backgroundColor: '#F8FAFC',
+                          borderRadius: '12px',
+                          border: '1px solid #E2E8F0',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <div
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '8px',
+                              backgroundColor: isWater ? '#E0F2FE' : '#FEF9C3',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            {isWater ? (
+                              <Drop size={18} weight="fill" color="#09B2FF" />
+                            ) : (
+                              <Lightning size={18} weight="fill" color="#EAB308" />
+                            )}
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
+                              {item.unit}
+                            </div>
+                            <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
+                              {item.floor} • No: {item.meterNo}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ textAlign: 'right' }}>
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              padding: '2px 8px',
+                              borderRadius: '6px',
+                              fontSize: '0.6875rem',
+                              fontWeight: 700,
+                              backgroundColor: '#FEF2F2',
+                              color: '#DC2626',
+                            }}
+                          >
+                            {language === 'id' ? 'Belum Dicatat' : 'Pending'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setIsUnrecordedModalOpen(false)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '4px',
+                }}
+              >
+                {language === 'id' ? 'Tutup' : 'Close'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* Utility Meter Month Picker Bottom Sheet Modal */}
+      {isMeterMonthPickerOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsMeterMonthPickerOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {language === 'id' ? 'Pilih Periode Scan Meter' : 'Select Meter Scanning Period'}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Pilih bulan dan tahun' : 'Choose month and year'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsMeterMonthPickerOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Year Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '6px 12px',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setMeterPickerTempYear((y) => y - 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                  {meterPickerTempYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMeterPickerTempYear((y) => y + 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+
+              {/* 12 Month Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                }}
+              >
+                {(language === 'id' ? WO_MONTHS_ID : WO_MONTHS_EN).map((mName, idx) => {
+                  const isSelected = meterPickerTempMonth === idx;
+                  return (
+                    <button
+                      key={mName}
+                      type="button"
+                      onClick={() => setMeterPickerTempMonth(idx)}
+                      style={{
+                        padding: '10px 4px',
+                        borderRadius: '10px',
+                        border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                        color: isSelected ? '#02388A' : '#334155',
+                        fontSize: '0.8125rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {mName}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Apply Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setMeterSelectedMonth(meterPickerTempMonth);
+                  setMeterSelectedYear(meterPickerTempYear);
+                  setIsMeterMonthPickerOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '4px',
+                  boxShadow: 'none',
+                }}
+              >
+                {language === 'id' ? 'Terapkan' : 'Apply'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+    </div>
+  );
+};
+
+/**
+ * Housekeeping Specific Overview Sub-Component
+ */
+const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
+  const { language } = useLanguage();
+  const [clockedIn, setClockedIn] = useState(true);
+  const [isYearlyModalOpen, setIsYearlyModalOpen] = useState(false);
+  const [selectedYear, setSelectedYear] = useState(2026);
+  const [isHsMonthPickerOpen, setIsHsMonthPickerOpen] = useState(false);
+  const [hsSelectedMonth, setHsSelectedMonth] = useState(8); // 8 = September
+  const [hsSelectedYear, setHsSelectedYear] = useState(2026);
+  const [hsPickerTempMonth, setHsPickerTempMonth] = useState(8);
+  const [hsPickerTempYear, setHsPickerTempYear] = useState(2026);
+
+  const [isInspMonthPickerOpen, setIsInspMonthPickerOpen] = useState(false);
+  const [inspSelectedMonth, setInspSelectedMonth] = useState(8); // 8 = September
+  const [inspSelectedYear, setInspSelectedYear] = useState(2026);
+  const [inspPickerTempMonth, setInspPickerTempMonth] = useState(8);
+  const [inspPickerTempYear, setInspPickerTempYear] = useState(2026);
+
+  const HS_MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const HS_MONTHS_ID = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const currentHsMonthName = language === 'id' ? HS_MONTHS_ID[hsSelectedMonth] : HS_MONTHS_EN[hsSelectedMonth];
+  const currentInspMonthName = language === 'id' ? HS_MONTHS_ID[inspSelectedMonth] : HS_MONTHS_EN[inspSelectedMonth];
+
+  const handleViewDetails = (section) => {
+    if (onNavigateDetails) {
+      onNavigateDetails(section);
+    } else {
+      alert(t('overview.detailsAlert', { section }));
+    }
+  };
+
+  const currentYearData = YEARLY_ATTENDANCE_DATA[selectedYear] || YEARLY_ATTENDANCE_DATA[2026];
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100%',
+        backgroundColor: '#F8FAFC',
+        fontFamily: 'var(--font-sans)',
+        padding: '16px',
+        gap: '16px',
+        boxSizing: 'border-box',
+        userSelect: 'none',
+        paddingBottom: '40px',
+      }}
+    >
+      {/* =========================================================================
+          SECTION 1: Shift Hari Ini (Today Shift)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.eng.todayShift')}
+          </h2>
+          <span
+            style={{
+              backgroundColor: '#DCFCE7',
+              color: '#16A34A',
+              fontSize: '0.6875rem',
+              fontWeight: 700,
+              padding: '3px 8px',
+              borderRadius: '9999px',
+            }}
+          >
+            {t('overview.eng.onTime')}
+          </span>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>
+            Morning Shift • 07:00 - 16:00 WIB
+          </div>
+
+          {/* 2 Side-by-Side Clock Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderRadius: '12px',
+                padding: '10px 12px',
+                border: '1px solid #F1F5F9',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                {t('overview.eng.clockIn')}
+              </span>
+              <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#1E293B', letterSpacing: '-0.3px' }}>
+                06:55 <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#64748B' }}>WIB</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                <SealCheck size={14} weight="fill" color="#16A34A" />
+                <span style={{ fontSize: '0.6875rem', color: '#16A34A', fontWeight: 600 }}>
+                  {t('overview.eng.recorded')}
+                </span>
+              </div>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderRadius: '12px',
+                padding: '10px 12px',
+                border: '1px solid #F1F5F9',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                {t('overview.eng.clockOut')}
+              </span>
+              <div style={{ fontSize: '1.0625rem', fontWeight: 800, color: !clockedIn ? '#1E293B' : '#94A3B8', letterSpacing: '-0.3px' }}>
+                {!clockedIn ? (
+                  <>16:05 <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#64748B' }}>WIB</span></>
+                ) : (
+                  '-- : --'
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                {!clockedIn ? (
+                  <>
+                    <SealCheck size={14} weight="fill" color="#16A34A" />
+                    <span style={{ fontSize: '0.6875rem', color: '#16A34A', fontWeight: 600 }}>
+                      {t('overview.eng.recorded')}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <HourglassMedium size={14} weight="fill" color="#94A3B8" />
+                    <span style={{ fontSize: '0.6875rem', color: '#94A3B8', fontWeight: 600 }}>
+                      {t('overview.eng.notRecorded')}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          SECTION 2: Rekap Presensi Bulanan (Monthly Attendance)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.eng.monthlyAttendanceTitle')}
+          </h2>
+
+          <button
+            type="button"
+            onClick={() => handleViewDetails('Employee attendance')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#02388A',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px',
+              cursor: 'pointer',
+              padding: 0,
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            <span>{t('overview.viewDetails')}</span>
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>
+            {language === 'id' ? 'Bulan Ini (September 2026)' : 'This Month (September 2026)'}
+          </div>
+
+          {/* Hero Fill Attendance Rate Banner */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #02388A 0%, #0052CC 60%, #0284C7 100%)',
+              borderRadius: '14px',
+              padding: '13px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Subtle background glow effect */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '90px',
+                height: '90px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(2, 56, 138, 0) 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CalendarBlank size={18} weight="fill" color="#38BDF8" />
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.1px' }}>
+                  {t('overview.eng.attendancePct')}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: '#FFFFFF',
+                    fontSize: '0.6875rem',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  23/24 {language === 'id' ? 'Hari' : 'Days'}
+                </span>
+                <span
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                    letterSpacing: '-0.5px',
+                  }}
+                >
+                  96%
+                </span>
+              </div>
+            </div>
+
+            {/* Glowing White Progress Bar on Semi-transparent Track */}
+            <div
+              style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                borderRadius: '9999px',
+                overflow: 'hidden',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              <div
+                style={{
+                  width: '96%',
+                  height: '100%',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '9999px',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* 4 KPI Metrics */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+            <div style={{ backgroundColor: '#F0FDF4', border: '1px solid #DCFCE7', borderRadius: '12px', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>22</span>
+              <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{t('overview.eng.onTime')}</span>
+            </div>
+            <div style={{ backgroundColor: '#FFFBEB', border: '1px solid #FEF3C7', borderRadius: '12px', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>1</span>
+              <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{t('overview.eng.late')}</span>
+            </div>
+            <div style={{ backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>1</span>
+              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{t('overview.eng.leaveDays')}</span>
+            </div>
+            <div style={{ backgroundColor: '#FEF2F2', border: '1px solid #FEE2E2', borderRadius: '12px', padding: '10px 4px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>0</span>
+              <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>{t('overview.eng.alpha')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          SECTION 3: Home Service / Tugas Housekeeping
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.hk.hsTitle')}
+          </h2>
+          <button
+            type="button"
+            onClick={() => {
+              setHsPickerTempMonth(hsSelectedMonth);
+              setHsPickerTempYear(hsSelectedYear);
+              setIsHsMonthPickerOpen(true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+              boxShadow: 'none',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            <span>{currentHsMonthName} {hsSelectedYear}</span>
+            <CaretDown size={14} weight="bold" color="#053079" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          {/* Donut Chart Breakdown for Home Service */}
+          <div
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              cursor: 'pointer',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              padding: '14px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '16px',
+            }}
+          >
+            {/* Left Donut SVG with Center Label */}
+            <div
+              style={{
+                position: 'relative',
+                width: '110px',
+                height: '110px',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <svg
+                width="110"
+                height="110"
+                viewBox="0 0 120 120"
+                style={{
+                  transform: 'rotate(-90deg)',
+                  overflow: 'visible',
+                }}
+              >
+                {/* Background Ring */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="46"
+                  fill="none"
+                  stroke="#E2E8F0"
+                  strokeWidth="12"
+                />
+                {/* Works Executed Segment (66.7% - Green #16A34A) */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="46"
+                  fill="none"
+                  stroke="#16A34A"
+                  strokeWidth="12"
+                  strokeDasharray={`${(12 / 18) * 289.03} 289.03`}
+                  strokeDashoffset="0"
+                  strokeLinecap="round"
+                />
+                {/* Surveys Conducted Segment (33.3% - Blue #2563EB) */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="46"
+                  fill="none"
+                  stroke="#2563EB"
+                  strokeWidth="12"
+                  strokeDasharray={`${(6 / 18) * 289.03} 289.03`}
+                  strokeDashoffset={-((12 / 18) * 289.03)}
+                  strokeLinecap="round"
+                />
+              </svg>
+
+              {/* Center Text */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'none',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 800,
+                    color: '#0F172A',
+                    lineHeight: 1,
+                    letterSpacing: '-0.3px',
+                  }}
+                >
+                  18
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.625rem',
+                    fontWeight: 600,
+                    color: '#64748B',
+                    marginTop: '2px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.3px',
+                  }}
+                >
+                  Total
+                </span>
+              </div>
+            </div>
+
+            {/* Right Breakdown Details */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {/* Works / Layanan Item */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: '#16A34A',
+                      display: 'inline-block',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1E293B', lineHeight: 1.2 }}>
+                      {language === 'id' ? 'Layanan yang Dilakukan' : 'Services Executed'}
+                    </div>
+                    <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
+                      66.7% {language === 'id' ? 'dari total' : 'of total'}
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#15803D' }}>
+                  12
+                </span>
+              </div>
+
+              <div style={{ height: '1px', backgroundColor: '#E2E8F0', width: '100%' }} />
+
+              {/* Surveys Item */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      width: '10px',
+                      height: '10px',
+                      borderRadius: '50%',
+                      backgroundColor: '#2563EB',
+                      display: 'inline-block',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1E293B', lineHeight: 1.2 }}>
+                      {language === 'id' ? 'Survey yang Dilakukan' : 'Surveys Conducted'}
+                    </div>
+                    <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>
+                      33.3% {language === 'id' ? 'dari total' : 'of total'}
+                    </div>
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#1D4ED8' }}>
+                  6
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Weekly Activity Trend (Survey vs Layanan / Works) */}
+          <div
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              backgroundColor: '#F8FAFC',
+              borderRadius: '14px',
+              border: '1px solid #E2E8F0',
+              padding: '14px 14px 10px 14px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>
+                {language === 'id' ? 'Tren Aktivitas Mingguan' : 'Weekly Activity Trend'}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.6875rem', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#1D4ED8' }}>
+                  <span style={{ width: '10px', height: '3px', backgroundColor: '#2563EB', borderRadius: '2px' }} />
+                  <span>Survey</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#15803D' }}>
+                  <span style={{ width: '10px', height: '3px', backgroundColor: '#16A34A', borderRadius: '2px' }} />
+                  <span>{language === 'id' ? 'Layanan' : 'Services'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', position: 'relative' }}>
+              <svg
+                viewBox="0 0 340 160"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  overflow: 'visible',
+                  animation: 'chartFadeIn 0.35s ease-out',
+                }}
+              >
+                <defs>
+                  <linearGradient id="hkHsSurveyGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#2563EB" stopOpacity="0.01" />
+                  </linearGradient>
+                  <linearGradient id="hkHsWorkGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#16A34A" stopOpacity="0.22" />
+                    <stop offset="100%" stopColor="#16A34A" stopOpacity="0.01" />
+                  </linearGradient>
+                </defs>
+
+                {/* Y-Axis Grid Lines & Labels */}
+                {[
+                  { val: '6', y: 22 },
+                  { val: '4', y: 56 },
+                  { val: '2', y: 90 },
+                  { val: '0', y: 124 },
+                ].map((grid) => (
+                  <g key={grid.val}>
+                    <text
+                      x="18"
+                      y={grid.y + 4}
+                      fontSize="10"
+                      fontWeight="500"
+                      fill="#94A3B8"
+                      textAnchor="end"
+                    >
+                      {grid.val}
+                    </text>
+                    <line
+                      x1="28"
+                      y1={grid.y}
+                      x2="330"
+                      y2={grid.y}
+                      stroke="#E2E8F0"
+                      strokeDasharray="3 3"
+                      strokeWidth="1"
+                    />
+                  </g>
+                ))}
+
+                {/* Work Area Under Line (Green) */}
+                <path
+                  d="M 55,73 L 135,73 L 215,56 L 295,90 L 295,124 L 55,124 Z"
+                  fill="url(#hkHsWorkGrad)"
+                  style={{ animation: 'areaFadeIn 0.4s ease-out' }}
+                />
+
+                {/* Work Connecting Line (Green) */}
+                <path
+                  d="M 55,73 L 135,73 L 215,56 L 295,90"
+                  fill="none"
+                  stroke="#16A34A"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Survey Area Under Line (Blue) */}
+                <path
+                  d="M 55,107 L 135,90 L 215,107 L 295,90 L 295,124 L 55,124 Z"
+                  fill="url(#hkHsSurveyGrad)"
+                  style={{ animation: 'areaFadeIn 0.4s ease-out' }}
+                />
+
+                {/* Survey Connecting Line (Blue) */}
+                <path
+                  d="M 55,107 L 135,90 L 215,107 L 295,90"
+                  fill="none"
+                  stroke="#2563EB"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Data Points & Values for Work (Green) */}
+                {[
+                  { x: 55, y: 73, val: '3' },
+                  { x: 135, y: 73, val: '3' },
+                  { x: 215, y: 56, val: '4' },
+                  { x: 295, y: 90, val: '2' },
+                ].map((pt, i) => (
+                  <g key={`hk-hs-work-${i}`}>
+                    <text
+                      x={pt.x}
+                      y={pt.y - 8}
+                      fontSize="11"
+                      fontWeight="700"
+                      fill="#15803D"
+                      textAnchor="middle"
+                    >
+                      {pt.val}
+                    </text>
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r="4"
+                      fill="#FFFFFF"
+                      stroke="#16A34A"
+                      strokeWidth="2.5"
+                    />
+                  </g>
+                ))}
+
+                {/* Data Points & Values for Survey (Blue) */}
+                {[
+                  { x: 55, y: 107, val: '1' },
+                  { x: 135, y: 90, val: '2' },
+                  { x: 215, y: 107, val: '1' },
+                  { x: 295, y: 90, val: '2' },
+                ].map((pt, i) => (
+                  <g key={`hk-hs-survey-${i}`}>
+                    <text
+                      x={pt.x}
+                      y={pt.y + 15}
+                      fontSize="11"
+                      fontWeight="700"
+                      fill="#1D4ED8"
+                      textAnchor="middle"
+                    >
+                      {pt.val}
+                    </text>
+                    <circle
+                      cx={pt.x}
+                      cy={pt.y}
+                      r="4"
+                      fill="#FFFFFF"
+                      stroke="#2563EB"
+                      strokeWidth="2.5"
+                    />
+                  </g>
+                ))}
+
+                {/* X-Axis Labels */}
+                {[
+                  { x: 55, label: language === 'id' ? 'Mg 1' : 'W1' },
+                  { x: 135, label: language === 'id' ? 'Mg 2' : 'W2' },
+                  { x: 215, label: language === 'id' ? 'Mg 3' : 'W3' },
+                  { x: 295, label: language === 'id' ? 'Mg 4' : 'W4' },
+                ].map((axis, i) => (
+                  <text
+                    key={`hk-hs-axis-${i}`}
+                    x={axis.x}
+                    y="142"
+                    fontSize="10"
+                    fontWeight="600"
+                    fill="#64748B"
+                    textAnchor="middle"
+                  >
+                    {axis.label}
+                  </text>
+                ))}
+              </svg>
+            </div>
+          </div>
+
+          {/* Customer Satisfaction & Review Summary - Rich Fill Card */}
+          <div
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'linear-gradient(135deg, #D97706 0%, #B45309 100%)',
+              borderRadius: '12px',
+              padding: '10px 14px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(180, 83, 9, 0.18)',
+              color: '#FFFFFF',
+              position: 'relative',
+              overflow: 'hidden',
+              gap: '12px',
+            }}
+          >
+            {/* Background Glow Effect */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '70px',
+                height: '70px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            {/* Left: Star Icon + Score & Stars + Subtitle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', zIndex: 1 }}>
+              <div
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                }}
+              >
+                <Star size={18} weight="fill" color="#FEF08A" />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1, letterSpacing: '-0.3px' }}>
+                    4.9
+                  </span>
+                  <div style={{ display: 'flex', gap: '2px' }}>
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} size={11} weight="fill" color="#FDE047" />
+                    ))}
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#FEF3C7', lineHeight: 1 }}>
+                  {language === 'id' ? 'Rating Kepuasan Tenant' : 'Tenant Satisfaction'}
+                </span>
+              </div>
+            </div>
+
+            {/* Right: Satisfaction % & Review Count */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '2px', zIndex: 1 }}>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1 }}>
+                98% {language === 'id' ? 'Puas' : 'Satisfied'}
+              </span>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#FEF3C7', lineHeight: 1 }}>
+                12 {language === 'id' ? 'Ulasan' : 'Reviews'}
+              </span>
+            </div>
+          </div>
+
+          {/* View All Home Services Button */}
+          <button
+            type="button"
+            onClick={() => handleViewDetails('Home Service')}
+            style={{
+              width: '100%',
+              height: '38px',
+              backgroundColor: '#FFFFFF',
+              color: '#02388A',
+              borderRadius: '10px',
+              border: '1px solid #E2E8F0',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              marginTop: '2px',
+            }}
+          >
+            {t('overview.hk.viewAllHs')}
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+      </div>
+
+      {/* Home Service Month Picker Bottom Sheet Modal */}
+      {isHsMonthPickerOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsHsMonthPickerOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {language === 'id' ? 'Pilih Periode Home Service' : 'Select Home Service Period'}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Pilih bulan dan tahun' : 'Choose month and year'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsHsMonthPickerOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Year Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '6px 12px',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setHsPickerTempYear((y) => y - 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                  {hsPickerTempYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setHsPickerTempYear((y) => y + 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+
+              {/* 12 Month Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                }}
+              >
+                {(language === 'id' ? HS_MONTHS_ID : HS_MONTHS_EN).map((mName, idx) => {
+                  const isSelected = hsPickerTempMonth === idx;
+                  return (
+                    <button
+                      key={mName}
+                      type="button"
+                      onClick={() => setHsPickerTempMonth(idx)}
+                      style={{
+                        padding: '10px 4px',
+                        borderRadius: '10px',
+                        border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                        color: isSelected ? '#02388A' : '#334155',
+                        fontSize: '0.8125rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {mName}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Apply Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setHsSelectedMonth(hsPickerTempMonth);
+                  setHsSelectedYear(hsPickerTempYear);
+                  setIsHsMonthPickerOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '4px',
+                }}
+              >
+                {language === 'id' ? 'Terapkan Periode' : 'Apply Period'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          SECTION 4: Jadwal Inspeksi Kebersihan (Bulanan & Tren Mingguan)
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.hk.inspectionTitle')}
+          </h2>
+          <button
+            type="button"
+            onClick={() => {
+              setInspPickerTempMonth(inspSelectedMonth);
+              setInspPickerTempYear(inspSelectedYear);
+              setIsInspMonthPickerOpen(true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              padding: '6px 14px',
+              borderRadius: '9999px',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              color: '#334155',
+              cursor: 'pointer',
+              outline: 'none',
+              fontFamily: 'var(--font-sans)',
+              boxShadow: 'none',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            <span>{currentInspMonthName} {inspSelectedYear}</span>
+            <CaretDown size={14} weight="bold" color="#053079" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          {/* 3 Activity Performance Metrics (Summary Badges) */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '8px',
+              textAlign: 'center',
+            }}
+          >
+            {/* 1. Total Jadwal Inspeksi */}
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                borderRadius: '12px',
+                padding: '8px 4px',
+                border: '1px solid #E2E8F0',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+                24
+              </div>
+              <div style={{ fontSize: '0.625rem', color: '#334155', fontWeight: 700, lineHeight: 1.2 }}>
+                <div>Total</div>
+                <div>{language === 'id' ? 'Jadwal' : 'Schedules'}</div>
+              </div>
+            </div>
+
+            {/* 2. Selesai / Completed (Hijau) */}
+            <div
+              style={{
+                backgroundColor: '#F0FDF4',
+                borderRadius: '12px',
+                padding: '8px 4px',
+                border: '1px solid #DCFCE7',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#15803D', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+                20
+              </div>
+              <div style={{ fontSize: '0.625rem', color: '#166534', fontWeight: 700, lineHeight: 1.2 }}>
+                <div>{language === 'id' ? 'Inspeksi' : 'Inspections'}</div>
+                <div>{language === 'id' ? 'Selesai' : 'Completed'}</div>
+              </div>
+            </div>
+
+            {/* 3. Belum Dikerjakan / Pending (Orange) */}
+            <div
+              style={{
+                backgroundColor: '#FFF7ED',
+                borderRadius: '12px',
+                padding: '8px 4px',
+                border: '1px solid #FFEDD5',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#C2410C', letterSpacing: '-0.3px', lineHeight: 1.1 }}>
+                4
+              </div>
+              <div style={{ fontSize: '0.625rem', color: '#9A3412', fontWeight: 700, lineHeight: 1.2 }}>
+                <div>{language === 'id' ? 'Inspeksi' : 'Inspections'}</div>
+                <div>{language === 'id' ? 'Pending' : 'Pending'}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Dynamic Grouped Bar Chart for Weekly Inspections (Green Selesai vs Orange Pending) */}
+          <div style={{ marginTop: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>
+                {language === 'id' ? 'Tren Inspeksi Mingguan' : 'Weekly Inspection Trend'}
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.6875rem', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#15803D' }}>
+                  <span style={{ width: '8px', height: '8px', backgroundColor: '#16A34A', borderRadius: '2px' }} />
+                  <span>{language === 'id' ? 'Selesai' : 'Completed'}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#C2410C' }}>
+                  <span style={{ width: '8px', height: '8px', backgroundColor: '#F97316', borderRadius: '2px' }} />
+                  <span>{language === 'id' ? 'Pending' : 'Pending'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', position: 'relative' }}>
+              <svg
+                viewBox="0 0 340 160"
+                style={{
+                  width: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  overflow: 'visible',
+                  animation: 'chartFadeIn 0.35s ease-out',
+                }}
+              >
+                {/* Y-Axis Grid Lines & Labels */}
+                {[
+                  { val: '8', y: 24 },
+                  { val: '6', y: 49 },
+                  { val: '4', y: 74 },
+                  { val: '2', y: 99 },
+                  { val: '0', y: 124 },
+                ].map((grid) => (
+                  <g key={grid.val}>
+                    <text
+                      x="18"
+                      y={grid.y + 4}
+                      fontSize="10"
+                      fontWeight="500"
+                      fill="#94A3B8"
+                      textAnchor="end"
+                    >
+                      {grid.val}
+                    </text>
+                    <line
+                      x1="28"
+                      y1={grid.y}
+                      x2="330"
+                      y2={grid.y}
+                      stroke="#E2E8F0"
+                      strokeDasharray="3 3"
+                      strokeWidth="1"
+                    />
+                  </g>
+                ))}
+
+                {/* Grouped Bars per Week */}
+                {[
+                  {
+                    week: language === 'id' ? 'Mg 1' : 'W1',
+                    centerX: 70,
+                    complete: { val: 5, x: 54, y: 61.5, height: 62.5 },
+                    pending: { val: 0, x: 72, y: 124, height: 0 },
+                  },
+                  {
+                    week: language === 'id' ? 'Mg 2' : 'W2',
+                    centerX: 140,
+                    complete: { val: 6, x: 124, y: 49, height: 75 },
+                    pending: { val: 1, x: 142, y: 111.5, height: 12.5 },
+                  },
+                  {
+                    week: language === 'id' ? 'Mg 3' : 'W3',
+                    centerX: 210,
+                    complete: { val: 5, x: 194, y: 61.5, height: 62.5 },
+                    pending: { val: 1, x: 212, y: 111.5, height: 12.5 },
+                  },
+                  {
+                    week: language === 'id' ? 'Mg 4' : 'W4',
+                    centerX: 280,
+                    complete: { val: 4, x: 264, y: 74, height: 50 },
+                    pending: { val: 2, x: 282, y: 99, height: 25 },
+                  },
+                ].map((item, idx) => (
+                  <g key={item.week}>
+                    {/* Complete Bar (Green) */}
+                    {item.complete.height > 0 && (
+                      <rect
+                        x={item.complete.x}
+                        y={item.complete.y}
+                        width="14"
+                        height={item.complete.height}
+                        rx="3"
+                        ry="3"
+                        fill="#16A34A"
+                        className="animate-bar-grow"
+                        style={{ animationDelay: `${0.05 + idx * 0.05}s` }}
+                      />
+                    )}
+                    <text
+                      x={item.complete.x + 7}
+                      y={item.complete.y - 4}
+                      fontSize="10"
+                      fontWeight="700"
+                      fill="#15803D"
+                      textAnchor="middle"
+                    >
+                      {item.complete.val}
+                    </text>
+
+                    {/* Pending Bar (Orange) */}
+                    {item.pending.height > 0 ? (
+                      <rect
+                        x={item.pending.x}
+                        y={item.pending.y}
+                        width="14"
+                        height={item.pending.height}
+                        rx="3"
+                        ry="3"
+                        fill="#F97316"
+                        className="animate-bar-grow"
+                        style={{ animationDelay: `${0.08 + idx * 0.05}s` }}
+                      />
+                    ) : (
+                      <rect
+                        x={item.pending.x}
+                        y={122}
+                        width="14"
+                        height="2"
+                        rx="1"
+                        ry="1"
+                        fill="#FED7AA"
+                      />
+                    )}
+                    <text
+                      x={item.pending.x + 7}
+                      y={item.pending.val === 0 ? 116 : item.pending.y - 4}
+                      fontSize="10"
+                      fontWeight="700"
+                      fill="#C2410C"
+                      textAnchor="middle"
+                    >
+                      {item.pending.val}
+                    </text>
+
+                    {/* X-Axis Label */}
+                    <text
+                      x={item.centerX}
+                      y="144"
+                      fontSize="11"
+                      fontWeight="600"
+                      fill="#64748B"
+                      textAnchor="middle"
+                    >
+                      {item.week}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </div>
+
+          {/* 2 Categorical Breakdown Cards (Complete - Green vs Pending - Orange) with Asset, Floor, Room */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+            }}
+          >
+            {/* Card 1: Selesai / Complete (Hijau Solid Fill) */}
+            <div
+              style={{
+                backgroundColor: '#16A34A',
+                borderRadius: '14px',
+                padding: '12px 12px',
+                border: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                boxShadow: '0 2px 8px rgba(22, 163, 74, 0.18)',
+              }}
+            >
+              {/* Header Selesai */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <CheckCircle size={16} weight="fill" color="#FFFFFF" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF' }}>
+                    {t('overview.eng.inspectedDone')}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: '1.1875rem',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                  }}
+                >
+                  20
+                </span>
+              </div>
+
+              {/* Divider */}
+              <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.22)' }} />
+
+              {/* Breakdown List: Asset, Floor, Room */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {/* Asset */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Wrench size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catAsset')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    8
+                  </span>
+                </div>
+
+                {/* Floor */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Buildings size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catFloor')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    7
+                  </span>
+                </div>
+
+                {/* Room */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Door size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catRoom')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    5
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Belum Dikerjakan / Pending (Orange Solid Fill) */}
+            <div
+              style={{
+                backgroundColor: '#F97316',
+                borderRadius: '14px',
+                padding: '12px 12px',
+                border: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                boxShadow: '0 2px 8px rgba(249, 115, 22, 0.18)',
+              }}
+            >
+              {/* Header Pending */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <Clock size={16} weight="fill" color="#FFFFFF" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF' }}>
+                    {t('overview.eng.inspectedPending')}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: '1.1875rem',
+                    fontWeight: 800,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                  }}
+                >
+                  4
+                </span>
+              </div>
+
+              {/* Divider */}
+              <div style={{ width: '100%', height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.22)' }} />
+
+              {/* Breakdown List: Asset, Floor, Room */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {/* Asset */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Wrench size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catAsset')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    1
+                  </span>
+                </div>
+
+                {/* Floor */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Buildings size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catFloor')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    2
+                  </span>
+                </div>
+
+                {/* Room */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Door size={12} weight="bold" color="#FFFFFF" />
+                    <span style={{ fontSize: '0.6875rem', color: '#FFFFFF', fontWeight: 600 }}>
+                      {t('overview.eng.catRoom')}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 800,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(255, 255, 255, 0.24)',
+                      minWidth: '22px',
+                      height: '18px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '6px',
+                      padding: '0 4px',
+                      textAlign: 'center',
+                      boxSizing: 'border-box',
+                      lineHeight: 1,
+                    }}
+                  >
+                    1
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* View All Button */}
+          <button
+            type="button"
+            onClick={() => alert('Opening all housekeeping inspection schedules')}
+            style={{
+              width: '100%',
+              height: '38px',
+              backgroundColor: '#FFFFFF',
+              color: '#02388A',
+              borderRadius: '10px',
+              border: '1px solid #E2E8F0',
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              marginTop: '2px',
+            }}
+          >
+            {t('overview.eng.viewAllInspections')}
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+      </div>
+
+      {/* Inspection Month Picker Modal */}
+      {isInspMonthPickerOpen && (() => {
+        const modalTarget = typeof document !== 'undefined'
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
+          : null;
+
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setIsInspMonthPickerOpen(false)}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '440px',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px',
+                maxHeight: '85%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                boxShadow: '0 -8px 30px rgba(0,0,0,0.12)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag Pill */}
+              <div
+                style={{
+                  width: '36px',
+                  height: '4px',
+                  backgroundColor: '#CBD5E1',
+                  borderRadius: '9999px',
+                  margin: '0 auto -4px auto',
+                }}
+              />
+
+              {/* Modal Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                    {language === 'id' ? 'Pilih Periode Inspeksi' : 'Select Inspection Period'}
+                  </h2>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Pilih bulan dan tahun' : 'Choose month and year'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsInspMonthPickerOpen(false)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#F1F5F9',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Year Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '6px 12px',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setInspPickerTempYear((y) => y - 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretLeft size={16} weight="bold" />
+                </button>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                  {inspPickerTempYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setInspPickerTempYear((y) => y + 1)}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    color: '#475569',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <CaretRight size={16} weight="bold" />
+                </button>
+              </div>
+
+              {/* 12 Month Grid */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: '8px',
+                }}
+              >
+                {(language === 'id' ? HS_MONTHS_ID : HS_MONTHS_EN).map((mName, idx) => {
+                  const isSelected = inspPickerTempMonth === idx;
+                  return (
+                    <button
+                      key={mName}
+                      type="button"
+                      onClick={() => setInspPickerTempMonth(idx)}
+                      style={{
+                        padding: '10px 4px',
+                        borderRadius: '10px',
+                        border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                        color: isSelected ? '#02388A' : '#334155',
+                        fontSize: '0.8125rem',
+                        fontWeight: isSelected ? 800 : 600,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {mName}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Apply Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setInspSelectedMonth(inspPickerTempMonth);
+                  setInspSelectedYear(inspPickerTempYear);
+                  setIsInspMonthPickerOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: '4px',
+                }}
+              >
+                {language === 'id' ? 'Terapkan Periode' : 'Apply Period'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          SECTION 5: Pengelolaan Sampah & Stok Kimia
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {t('overview.hk.garbageTitle')}
+          </h2>
+          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>
+            Period Sep 2026
+          </span>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          {/* Waste Chutes Bar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+              <span style={{ fontWeight: 600, color: '#1E293B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <CheckCircle size={14} color="#16A34A" weight="fill" />
+                {t('overview.hk.garbageStations')}
+              </span>
+              <span style={{ fontWeight: 700, color: '#02388A' }}>28 / 30 (93.3%)</span>
+            </div>
+            <div style={{ width: '100%', height: '8px', backgroundColor: '#F1F5F9', borderRadius: '9999px', overflow: 'hidden' }}>
+              <div style={{ width: '93.3%', height: '100%', backgroundColor: '#16A34A', borderRadius: '9999px' }} />
+            </div>
+          </div>
+
+          {/* Chemical Stock Bar */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+              <span style={{ fontWeight: 600, color: '#1E293B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Drop size={14} color="#0EA5E9" weight="fill" />
+                {t('overview.hk.chemicalSupply')}
+              </span>
+              <span style={{ fontWeight: 700, color: '#02388A' }}>88.5% Stock Safe</span>
+            </div>
+            <div style={{ width: '100%', height: '8px', backgroundColor: '#F1F5F9', borderRadius: '9999px', overflow: 'hidden' }}>
+              <div style={{ width: '88.5%', height: '100%', backgroundColor: '#0EA5E9', borderRadius: '9999px' }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
  * Building Management Overview View
  * Implements:
  * 1. Building summary
@@ -111,8 +5598,18 @@ export const OverviewReportView = ({ user, onNavigateDetails }) => {
     }
   };
 
-  // If user is Engineering, Housekeeping, or Security, render empty overview container
-  if (isEngineering || isHousekeeping || isSecurity) {
+  // If user is Engineering, render rich Engineering Overview
+  if (isEngineering) {
+    return <EngineeringOverviewContent t={t} onNavigateDetails={onNavigateDetails} />;
+  }
+
+  // If user is Housekeeping, render rich Housekeeping Overview
+  if (isHousekeeping) {
+    return <HousekeepingOverviewContent t={t} onNavigateDetails={onNavigateDetails} />;
+  }
+
+  // If user is Security, render empty overview container
+  if (isSecurity) {
     return (
       <div
         style={{
@@ -154,7 +5651,7 @@ export const OverviewReportView = ({ user, onNavigateDetails }) => {
             display: 'flex',
             flexDirection: 'column',
             gap: '16px',
-            boxShadow: '0 4px 14px rgba(239, 68, 68, 0.25)',
+            boxShadow: 'none',
             color: '#FFFFFF',
           }}
         >
@@ -197,7 +5694,7 @@ export const OverviewReportView = ({ user, onNavigateDetails }) => {
                   fontWeight: 700,
                   padding: '3px 10px',
                   borderRadius: '9999px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                  boxShadow: 'none',
                 }}
               >
                 {t('overview.overdue')}
@@ -1886,6 +7383,31 @@ export const OverviewReportView = ({ user, onNavigateDetails }) => {
             </span>
           </div>
         </div>
+
+        {/* Show Unrecorded Utility Button */}
+        <button
+          type="button"
+          onClick={() => handleViewDetails('Unrecorded Utility')}
+          style={{
+            width: '100%',
+            height: '38px',
+            backgroundColor: '#FFFFFF',
+            color: '#02388A',
+            borderRadius: '10px',
+            border: '1px solid #E2E8F0',
+            fontSize: '0.8125rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            marginTop: '2px',
+          }}
+        >
+          {t('overview.eng.showUnrecordedUtility')}
+          <CaretRight size={14} weight="bold" />
+        </button>
       </div>
 
       {/* =========================================================================
@@ -1893,7 +7415,7 @@ export const OverviewReportView = ({ user, onNavigateDetails }) => {
           ========================================================================= */}
       {isPickerOpen && (() => {
         const modalTarget = typeof document !== 'undefined'
-          ? document.querySelector('.android-device-screen') || document.body
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
           : null;
 
         const modalElement = (

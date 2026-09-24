@@ -529,7 +529,7 @@ export const UnitTowerView = ({
       {/* 3. Filter Bottom Sheet Modal (Mounted inside Phone Frame) */}
       {isFilterModalOpen && (() => {
         const modalTarget = typeof document !== 'undefined'
-          ? document.querySelector('.android-device-screen') || document.body
+          ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
           : null;
 
         const modalElement = (
