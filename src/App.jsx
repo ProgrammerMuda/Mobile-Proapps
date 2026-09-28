@@ -68,6 +68,7 @@ function App() {
   const [monthlyAttendanceMonth, setMonthlyAttendanceMonth] = useState(8); // 0-indexed (8 = September)
   const [monthlyAttendanceYear, setMonthlyAttendanceYear] = useState(2026);
   const [isMonthlyAttendancePickerOpen, setIsMonthlyAttendancePickerOpen] = useState(false);
+  const [monthlyAttendancePreviousScreen, setMonthlyAttendancePreviousScreen] = useState('overview');
   const [workOrderMonth, setWorkOrderMonth] = useState(8); // 8 = September
   const [workOrderYear, setWorkOrderYear] = useState(2026);
   const [isWorkOrderPickerOpen, setIsWorkOrderPickerOpen] = useState(false);
@@ -232,7 +233,7 @@ function App() {
           />
         ) : currentScreen === 'monthly-attendance' ? (
           <MonthlyAttendanceDetailHeader
-            onBack={() => setCurrentScreen('overview')}
+            onBack={() => setCurrentScreen(monthlyAttendancePreviousScreen || 'overview')}
             selectedMonth={monthlyAttendanceMonth}
             selectedYear={monthlyAttendanceYear}
             onPrevMonth={handlePrevAttendanceMonth}
@@ -378,6 +379,7 @@ function App() {
               if (userSession?.roleCode === 'BM') {
                 setCurrentScreen('attendance-detail');
               } else {
+                setMonthlyAttendancePreviousScreen('overview');
                 setCurrentScreen('monthly-attendance');
               }
             } else if (secLower === 'work order' || secLower === 'my work orders') {
@@ -480,6 +482,9 @@ function App() {
               setCurrentScreen('work-order-detail');
             } else if (menuId === 'home-service') {
               setCurrentScreen('home-service-detail');
+            } else if (menuId === 'report-attendance' || menuId === 'monthly-attendance') {
+              setMonthlyAttendancePreviousScreen('work-attendance');
+              setCurrentScreen('monthly-attendance');
             }
           }}
         />

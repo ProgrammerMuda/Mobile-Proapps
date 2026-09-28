@@ -1019,7 +1019,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             {/* 3. Report Attendance */}
             <button
               type="button"
-              onClick={() => setIsReportModalOpen(true)}
+              onClick={() => {
+                if (onNavigateMenu) {
+                  onNavigateMenu('report-attendance');
+                } else {
+                  setIsReportModalOpen(true);
+                }
+              }}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px',
@@ -1157,7 +1163,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
             <button
               type="button"
-              onClick={() => setIsReportModalOpen(true)}
+              onClick={() => {
+                if (onNavigateMenu) {
+                  onNavigateMenu('report-attendance');
+                } else {
+                  setIsReportModalOpen(true);
+                }
+              }}
               style={{
                 background: 'none',
                 border: 'none',
