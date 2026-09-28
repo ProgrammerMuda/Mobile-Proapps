@@ -2403,16 +2403,19 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </div>
 
               {/* 3D Illustration: Out of Range Location */}
-              <img
-                src={outOfRangeLocation}
-                alt="Outside Radius"
-                style={{
-                  width: '160px',
-                  height: '160px',
-                  objectFit: 'contain',
-                  margin: '0 auto',
-                }}
-              />
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '4px 0 6px 0' }}>
+                <img
+                  src={outOfRangeLocation}
+                  alt="Outside Radius"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '220px',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </div>
 
               {/* Title & Subtitle */}
               <div style={{ textAlign: 'center', padding: '0 8px' }}>
