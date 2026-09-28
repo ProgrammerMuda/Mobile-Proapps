@@ -431,28 +431,19 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             {/* Live GPS Badge disamping jam */}
             <div
               style={{
-                backgroundColor: '#EFF6FF',
-                border: '1px solid #DBEAFE',
+                backgroundColor: '#2563EB',
                 borderRadius: '9999px',
-                padding: '4px 10px',
+                padding: '5px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '5px',
                 fontSize: '0.6875rem',
                 fontWeight: 700,
-                color: '#1D4ED8',
+                color: '#FFFFFF',
+                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
               }}
             >
-              <div
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: '#16A34A',
-                  boxShadow: '0 0 0 2px rgba(22, 163, 74, 0.25)',
-                }}
-              />
-              <NavigationArrow size={12} weight="fill" color="#2563EB" />
+              <NavigationArrow size={13} weight="fill" color="#FFFFFF" />
               <span>Live GPS</span>
             </div>
           </div>
