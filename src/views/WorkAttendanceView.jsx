@@ -1986,17 +1986,18 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               fontFamily: 'var(--font-sans)',
             }}
           >
-            {/* Top Bar Header (ProApps Header Blue) */}
+            {/* Top Bar Header (Clean White Surface) */}
             <div
               style={{
                 height: '56px',
-                backgroundColor: '#02388A',
+                backgroundColor: 'var(--color-background-surface, #FFFFFF)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0 16px',
                 zIndex: 20,
-                boxShadow: '0 2px 8px rgba(2, 56, 138, 0.15)',
+                borderBottom: '1px solid var(--color-border-default, #E5E7EB)',
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
               }}
             >
               <button
@@ -2010,14 +2011,14 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: '#FFFFFF',
+                  color: 'var(--color-text-primary, #334155)',
                   borderRadius: '8px',
                 }}
               >
                 <CaretLeft size={24} weight="bold" />
               </button>
 
-              <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+              <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--color-text-primary, #334155)', margin: 0 }}>
                 {actionType === 'CLOCK_IN'
                   ? (language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In')
                   : (language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out')}
