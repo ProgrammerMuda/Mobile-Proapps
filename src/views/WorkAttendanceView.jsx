@@ -1688,23 +1688,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </div>
               </div>
 
-              {/* Live GPS badge */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  backgroundColor: '#2563EB',
-                  padding: '4px 10px',
-                  borderRadius: '9999px',
-                  fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                }}
-              >
-                <NavigationArrow size={12} weight="fill" color="#FFFFFF" />
-                <span>GPS</span>
-              </div>
+              {/* Balancing spacer */}
+              <div style={{ width: '36px' }} />
             </div>
 
             {/* Video Viewport / Photo Snapshot */}
@@ -1781,41 +1766,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </div>
               )}
 
-              {/* Center Face Guide Oval (Only when not captured) */}
-              {!capturedSelfie && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    width: '210px',
-                    height: '280px',
-                    borderRadius: '50%',
-                    border: '2px dashed rgba(255, 255, 255, 0.55)',
-                    pointerEvents: 'none',
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    justifyContent: 'center',
-                    paddingBottom: '16px',
-                    boxSizing: 'border-box',
-                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.25)',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '0.6875rem',
-                      fontWeight: 600,
-                      color: '#FFFFFF',
-                      backgroundColor: 'rgba(15, 23, 42, 0.65)',
-                      padding: '3px 10px',
-                      borderRadius: '9999px',
-                      backdropFilter: 'blur(4px)',
-                    }}
-                  >
-                    {language === 'id' ? 'Posisikan Wajah Anda' : 'Align Face in Frame'}
-                  </span>
-                </div>
-              )}
-
-              {/* Attendance Watermark Overlay (Bottom-Left) */}
+              {/* Attendance Timestamp Watermark Overlay (Bottom-Left) */}
               <div
                 style={{
                   position: 'absolute',
@@ -1824,42 +1775,25 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   right: '16px',
                   pointerEvents: 'none',
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: '3px',
+                  alignItems: 'center',
                 }}
               >
                 <div
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '5px',
+                    gap: '6px',
                     backgroundColor: 'rgba(0, 0, 0, 0.65)',
-                    padding: '4px 8px',
+                    padding: '6px 12px',
                     borderRadius: '8px',
                     color: '#FFFFFF',
                     fontSize: '0.6875rem',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     width: 'fit-content',
                     backdropFilter: 'blur(4px)',
                   }}
                 >
-                  <MapPin size={13} color="#38BDF8" weight="fill" />
-                  <span>{activeLocationTitle}</span>
-                </div>
-                <div
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-                    padding: '4px 8px',
-                    borderRadius: '8px',
-                    color: '#94A3B8',
-                    fontSize: '0.625rem',
-                    width: 'fit-content',
-                    backdropFilter: 'blur(4px)',
-                  }}
-                >
+                  <Clock size={13} color="#38BDF8" weight="bold" />
                   <span>{userName} ({empId}) • {currentTime}, 28 Sep 2026</span>
                 </div>
               </div>
