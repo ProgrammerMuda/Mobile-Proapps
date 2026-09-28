@@ -512,20 +512,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <SignOut size={14} weight="bold" color="#D97706" />
                   Clock Out
                 </span>
-                {isClockedIn ? (
-                  <span
-                    style={{
-                      fontSize: '0.5625rem',
-                      fontWeight: 700,
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      backgroundColor: '#EFF6FF',
-                      color: '#1D4ED8',
-                    }}
-                  >
-                    {language === 'id' ? 'Aktif' : 'Active'}
-                  </span>
-                ) : clockOutTime ? (
+                {clockOutTime ? (
                   <span
                     style={{
                       fontSize: '0.5625rem',
