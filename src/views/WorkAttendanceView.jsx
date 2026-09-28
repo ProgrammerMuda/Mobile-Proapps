@@ -207,7 +207,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             });
           }
         },
-        () => {},
+        () => { },
         { enableHighAccuracy: true, timeout: 5000 }
       );
     }
@@ -228,7 +228,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               streamRef.current = stream;
               if (videoRef.current) {
                 videoRef.current.srcObject = stream;
-                videoRef.current.play().catch(() => {});
+                videoRef.current.play().catch(() => { });
               }
               setCameraError(false);
             } else {
@@ -361,36 +361,36 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const activeShiftName = isEng
     ? 'Shift Pagi'
     : isHk
-    ? 'Shift Pagi'
-    : isSec
-    ? 'Shift Pagi'
-    : 'Shift Reguler';
+      ? 'Shift Pagi'
+      : isSec
+        ? 'Shift Pagi'
+        : 'Shift Reguler';
 
   const activeShiftHours = isEng
     ? '08.00 - 17.00'
     : isHk
-    ? '06.30 - 15.30'
-    : isSec
-    ? '07.00 - 19.00'
-    : '08.00 - 17.00';
+      ? '06.30 - 15.30'
+      : isSec
+        ? '07.00 - 19.00'
+        : '08.00 - 17.00';
 
   const activeShiftTitle = `${activeShiftName} (${activeShiftHours})`;
 
   const activeLocationTitle = isEng
     ? 'Workshop Engineering • Radius 15m'
     : isHk
-    ? 'Janitor Hub & Koridor • Radius 15m'
-    : isSec
-    ? 'Pos Gerbang Utama • Radius 15m'
-    : 'Lobby Tower A • Radius 15m';
+      ? 'Janitor Hub & Koridor • Radius 15m'
+      : isSec
+        ? 'Pos Gerbang Utama • Radius 15m'
+        : 'Lobby Tower A • Radius 15m';
 
   const baseLocationName = isEng
     ? 'Workshop Engineering'
     : isHk
-    ? 'Janitor Hub & Koridor'
-    : isSec
-    ? 'Pos Gerbang Utama'
-    : 'Lobby Tower A';
+      ? 'Janitor Hub & Koridor'
+      : isSec
+        ? 'Pos Gerbang Utama'
+        : 'Lobby Tower A';
 
   // Helper to parse time in minutes
   const getMinutesFromTime = (timeStr) => {
@@ -438,8 +438,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id'
         ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Belum Absen')
         : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Pending'),
-      statusColor: (isClockInLate || (!isClockedIn && !clockOutTime)) ? '#D97706' : '#16A34A',
-      statusBg: (isClockInLate || (!isClockedIn && !clockOutTime)) ? '#FEF3C7' : '#DCFCE7',
+      statusColor: isClockInLate ? '#FFFFFF' : (!isClockedIn && !clockOutTime) ? '#D97706' : '#16A34A',
+      statusBg: isClockInLate ? '#D97706' : (!isClockedIn && !clockOutTime) ? '#FEF3C7' : '#DCFCE7',
       location: activeLocationTitle,
       note: isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola',
     },
@@ -502,8 +502,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       duration: '09j 12m',
       status: 'TERLAMBAT',
       statusLabel: language === 'id' ? 'Terlambat (18m)' : 'Late (18m)',
-      statusColor: '#D97706',
-      statusBg: '#FEF3C7',
+      statusColor: '#FFFFFF',
+      statusBg: '#D97706',
       location: isEng ? 'Ruang Chiller • Radius 18m' : isHk ? 'Lobby Barat • Radius 18m' : isSec ? 'Pos Barat • Radius 18m' : 'Lobby Tower A • Radius 18m',
       note: 'Macet jalur tol lingkar luar',
     },
@@ -1221,119 +1221,141 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
           {/* History Cards List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {filteredHistory.map((item) => (
-              <div
-                key={item.id}
-                style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '14px',
-                  border: item.isToday ? '1.5px solid #2563EB' : '1px solid #E2E8F0',
-                  padding: '14px 16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                  boxShadow: item.isToday ? '0 2px 8px rgba(37, 99, 235, 0.08)' : 'none',
-                }}
-              >
-                {/* Header: Date & Status Badge */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
-                      {language === 'id' ? item.date : item.dateEn}
-                    </span>
-                    {item.isToday && (
-                      <span
-                        style={{
-                          fontSize: '0.625rem',
-                          fontWeight: 700,
-                          backgroundColor: '#EFF6FF',
-                          color: '#1D4ED8',
-                          padding: '1px 6px',
-                          borderRadius: '4px',
-                          border: '1px solid #DBEAFE',
-                        }}
-                      >
-                        {language === 'id' ? 'Hari Ini' : 'Today'}
+            {filteredHistory.map((item) => {
+              const isLate = item.status === 'TERLAMBAT';
+              const isAlpha = item.status === 'ALPHA';
+
+              let cardBg = '#FFFFFF';
+              let cardBorder = item.isToday ? '1.5px solid #2563EB' : '1px solid #E2E8F0';
+              let tileBg = '#F8FAFC';
+              let tileBorder = '1px solid #F1F5F9';
+
+              if (isLate) {
+                cardBg = '#FFFBEB';
+                cardBorder = item.isToday ? '1.5px solid #D97706' : '1px solid #FDE68A';
+                tileBg = '#FFFFFF';
+                tileBorder = '1px solid #FEF3C7';
+              } else if (isAlpha) {
+                cardBg = '#FEF2F2';
+                cardBorder = item.isToday ? '1.5px solid #DC2626' : '1px solid #FECACA';
+                tileBg = '#FFFFFF';
+                tileBorder = '1px solid #FEE2E2';
+              }
+
+              return (
+                <div
+                  key={item.id}
+                  style={{
+                    backgroundColor: cardBg,
+                    borderRadius: '14px',
+                    border: cardBorder,
+                    padding: '14px 16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    boxShadow: item.isToday ? (isLate ? '0 2px 8px rgba(217, 119, 6, 0.1)' : isAlpha ? '0 2px 8px rgba(220, 38, 38, 0.1)' : '0 2px 8px rgba(37, 99, 235, 0.08)') : 'none',
+                  }}
+                >
+                  {/* Header: Date & Status Badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
+                        {language === 'id' ? item.date : item.dateEn}
                       </span>
-                    )}
-                  </div>
+                      {item.isToday && (
+                        <span
+                          style={{
+                            fontSize: '0.625rem',
+                            fontWeight: 700,
+                            backgroundColor: '#EFF6FF',
+                            color: '#1D4ED8',
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            border: '1px solid #DBEAFE',
+                          }}
+                        >
+                          {language === 'id' ? 'Hari Ini' : 'Today'}
+                        </span>
+                      )}
+                    </div>
 
-                  <span
-                    style={{
-                      fontSize: '0.6875rem',
-                      fontWeight: 700,
-                      backgroundColor: item.statusBg,
-                      color: item.statusColor,
-                      padding: '2px 8px',
-                      borderRadius: '9999px',
-                    }}
-                  >
-                    {item.statusLabel}
-                  </span>
-                </div>
-
-                {/* Body: 2-Column Clock In & Clock Out Tiles (Matching Daily Attendance Record) */}
-                {item.status !== 'LIBUR' ? (
-                  <>
-                    <div
+                    <span
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '10px',
-                        backgroundColor: '#F8FAFC',
-                        borderRadius: '10px',
-                        padding: '8px 12px',
-                        border: '1px solid #F1F5F9',
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        backgroundColor: isLate ? '#D97706' : isAlpha ? '#DC2626' : item.statusBg,
+                        color: (isLate || isAlpha) ? '#FFFFFF' : item.statusColor,
+                        padding: '2px 8px',
+                        borderRadius: '9999px',
                       }}
                     >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                          {language === 'id' ? 'Masuk' : 'Clock In'}
-                        </span>
-                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
-                          {item.clockIn}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                          {language === 'id' ? 'Keluar' : 'Clock Out'}
-                        </span>
-                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
-                          {item.clockOut}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Footer: Schedule & Duration */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                      <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
-                        {item.shift}
-                      </span>
-                      <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
-                        {language === 'id' ? `Durasi: ${item.duration}` : `Duration: ${item.duration}`}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div
-                    style={{
-                      backgroundColor: '#F8FAFC',
-                      borderRadius: '10px',
-                      padding: '10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      color: '#64748B',
-                      fontSize: '0.75rem',
-                    }}
-                  >
-                    <CalendarBlank size={16} color="#64748B" />
-                    <span>{language === 'id' ? 'Tidak ada jadwal shift yang dibuat' : 'No shift schedule assigned for this day'}</span>
+                      {item.statusLabel}
+                    </span>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {/* Body: 2-Column Clock In & Clock Out Tiles (Matching Daily Attendance Record) */}
+                  {item.status !== 'LIBUR' ? (
+                    <>
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '10px',
+                          backgroundColor: tileBg,
+                          borderRadius: '10px',
+                          padding: '8px 12px',
+                          border: tileBorder,
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                            {language === 'id' ? 'Masuk' : 'Clock In'}
+                          </span>
+                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                            {item.clockIn}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                            {language === 'id' ? 'Keluar' : 'Clock Out'}
+                          </span>
+                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                            {item.clockOut}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer: Schedule & Duration */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
+                        <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                          {item.shift}
+                        </span>
+                        <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
+                          {language === 'id' ? `Durasi: ${item.duration}` : `Duration: ${item.duration}`}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: '#F8FAFC',
+                        borderRadius: '10px',
+                        padding: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: '#64748B',
+                        fontSize: '0.75rem',
+                      }}
+                    >
+                      <CalendarBlank size={16} color="#64748B" />
+                      <span>{language === 'id' ? 'Tidak ada jadwal shift yang dibuat' : 'No shift schedule assigned for this day'}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -2334,8 +2356,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         >
                           {checkIsLate(checkInSnapshot?.time || currentTime)
                             ? (language === 'id'
-                                ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
-                                : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
+                              ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
+                              : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
                             : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
                         </span>
                       </div>
@@ -3000,8 +3022,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         >
                           {checkIsLate(checkInSnapshot?.time || currentTime)
                             ? (language === 'id'
-                                ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
-                                : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
+                              ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
+                              : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
                             : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
                         </span>
                       </div>

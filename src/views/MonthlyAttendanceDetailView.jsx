@@ -99,6 +99,18 @@ const generateMonthlyLogs = (year, monthIndex) => {
         workDuration: '0h 0m',
         notes: 'Cuti Tahunan (Disetujui)',
       });
+    } else if (day === 3) {
+      // 1 Alpha day
+      logs.push({
+        id: `att-${year}-${monthIndex}-${day}`,
+        date: dateObj,
+        dayNumber: day,
+        status: 'alpha',
+        clockIn: '-- : --',
+        clockOut: '-- : --',
+        workDuration: '0h 0m',
+        notes: 'Tanpa Keterangan (Alpha)',
+      });
     } else {
       // On time days
       const clockInMin = Math.floor(45 + ((day * 7) % 14));
