@@ -1256,23 +1256,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <CaretRight size={18} weight="bold" color="#94A3B8" />
                 </button>
               </div>
-
-              {/* Location Tag */}
-              <div
-                style={{
-                  backgroundColor: '#F8FAFC',
-                  borderRadius: '10px',
-                  padding: '8px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '0.6875rem',
-                  color: '#64748B',
-                }}
-              >
-                <MapPin size={14} color="#2563EB" weight="fill" />
-                <span>{language === 'id' ? 'Lokasi Aktif' : 'Active Location'}: <strong>{activeLocationTitle}</strong></span>
-              </div>
             </div>
           </div>
         );
