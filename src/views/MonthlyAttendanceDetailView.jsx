@@ -12,6 +12,7 @@ import {
   XCircle,
 } from '@phosphor-icons/react';
 import { useLanguage } from '../context/LanguageContext';
+import attendanceEmptySearch from '../assets/attendance-empty-search.png';
 
 const MONTH_NAMES = [
   'January',
@@ -843,15 +844,52 @@ export const MonthlyAttendanceDetailView = ({
           <div
             style={{
               backgroundColor: '#FFFFFF',
-              borderRadius: '16px',
-              padding: '32px 16px',
+              borderRadius: '20px',
+              padding: '32px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
               textAlign: 'center',
-              color: '#94A3B8',
-              fontSize: '0.875rem',
               border: '1px solid #E2E8F0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
             }}
           >
-            {language === 'id' ? 'Tidak ada data kehadiran untuk filter ini' : 'No attendance records found'}
+            <img
+              src={attendanceEmptySearch}
+              alt="No Attendance Records Found"
+              style={{
+                width: '160px',
+                maxWidth: '75%',
+                height: 'auto',
+                objectFit: 'contain',
+                marginBottom: '14px',
+                filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
+              }}
+            />
+            <h4
+              style={{
+                fontSize: '1rem',
+                fontWeight: 800,
+                color: '#334155',
+                margin: '0 0 6px 0',
+                letterSpacing: '-0.2px',
+              }}
+            >
+              No Attendance Records Found
+            </h4>
+            <p
+              style={{
+                fontSize: '0.8125rem',
+                color: '#64748B',
+                margin: 0,
+                lineHeight: 1.45,
+                maxWidth: '280px',
+                fontWeight: 500,
+              }}
+            >
+              There are no attendance records matching your selected status filter.
+            </p>
           </div>
         ) : (
           filteredLogs.map((log) => {

@@ -55,6 +55,7 @@ import inspection3d from '../assets/menu-icons/inspection-3d.png';
 import payslip3d from '../assets/menu-icons/payslip-3d.png';
 import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
 import dayOffIllustration from '../assets/day-off-illustration.png';
+import attendanceEmptySearch from '../assets/attendance-empty-search.png';
 
 /**
  * Top Header for Work Attendance
@@ -1478,40 +1479,92 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
           {/* History Cards List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {filteredHistory.map((item) => {
-              const isLate = item.status === 'TERLAMBAT' || item.inStatus === 'LATE' || item.outStatus === 'EARLY_OUT';
-              const isAlpha = item.status === 'ALPHA';
-              const isOff = item.status === 'LIBUR';
-
-              let cardBg = '#FFFFFF';
-              let cardBorder = item.isToday ? '1.5px solid #2563EB' : '1px solid #E2E8F0';
-              let tileBg = '#F8FAFC';
-              let tileBorder = '1px solid #F1F5F9';
-
-              if (isAlpha) {
-                cardBg = '#FEF2F2';
-                cardBorder = item.isToday ? '1.5px solid #DC2626' : '1px solid #FECACA';
-                tileBg = '#FFFFFF';
-                tileBorder = '1px solid #FEE2E2';
-              } else if (isLate) {
-                cardBg = '#FFFBEB';
-                cardBorder = item.isToday ? '1.5px solid #D97706' : '1px solid #FDE68A';
-                tileBg = '#FFFFFF';
-                tileBorder = '1px solid #FEF3C7';
-              } else if (isOff) {
-                cardBg = '#F1F5F9';
-                cardBorder = '1px solid #E2E8F0';
-                tileBg = '#FFFFFF';
-                tileBorder = '1px solid #E2E8F0';
-              }
-
-              return (
-                <div
-                  key={item.id}
+            {filteredHistory.length === 0 ? (
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '20px',
+                  padding: '32px 20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  border: '1px solid #E2E8F0',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+                }}
+              >
+                <img
+                  src={attendanceEmptySearch}
+                  alt="No Attendance Records Found"
                   style={{
-                    backgroundColor: cardBg,
-                    borderRadius: '14px',
-                    border: cardBorder,
+                    width: '160px',
+                    maxWidth: '75%',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    marginBottom: '14px',
+                    filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
+                  }}
+                />
+                <h4
+                  style={{
+                    fontSize: '1rem',
+                    fontWeight: 800,
+                    color: '#334155',
+                    margin: '0 0 6px 0',
+                    letterSpacing: '-0.2px',
+                  }}
+                >
+                  No Attendance Records Found
+                </h4>
+                <p
+                  style={{
+                    fontSize: '0.8125rem',
+                    color: '#64748B',
+                    margin: 0,
+                    lineHeight: 1.45,
+                    maxWidth: '280px',
+                    fontWeight: 500,
+                  }}
+                >
+                  There are no attendance records matching your selected status filter.
+                </p>
+              </div>
+            ) : (
+              filteredHistory.map((item) => {
+                const isLate = item.status === 'TERLAMBAT' || item.inStatus === 'LATE' || item.outStatus === 'EARLY_OUT';
+                const isAlpha = item.status === 'ALPHA';
+                const isOff = item.status === 'LIBUR';
+
+                let cardBg = '#FFFFFF';
+                let cardBorder = item.isToday ? '1.5px solid #2563EB' : '1px solid #E2E8F0';
+                let tileBg = '#F8FAFC';
+                let tileBorder = '1px solid #F1F5F9';
+
+                if (isAlpha) {
+                  cardBg = '#FEF2F2';
+                  cardBorder = item.isToday ? '1.5px solid #DC2626' : '1px solid #FECACA';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #FEE2E2';
+                } else if (isLate) {
+                  cardBg = '#FFFBEB';
+                  cardBorder = item.isToday ? '1.5px solid #D97706' : '1px solid #FDE68A';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #FEF3C7';
+                } else if (isOff) {
+                  cardBg = '#F1F5F9';
+                  cardBorder = '1px solid #E2E8F0';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #E2E8F0';
+                }
+
+                return (
+                  <div
+                    key={item.id}
+                    style={{
+                      backgroundColor: cardBg,
+                      borderRadius: '14px',
+                      border: cardBorder,
                     padding: '14px 16px',
                     display: 'flex',
                     flexDirection: 'column',
@@ -1608,7 +1661,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   )}
                 </div>
               );
-            })}
+            }))}
           </div>
         </div>
       </div>
