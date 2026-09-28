@@ -2548,46 +2548,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </div>
 
 
-              {/* Titik Lokasi & Koordinat */}
-              <div
-                style={{
-                  backgroundColor: 'var(--color-background-surface, #FFFFFF)',
-                  border: '1px solid var(--color-border-default, #E5E7EB)',
-                  borderRadius: '14px',
-                  padding: '10px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <div style={{ flex: 1, paddingRight: '8px' }}>
-                  <div style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '2px' }}>
-                    {language === 'id' ? 'Titik Lokasi & Koordinat' : 'Location & Coordinates'}
-                  </div>
-                  <div style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
-                    {checkInSnapshot?.location || baseLocationName}
-                  </div>
-                  <div style={{ fontSize: '0.625rem', color: 'var(--color-text-secondary, #64748B)', fontFamily: 'monospace', marginTop: '2px' }}>
-                    Lat: {checkInSnapshot?.coords?.lat || userCoords.lat}, Long: {checkInSnapshot?.coords?.lng || userCoords.lng}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
-                    backgroundColor: '#FEF2F2',
-                    border: '1px solid #FECACA',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#DC2626',
-                    flexShrink: 0,
-                  }}
-                >
-                  <MapPin size={18} weight="fill" color="#DC2626" />
-                </div>
-              </div>
 
               {/* Distance Warning Card (Detected Distance & Max allowed radius) */}
               <div
