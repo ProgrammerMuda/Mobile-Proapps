@@ -376,12 +376,8 @@ function App() {
             } else if (secLower === 'tenant requests') {
               setCurrentScreen('request-detail');
             } else if (secLower === 'monthly attendance' || secLower === 'employee attendance') {
-              if (userSession?.roleCode === 'BM') {
-                setCurrentScreen('attendance-detail');
-              } else {
-                setMonthlyAttendancePreviousScreen('overview');
-                setCurrentScreen('monthly-attendance');
-              }
+              setMonthlyAttendancePreviousScreen('overview');
+              setCurrentScreen('monthly-attendance');
             } else if (secLower === 'work order' || secLower === 'my work orders') {
               setCurrentScreen('work-order-detail');
             } else if (secLower === 'home service' || secLower === 'home services' || secLower === 'my home services') {
@@ -434,6 +430,7 @@ function App() {
 
       {currentScreen === 'monthly-attendance' && (
         <MonthlyAttendanceDetailView
+          user={userSession}
           selectedMonth={monthlyAttendanceMonth}
           selectedYear={monthlyAttendanceYear}
           onMonthChange={(m, y) => {

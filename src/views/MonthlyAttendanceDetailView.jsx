@@ -10,6 +10,13 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  User,
+  Users,
+  MagnifyingGlass,
+  Buildings,
+  Briefcase,
+  SignIn,
+  SignOut,
 } from '@phosphor-icons/react';
 import { useLanguage } from '../context/LanguageContext';
 import attendanceEmptySearch from '../assets/attendance-empty-search.png';
@@ -226,6 +233,146 @@ const generateMonthlyLogs = (year, monthIndex) => {
   return logs;
 };
 
+// Department Breakdown Data for BM
+const DEPARTMENTS_DATA = [
+  {
+    id: 'engineering',
+    name: 'Engineering',
+    present: 39,
+    late: 6,
+    leave: 11,
+    absent: 18,
+    totalAssigned: 68,
+    percentage: 57,
+  },
+  {
+    id: 'housekeeping',
+    name: 'Housekeeping',
+    present: 26,
+    late: 5,
+    leave: 19,
+    absent: 29,
+    totalAssigned: 74,
+    percentage: 35,
+  },
+  {
+    id: 'security',
+    name: 'Security',
+    present: 23,
+    late: 4,
+    leave: 8,
+    absent: 15,
+    totalAssigned: 46,
+    percentage: 50,
+  },
+  {
+    id: 'management',
+    name: 'Management',
+    present: 13,
+    late: 2,
+    leave: 6,
+    absent: 11,
+    totalAssigned: 30,
+    percentage: 43,
+  },
+];
+
+// Mock Real-time Employees Attendance for BM
+const MOCK_EMPLOYEES_LIST = [
+  { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: '08:00 - 17:00', clockIn: '07:55 WIB', clockOut: '17:02 WIB', status: 'ONTIME', avatarBg: '#2563EB', initials: 'BS' },
+  { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: '07:00 - 16:00', clockIn: '06:50 WIB', clockOut: '16:05 WIB', status: 'ONTIME', avatarBg: '#059669', initials: 'SR' },
+  { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: '08:00 - 20:00', clockIn: '08:18 WIB', clockOut: null, status: 'LATE', avatarBg: '#D97706', initials: 'AS' },
+  { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: '08:00 - 17:00', clockIn: null, clockOut: null, status: 'LEAVE', avatarBg: '#0891B2', initials: 'DL' },
+  { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: '08:00 - 20:00', clockIn: '07:45 WIB', clockOut: '20:10 WIB', status: 'ONTIME', avatarBg: '#4F46E5', initials: 'RH' },
+  { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: '07:00 - 16:00', clockIn: null, clockOut: null, status: 'ALPHA', avatarBg: '#DC2626', initials: 'SW' },
+  { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: '08:30 - 17:30', clockIn: '08:25 WIB', clockOut: '17:35 WIB', status: 'ONTIME', avatarBg: '#0D9488', initials: 'HG' },
+  { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: '08:30 - 17:30', clockIn: '08:42 WIB', clockOut: null, status: 'LATE', avatarBg: '#E11D48', initials: 'FH' },
+];
+
+/**
+ * Mini Department Donut Chart Component
+ */
+const DepartmentDonutChart = ({ present, late, leave, absent, percentage }) => {
+  const total = present + late + leave + absent || 1;
+  const radius = 30;
+  const circumference = 2 * Math.PI * radius;
+  const strokeWidth = 10;
+
+  const presentDash = (present / total) * circumference;
+  const lateDash = (late / total) * circumference;
+  const leaveDash = (leave / total) * circumference;
+  const absentDash = (absent / total) * circumference;
+
+  return (
+    <div style={{ position: 'relative', width: '76px', height: '76px', flexShrink: 0 }}>
+      <svg
+        width="76"
+        height="76"
+        viewBox="0 0 80 80"
+        style={{
+          transform: 'rotate(-90deg)',
+          overflow: 'visible',
+        }}
+      >
+        <circle
+          cx="40"
+          cy="40"
+          r={radius}
+          fill="none"
+          stroke="#10B981"
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${presentDash} ${circumference}`}
+          strokeDashoffset={0}
+        />
+        <circle
+          cx="40"
+          cy="40"
+          r={radius}
+          fill="none"
+          stroke="#F59E0B"
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${lateDash} ${circumference}`}
+          strokeDashoffset={-presentDash}
+        />
+        <circle
+          cx="40"
+          cy="40"
+          r={radius}
+          fill="none"
+          stroke="#09B2FF"
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${leaveDash} ${circumference}`}
+          strokeDashoffset={-(presentDash + lateDash)}
+        />
+        <circle
+          cx="40"
+          cy="40"
+          r={radius}
+          fill="none"
+          stroke="#EF4444"
+          strokeWidth={strokeWidth}
+          strokeDasharray={`${absentDash} ${circumference}`}
+          strokeDashoffset={-(presentDash + lateDash + leaveDash)}
+        />
+      </svg>
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
+          {percentage}%
+        </span>
+      </div>
+    </div>
+  );
+};
+
 /**
  * Monthly Attendance Detail Header Bar
  */
@@ -398,6 +545,7 @@ export const MonthlyAttendanceDetailHeader = ({
  * Monthly Attendance Detail View Screen
  */
 export const MonthlyAttendanceDetailView = ({
+  user,
   selectedMonth = 8,
   selectedYear = 2026,
   onMonthChange,
@@ -405,6 +553,17 @@ export const MonthlyAttendanceDetailView = ({
   setIsPickerOpen,
 }) => {
   const { t, language } = useLanguage();
+  const isBM = user?.roleCode === 'BM';
+
+  // For BM: Tab switcher between 'MY_ATTENDANCE' and 'EMPLOYEES'
+  const [activeMainTab, setActiveMainTab] = useState('MY_ATTENDANCE');
+
+  // Employee tab filters (BM)
+  const [employeeDeptFilter, setEmployeeDeptFilter] = useState('ALL');
+  const [employeeStatusFilter, setEmployeeStatusFilter] = useState('ALL');
+  const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
+
+  // Personal Attendance filters
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [pickerTempMonth, setPickerTempMonth] = useState(selectedMonth);
   const [pickerTempYear, setPickerTempYear] = useState(selectedYear);
@@ -425,6 +584,25 @@ export const MonthlyAttendanceDetailView = ({
     if (activeFilter === 'LATE') return log.status === 'late';
     if (activeFilter === 'LEAVE') return log.status === 'leave';
     if (activeFilter === 'ALPHA') return log.status === 'alpha';
+    return true;
+  });
+
+  // Filtered employees for BM tab
+  const filteredEmployees = MOCK_EMPLOYEES_LIST.filter((emp) => {
+    if (employeeDeptFilter !== 'ALL' && emp.dept.toLowerCase() !== employeeDeptFilter.toLowerCase()) {
+      return false;
+    }
+    if (employeeStatusFilter !== 'ALL' && emp.status !== employeeStatusFilter) {
+      return false;
+    }
+    if (employeeSearchQuery.trim()) {
+      const q = employeeSearchQuery.toLowerCase();
+      return (
+        emp.name.toLowerCase().includes(q) ||
+        emp.dept.toLowerCase().includes(q) ||
+        emp.role.toLowerCase().includes(q)
+      );
+    }
     return true;
   });
 
@@ -600,7 +778,75 @@ export const MonthlyAttendanceDetailView = ({
         paddingBottom: '24px',
       }}
     >
-      {/* 1. Monthly KPI Summary Card */}
+      {/* BM Role: Segmented Tab Switcher (Absensi Saya vs Karyawan Lain) */}
+      {isBM && (
+        <div
+          style={{
+            display: 'flex',
+            backgroundColor: '#E2E8F0',
+            borderRadius: '12px',
+            padding: '4px',
+            gap: '4px',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setActiveMainTab('MY_ATTENDANCE')}
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              padding: '9px 12px',
+              borderRadius: '9px',
+              border: 'none',
+              backgroundColor: activeMainTab === 'MY_ATTENDANCE' ? '#FFFFFF' : 'transparent',
+              color: activeMainTab === 'MY_ATTENDANCE' ? '#02388A' : '#64748B',
+              fontSize: '0.8125rem',
+              fontWeight: activeMainTab === 'MY_ATTENDANCE' ? 700 : 600,
+              boxShadow: activeMainTab === 'MY_ATTENDANCE' ? '0 1px 4px rgba(0, 0, 0, 0.08)' : 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <User size={16} weight={activeMainTab === 'MY_ATTENDANCE' ? 'bold' : 'regular'} />
+            <span>{language === 'id' ? 'Absensi Saya' : 'My Attendance'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveMainTab('EMPLOYEES')}
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              padding: '9px 12px',
+              borderRadius: '9px',
+              border: 'none',
+              backgroundColor: activeMainTab === 'EMPLOYEES' ? '#FFFFFF' : 'transparent',
+              color: activeMainTab === 'EMPLOYEES' ? '#02388A' : '#64748B',
+              fontSize: '0.8125rem',
+              fontWeight: activeMainTab === 'EMPLOYEES' ? 700 : 600,
+              boxShadow: activeMainTab === 'EMPLOYEES' ? '0 1px 4px rgba(0, 0, 0, 0.08)' : 'none',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Users size={16} weight={activeMainTab === 'EMPLOYEES' ? 'bold' : 'regular'} />
+            <span>{language === 'id' ? 'Karyawan Lain' : 'All Employees'}</span>
+          </button>
+        </div>
+      )}
+
+      {/* =========================================================================
+          VIEW 1: PERSONAL ATTENDANCE (MY ATTENDANCE)
+          ========================================================================= */}
+      {(!isBM || activeMainTab === 'MY_ATTENDANCE') && (
+        <>
+          {/* 1. Monthly KPI Summary Card */}
       <div
         style={{
           backgroundColor: '#FFFFFF',
@@ -993,6 +1239,521 @@ export const MonthlyAttendanceDetailView = ({
           })
         )}
       </div>
+    </>
+  )}
+
+  {/* =========================================================================
+      VIEW 2: ALL EMPLOYEES ATTENDANCE (BM ONLY)
+      ========================================================================= */}
+  {isBM && activeMainTab === 'EMPLOYEES' && (
+    <>
+      {/* 1. Overall Employees KPI Summary Card */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+          boxShadow: 'none',
+          border: '1px solid #E2E8F0',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+              {language === 'id' ? 'Presensi Seluruh Karyawan' : 'All Employee Attendance'}
+            </h2>
+            <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
+              {language === 'id'
+                ? `${MONTH_NAMES_ID[selectedMonth]} ${selectedYear} • 4 Departemen Aktif`
+                : `${MONTH_NAMES[selectedMonth]} ${selectedYear} • 4 Active Departments`}
+            </p>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: '#EFF6FF',
+              color: '#1D4ED8',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              padding: '4px 10px',
+              borderRadius: '9999px',
+              border: '1px solid #DBEAFE',
+            }}
+          >
+            218 {language === 'id' ? 'Karyawan' : 'Employees'}
+          </div>
+        </div>
+
+        {/* 4 Day Count KPI Metrics Micro-Cards */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '8px',
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: '#F0FDF4',
+              border: '1px solid #DCFCE7',
+              borderRadius: '12px',
+              padding: '10px 4px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px',
+            }}
+          >
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>101</span>
+            <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Hadir' : 'Present'}</span>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: '#FFFBEB',
+              border: '1px solid #FEF3C7',
+              borderRadius: '12px',
+              padding: '10px 4px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px',
+            }}
+          >
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>17</span>
+            <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              borderRadius: '12px',
+              padding: '10px 4px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px',
+            }}
+          >
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>44</span>
+            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
+          </div>
+
+          <div
+            style={{
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FEE2E2',
+              borderRadius: '12px',
+              padding: '10px 4px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '2px',
+            }}
+          >
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>56</span>
+            <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Department Breakdown Progress Accordion Card */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '14px',
+        }}
+      >
+        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+          {language === 'id' ? 'Performa Presensi Per Departemen' : 'Attendance by Department'}
+        </h3>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {DEPARTMENTS_DATA.map((dept) => {
+            const ratioPercent = Math.round((dept.present / dept.totalAssigned) * 100);
+            return (
+              <div key={dept.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                    {dept.name}
+                  </span>
+                  <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B' }}>
+                    {dept.present}/{dept.totalAssigned} ({ratioPercent}%)
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    width: '100%',
+                    height: '7px',
+                    backgroundColor: '#F1F5F9',
+                    borderRadius: '9999px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${ratioPercent}%`,
+                      height: '100%',
+                      backgroundColor: '#02388A',
+                      borderRadius: '9999px',
+                      transition: 'width 0.4s ease-out',
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Employee List Section */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredEmployees.length === 0 ? 1 : 'initial' }}>
+        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
+          {language === 'id' ? 'Daftar Presensi Karyawan' : 'Employee Attendance List'}
+        </h3>
+
+        {/* Search Input Bar */}
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#FFFFFF',
+            borderRadius: '12px',
+            border: '1px solid #E2E8F0',
+            padding: '8px 12px',
+            gap: '8px',
+          }}
+        >
+          <MagnifyingGlass size={18} color="#64748B" />
+          <input
+            type="text"
+            value={employeeSearchQuery}
+            onChange={(e) => setEmployeeSearchQuery(e.target.value)}
+            placeholder={language === 'id' ? 'Cari nama karyawan atau divisi...' : 'Search employee name or dept...'}
+            style={{
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent',
+              fontSize: '0.8125rem',
+              color: '#334155',
+              width: '100%',
+              fontFamily: 'var(--font-sans)',
+            }}
+          />
+          {employeeSearchQuery && (
+            <button
+              type="button"
+              onClick={() => setEmployeeSearchQuery('')}
+              style={{
+                border: 'none',
+                background: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                color: '#94A3B8',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <X size={14} weight="bold" />
+            </button>
+          )}
+        </div>
+
+        {/* Department Filter Pills */}
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
+          {[
+            { id: 'ALL', label: language === 'id' ? 'Semua Dept' : 'All Depts' },
+            { id: 'Engineering', label: 'Engineering' },
+            { id: 'Housekeeping', label: 'Housekeeping' },
+            { id: 'Security', label: 'Security' },
+            { id: 'Management', label: 'Management' },
+          ].map((tab) => {
+            const isActive = employeeDeptFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setEmployeeDeptFilter(tab.id)}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '9999px',
+                  fontSize: '0.6875rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
+                  backgroundColor: isActive ? '#02388A' : '#FFFFFF',
+                  color: isActive ? '#FFFFFF' : '#475569',
+                  transition: 'all 0.15s ease',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Status Filter Tabs */}
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
+          {[
+            { id: 'ALL', label: language === 'id' ? 'Semua Status' : 'All Status' },
+            { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time' },
+            { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late' },
+            { id: 'LEAVE', label: language === 'id' ? 'Izin' : 'Leave' },
+            { id: 'ALPHA', label: 'Alpha' },
+          ].map((tab) => {
+            const isActive = employeeStatusFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setEmployeeStatusFilter(tab.id)}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '20px',
+                  fontSize: '0.6875rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: isActive ? '1px solid #475569' : '1px solid #E2E8F0',
+                  backgroundColor: isActive ? '#334155' : '#FFFFFF',
+                  color: isActive ? '#FFFFFF' : '#64748B',
+                  transition: 'all 0.15s ease',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Employee Cards List */}
+        {filteredEmployees.length === 0 ? (
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              border: '1px solid #E2E8F0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+              flex: 1,
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            <img
+              src={attendanceEmptySearch}
+              alt="No Attendance Records Found"
+              style={{
+                width: '100%',
+                height: 'auto',
+                maxHeight: '200px',
+                objectFit: 'contain',
+                marginBottom: '12px',
+                filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
+              }}
+            />
+            <h4
+              style={{
+                fontSize: '1.0625rem',
+                fontWeight: 800,
+                color: '#334155',
+                margin: '0 0 6px 0',
+                letterSpacing: '-0.2px',
+                textAlign: 'center',
+              }}
+            >
+              {language === 'id' ? 'Tidak Ada Karyawan Ditemukan' : 'No Employees Found'}
+            </h4>
+            <p
+              style={{
+                fontSize: '0.8125rem',
+                color: '#64748B',
+                margin: 0,
+                lineHeight: 1.45,
+                maxWidth: '300px',
+                fontWeight: 500,
+                textAlign: 'center',
+              }}
+            >
+              {language === 'id'
+                ? 'Tidak ada data presensi karyawan yang cocok dengan filter atau pencarian Anda.'
+                : 'There are no employee attendance records matching your search or filter.'}
+            </p>
+          </div>
+        ) : (
+          filteredEmployees.map((emp) => {
+            const isLate = emp.status === 'LATE';
+            const isAlpha = emp.status === 'ALPHA';
+            const isLeave = emp.status === 'LEAVE';
+            const isOntime = emp.status === 'ONTIME';
+
+            return (
+              <div
+                key={emp.id}
+                style={{
+                  backgroundColor: isAlpha ? '#FEF2F2' : isLate ? '#FFFBEB' : '#FFFFFF',
+                  borderRadius: '16px',
+                  border: isAlpha ? '1px solid #FECACA' : isLate ? '1px solid #FDE68A' : '1px solid #E2E8F0',
+                  padding: '14px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
+              >
+                {/* Top: Avatar, Name, Dept & Status Badge */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {/* Avatar */}
+                    <div
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '50%',
+                        backgroundColor: emp.avatarBg,
+                        color: '#FFFFFF',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.8125rem',
+                        fontWeight: 800,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {emp.initials}
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                        {emp.name}
+                      </span>
+                      <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                        {emp.dept} • {emp.role}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  {isOntime && (
+                    <span
+                      style={{
+                        backgroundColor: '#DCFCE7',
+                        color: '#16A34A',
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        padding: '3px 8px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+                    </span>
+                  )}
+                  {isLate && (
+                    <span
+                      style={{
+                        backgroundColor: '#FEF3C7',
+                        color: '#D97706',
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        padding: '3px 8px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      {language === 'id' ? 'Terlambat' : 'Late'}
+                    </span>
+                  )}
+                  {isLeave && (
+                    <span
+                      style={{
+                        backgroundColor: '#F1F5F9',
+                        color: '#64748B',
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        padding: '3px 8px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      {language === 'id' ? 'Izin / Cuti' : 'Leave'}
+                    </span>
+                  )}
+                  {isAlpha && (
+                    <span
+                      style={{
+                        backgroundColor: '#DC2626',
+                        color: '#FFFFFF',
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        padding: '3px 8px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      Alpha
+                    </span>
+                  )}
+                </div>
+
+                {/* Clock In & Out Grid */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '8px',
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #F1F5F9',
+                    borderRadius: '10px',
+                    padding: '8px 12px',
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                      {language === 'id' ? 'Masuk' : 'Clock In'}
+                    </span>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
+                      {emp.clockIn || '-- : --'}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                      {language === 'id' ? 'Keluar' : 'Clock Out'}
+                    </span>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
+                      {emp.clockOut || '-- : --'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Shift Info */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
+                  <span>Shift: {emp.shift}</span>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </>
+  )}
 
       {/* Month & Year Picker Bottom Sheet Modal (In-Frame) */}
       {isPickerOpen && (() => {
