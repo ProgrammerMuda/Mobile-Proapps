@@ -2522,29 +2522,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     <UserCheck size={14} weight="bold" color="#FFFFFF" />
                   </div>
                 </div>
-
-                {/* Floating Distance Badge on Map */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    backgroundColor: 'rgba(220, 38, 38, 0.92)',
-                    color: '#FFFFFF',
-                    padding: '4px 10px',
-                    borderRadius: '20px',
-                    fontSize: '0.6875rem',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    backdropFilter: 'blur(4px)',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                  }}
-                >
-                  <WarningCircle size={13} weight="fill" />
-                  <span>{language === 'id' ? 'Di Luar Radius (~125m)' : 'Out of Radius (~125m)'}</span>
-                </div>
               </div>
 
 
