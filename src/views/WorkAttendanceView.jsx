@@ -434,12 +434,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       clockIn: clockInTime || '08:14',
       clockOut: clockOutTime || (isClockedIn ? 'Sedang Bekerja...' : '--:--'),
       duration: isClockedIn ? elapsedDuration : clockOutTime ? '08j 50m' : '-',
-      status: isClockedIn ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : clockOutTime ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : 'BELUM_ABSEN',
+      status: isClockedIn ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : clockOutTime ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : 'TODAY',
       statusLabel: language === 'id'
-        ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Belum Absen')
-        : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Pending'),
-      statusColor: isClockInLate ? '#FFFFFF' : (!isClockedIn && !clockOutTime) ? '#D97706' : '#16A34A',
-      statusBg: isClockInLate ? '#D97706' : (!isClockedIn && !clockOutTime) ? '#FEF3C7' : '#DCFCE7',
+        ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Hari Ini')
+        : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Today'),
+      statusColor: isClockInLate ? '#FFFFFF' : (!isClockedIn && !clockOutTime) ? '#1D4ED8' : '#16A34A',
+      statusBg: isClockInLate ? '#D97706' : (!isClockedIn && !clockOutTime) ? '#EFF6FF' : '#DCFCE7',
       location: activeLocationTitle,
       note: isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola',
     },
@@ -1264,7 +1264,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
                         {language === 'id' ? item.date : item.dateEn}
                       </span>
-                      {item.isToday && (
+                      {item.isToday && (isClockedIn || clockOutTime) && (
                         <span
                           style={{
                             fontSize: '0.625rem',

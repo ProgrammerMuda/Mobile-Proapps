@@ -403,19 +403,20 @@ export const MonthlyAttendanceDetailView = ({
             Alpha
           </span>
         );
+      case 'today':
       case 'pending':
         return (
           <span
             style={{
-              backgroundColor: '#FEF3C7',
-              color: '#D97706',
+              backgroundColor: '#EFF6FF',
+              color: '#1D4ED8',
               fontSize: '0.6875rem',
               fontWeight: 700,
               padding: '2px 8px',
               borderRadius: '9999px',
             }}
           >
-            {language === 'id' ? 'Belum Absen' : 'Pending'}
+            {language === 'id' ? 'Hari Ini' : 'Today'}
           </span>
         );
       default:
