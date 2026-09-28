@@ -1484,7 +1484,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
-                  padding: '32px 20px',
+                  padding: '32px 16px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -1492,27 +1492,31 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   textAlign: 'center',
                   border: '1px solid #E2E8F0',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+                  minHeight: '340px',
+                  width: '100%',
+                  boxSizing: 'border-box',
                 }}
               >
                 <img
                   src={attendanceEmptySearch}
                   alt="No Attendance Records Found"
                   style={{
-                    width: '160px',
-                    maxWidth: '75%',
+                    width: '100%',
                     height: 'auto',
+                    maxHeight: '220px',
                     objectFit: 'contain',
-                    marginBottom: '14px',
+                    marginBottom: '16px',
                     filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
                   }}
                 />
                 <h4
                   style={{
-                    fontSize: '1rem',
+                    fontSize: '1.125rem',
                     fontWeight: 800,
                     color: '#334155',
-                    margin: '0 0 6px 0',
+                    margin: '0 0 8px 0',
                     letterSpacing: '-0.2px',
+                    textAlign: 'center',
                   }}
                 >
                   No Attendance Records Found
@@ -1522,9 +1526,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     fontSize: '0.8125rem',
                     color: '#64748B',
                     margin: 0,
-                    lineHeight: 1.45,
-                    maxWidth: '280px',
+                    lineHeight: 1.5,
+                    maxWidth: '300px',
                     fontWeight: 500,
+                    textAlign: 'center',
                   }}
                 >
                   There are no attendance records matching your selected status filter.
