@@ -390,41 +390,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             gap: '16px',
           }}
         >
-          {/* Employee Profile Header Row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  backgroundColor: roleBadgeBg,
-                  color: roleBadgeColor,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '0.875rem',
-                }}
-              >
-                {userName.charAt(0)}
-              </div>
-              <div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#0F172A' }}>{userName}</div>
-                <div style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>{userDept}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Full Edge-to-Edge Divider Outline */}
-          <div
-            style={{
-              height: '1px',
-              backgroundColor: '#E2E8F0',
-              margin: '0 -18px',
-            }}
-          />
-
           {/* Live Time & Shift Row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
