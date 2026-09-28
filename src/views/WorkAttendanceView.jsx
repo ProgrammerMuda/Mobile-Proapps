@@ -182,13 +182,23 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const roleBadgeBg = isEng ? '#FFEDD5' : isHk ? '#FEF3C7' : isSec ? '#FEE2E2' : '#F3E8FF';
   const roleBadgeColor = isEng ? '#C2410C' : isHk ? '#B45309' : isSec ? '#B91C1C' : '#6B21A8';
 
-  const activeShiftTitle = isEng
-    ? 'Shift Pagi (08:00 - 17:00)'
+  const activeShiftName = isEng
+    ? 'Shift Pagi'
     : isHk
-    ? 'Shift Pagi (06:30 - 15:30)'
+    ? 'Shift Pagi'
     : isSec
-    ? 'Shift Pagi (07:00 - 19:00)'
-    : 'Shift Normal (08:00 - 17:00)';
+    ? 'Shift Pagi'
+    : 'Shift Reguler';
+
+  const activeShiftHours = isEng
+    ? '08.00 - 17.00'
+    : isHk
+    ? '06.30 - 15.30'
+    : isSec
+    ? '07.00 - 19.00'
+    : '08.00 - 17.00';
+
+  const activeShiftTitle = `${activeShiftName} (${activeShiftHours})`;
 
   const activeLocationTitle = isEng
     ? 'Workshop Engineering • Radius 15m'
@@ -452,18 +462,22 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               style={{
                 backgroundColor: '#EFF6FF',
                 border: '1px solid #DBEAFE',
-                borderRadius: '8px',
-                padding: '4px 8px',
+                borderRadius: '10px',
+                padding: '6px 10px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
-                fontSize: '0.6875rem',
-                fontWeight: 700,
-                color: '#1D4ED8',
+                gap: '8px',
               }}
             >
-              <Clock size={13} weight="bold" />
-              <span>{activeShiftTitle}</span>
+              <Clock size={16} weight="bold" color="#1D4ED8" />
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.15 }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1D4ED8' }}>
+                  {activeShiftName}
+                </span>
+                <span style={{ fontSize: '0.625rem', fontWeight: 600, color: '#3B82F6', marginTop: '1px' }}>
+                  {activeShiftHours}
+                </span>
+              </div>
             </div>
           </div>
 
