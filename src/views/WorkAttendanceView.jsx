@@ -72,36 +72,39 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button
-          type="button"
-          onClick={onBack}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#FFFFFF',
-            cursor: 'pointer',
-            padding: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '8px',
-          }}
-        >
-          <CaretLeft size={24} weight="bold" />
-        </button>
-        <h1
-          style={{
-            fontSize: '1.125rem',
-            fontWeight: 700,
-            margin: 0,
-            color: '#FFFFFF',
-            letterSpacing: '-0.2px',
-          }}
-        >
-          {language === 'id' ? 'Presensi Kerja' : 'Work Attendance'}
-        </h1>
-      </div>
+      <button
+        type="button"
+        onClick={onBack}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: '#FFFFFF',
+          cursor: 'pointer',
+          padding: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '8px',
+        }}
+      >
+        <CaretLeft size={24} weight="bold" />
+      </button>
+
+      <h1
+        style={{
+          fontSize: '1.125rem',
+          fontWeight: 700,
+          margin: 0,
+          color: '#FFFFFF',
+          letterSpacing: '-0.2px',
+          textAlign: 'center',
+          flex: 1,
+        }}
+      >
+        {language === 'id' ? 'Presensi Kerja' : 'Work Attendance'}
+      </h1>
+
+      <div style={{ width: '32px' }} />
     </div>
   );
 };
