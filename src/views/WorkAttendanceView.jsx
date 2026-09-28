@@ -1157,15 +1157,33 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
             <div
               style={{
-                fontSize: '0.6875rem',
-                fontWeight: 700,
-                color: '#15803D',
-                backgroundColor: '#DCFCE7',
-                padding: '4px 8px',
-                borderRadius: '6px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                backgroundColor: '#F0FDF4',
+                border: '1px solid #BBF7D0',
+                padding: '4px 10px',
+                borderRadius: '9999px',
+                boxShadow: '0 1px 3px rgba(22, 163, 74, 0.06)',
               }}
             >
-              5 Hadir • 1 Libur
+              <span
+                style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: '#16A34A',
+                  display: 'inline-block',
+                  boxShadow: '0 0 0 2.5px rgba(22, 163, 74, 0.2)',
+                }}
+              />
+              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#15803D', letterSpacing: '-0.1px' }}>
+                {language === 'id' ? '5 Hadir' : '5 Present'}
+              </span>
+              <span style={{ fontSize: '0.625rem', color: '#94A3B8' }}>•</span>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B' }}>
+                {language === 'id' ? '1 Libur' : '1 Off'}
+              </span>
             </div>
           </div>
 
