@@ -2134,18 +2134,18 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 >
                   <div
                     style={{
-                      width: '26px',
-                      height: '26px',
+                      width: '36px',
+                      height: '36px',
                       borderRadius: '50%',
                       backgroundColor: 'var(--color-primary, #053079)',
-                      border: '2.5px solid #FFFFFF',
+                      border: '3px solid #FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 2px 8px rgba(5, 48, 121, 0.4)',
+                      boxShadow: '0 3px 10px rgba(5, 48, 121, 0.45)',
                     }}
                   >
-                    <UserCheck size={14} weight="bold" color="#FFFFFF" />
+                    <UserCheck size={18} weight="bold" color="#FFFFFF" />
                   </div>
                 </div>
               </div>
@@ -2475,18 +2475,18 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 >
                   <div
                     style={{
-                      width: '28px',
-                      height: '28px',
+                      width: '36px',
+                      height: '36px',
                       borderRadius: '50%',
                       backgroundColor: 'var(--color-primary, #053079)',
-                      border: '2.5px solid #FFFFFF',
+                      border: '3px solid #FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 2px 8px rgba(5, 48, 121, 0.45)',
+                      boxShadow: '0 3px 10px rgba(5, 48, 121, 0.45)',
                     }}
                   >
-                    <Buildings size={14} weight="bold" color="#FFFFFF" />
+                    <Buildings size={18} weight="bold" color="#FFFFFF" />
                   </div>
                 </div>
 
@@ -2505,19 +2505,19 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 >
                   <div
                     style={{
-                      width: '26px',
-                      height: '26px',
+                      width: '36px',
+                      height: '36px',
                       borderRadius: '50%',
                       backgroundColor: '#DC2626',
-                      border: '2.5px solid #FFFFFF',
+                      border: '3px solid #FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 2px 8px rgba(220, 38, 38, 0.5)',
+                      boxShadow: '0 3px 10px rgba(220, 38, 38, 0.55)',
                       position: 'relative',
                     }}
                   >
-                    <UserCheck size={14} weight="bold" color="#FFFFFF" />
+                    <UserCheck size={18} weight="bold" color="#FFFFFF" />
                   </div>
                 </div>
               </div>
