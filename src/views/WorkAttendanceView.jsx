@@ -2382,15 +2382,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </div>
 
               {/* 3D Illustration: Out of Range Location (Full Width up to padding) */}
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '2px 0 4px 0' }}>
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '4px 0 2px 0' }}>
                 <img
                   src={outOfRangeLocation}
                   alt="Outside Radius"
                   style={{
                     width: '100%',
                     height: 'auto',
-                    maxHeight: '190px',
-                    objectFit: 'contain',
                     display: 'block',
                   }}
                 />
