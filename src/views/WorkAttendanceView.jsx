@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../context/LanguageContext';
 import {
@@ -124,12 +124,106 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [attendanceMethod, setAttendanceMethod] = useState('QR'); // 'QR' | 'PHOTO'
   const [isFlashlightOn, setIsFlashlightOn] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [isSelfieFullscreenOpen, setIsSelfieFullscreenOpen] = useState(false);
+  const [capturedSelfie, setCapturedSelfie] = useState(null);
+  const [cameraError, setCameraError] = useState(false);
   const [actionType, setActionType] = useState('CLOCK_IN'); // 'CLOCK_IN' | 'CLOCK_OUT'
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
+
+  // Front camera stream & video ref
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+
+  // Front Camera setup for Full-Screen Selfie
+  useEffect(() => {
+    if (isSelfieFullscreenOpen && !capturedSelfie) {
+      let isMounted = true;
+      const startCamera = async () => {
+        try {
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: 'user', width: { ideal: 720 }, height: { ideal: 1280 } },
+              audio: false,
+            });
+            if (isMounted) {
+              streamRef.current = stream;
+              if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+                videoRef.current.play().catch(() => {});
+              }
+              setCameraError(false);
+            } else {
+              stream.getTracks().forEach((track) => track.stop());
+            }
+          } else {
+            setCameraError(true);
+          }
+        } catch (err) {
+          console.warn('Front camera not accessible, using interactive simulation:', err);
+          if (isMounted) setCameraError(true);
+        }
+      };
+
+      startCamera();
+
+      return () => {
+        isMounted = false;
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+      };
+    }
+  }, [isSelfieFullscreenOpen, capturedSelfie]);
+
+  // Handle taking selfie photo
+  const handleTakeSelfie = () => {
+    if (videoRef.current && !cameraError) {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth || 640;
+        canvas.height = videoRef.current.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+        // Mirror front camera horizontally
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setCapturedSelfie(dataUrl);
+      } catch (e) {
+        setCapturedSelfie('simulated_photo');
+      }
+    } else {
+      setCapturedSelfie('simulated_photo');
+    }
+  };
+
+  const handleRetakeSelfie = () => {
+    setCapturedSelfie(null);
+  };
+
+  const handleSubmitSelfie = () => {
+    setIsSelfieFullscreenOpen(false);
+    setCapturedSelfie(null);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    handleConfirmClock();
+  };
+
+  const handleCloseSelfieCamera = () => {
+    setIsSelfieFullscreenOpen(false);
+    setCapturedSelfie(null);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  };
 
   // History Filter state
   const [historyFilter, setHistoryFilter] = useState('ALL'); // 'ALL' | 'HADIR' | 'TERLAMBAT' | 'LIBUR'
@@ -1189,7 +1283,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   onClick={() => {
                     setAttendanceMethod('PHOTO');
                     setIsMethodSheetOpen(false);
-                    setIsActionModalOpen(true);
+                    setIsSelfieFullscreenOpen(true);
                   }}
                   style={{
                     width: '100%',
@@ -1250,7 +1344,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       })()}
 
       {/* =========================================================================
-          MODAL 1: CLOCK IN / CLOCK OUT ACTION SHEET (QR CODE & SELFIE SIMULATION)
+          MODAL 1: SCAN QR CODE ACTION MODAL
           ========================================================================= */}
       {isActionModalOpen && (() => {
         const modalTarget = getModalTarget();
@@ -1296,9 +1390,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                      {attendanceMethod === 'QR'
-                        ? (actionType === 'CLOCK_IN' ? (language === 'id' ? 'Scan QR Clock In' : 'Scan QR Clock In') : (language === 'id' ? 'Scan QR Clock Out' : 'Scan QR Clock Out'))
-                        : (actionType === 'CLOCK_IN' ? (language === 'id' ? 'Foto Selfie Clock In' : 'Selfie Clock In') : (language === 'id' ? 'Foto Selfie Clock Out' : 'Selfie Clock Out'))}
+                      {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Scan QR Clock In' : 'Scan QR Clock In') : (language === 'id' ? 'Scan QR Clock Out' : 'Scan QR Clock Out')}
                     </h3>
                     <span
                       style={{
@@ -1306,11 +1398,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         fontWeight: 700,
                         padding: '2px 6px',
                         borderRadius: '4px',
-                        backgroundColor: attendanceMethod === 'QR' ? '#EFF6FF' : '#DCFCE7',
-                        color: attendanceMethod === 'QR' ? '#2563EB' : '#15803D',
+                        backgroundColor: '#EFF6FF',
+                        color: '#2563EB',
                       }}
                     >
-                      {attendanceMethod === 'QR' ? 'QR Scanner' : 'Face Match'}
+                      QR Scanner
                     </span>
                   </div>
                   <span style={{ fontSize: '0.6875rem', color: '#64748B' }}>
@@ -1336,222 +1428,143 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </button>
               </div>
 
-              {/* Viewfinder simulation based on method */}
-              {attendanceMethod === 'QR' ? (
-                /* QR SCANNER VIEWPORT */
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {/* QR SCANNER VIEWPORT */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div
+                  style={{
+                    height: '180px',
+                    backgroundColor: '#090D16',
+                    borderRadius: '16px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#FFFFFF',
+                    border: '1.5px solid #1E293B',
+                  }}
+                >
+                  {/* Scanner Center Box */}
                   <div
                     style={{
-                      height: '180px',
-                      backgroundColor: '#090D16',
-                      borderRadius: '16px',
+                      width: '120px',
+                      height: '120px',
+                      border: '2px solid rgba(56, 189, 248, 0.6)',
+                      borderRadius: '12px',
                       position: 'relative',
-                      overflow: 'hidden',
                       display: 'flex',
-                      flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#FFFFFF',
-                      border: '1.5px solid #1E293B',
+                      backgroundColor: 'rgba(15, 23, 42, 0.4)',
                     }}
                   >
-                    {/* Scanner Center Box */}
-                    <div
-                      style={{
-                        width: '120px',
-                        height: '120px',
-                        border: '2px solid rgba(56, 189, 248, 0.6)',
-                        borderRadius: '12px',
-                        position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: 'rgba(15, 23, 42, 0.4)',
-                      }}
-                    >
-                      {/* Corner Accents */}
-                      <div style={{ position: 'absolute', top: '-2px', left: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderTopLeftRadius: '4px' }} />
-                      <div style={{ position: 'absolute', top: '-2px', right: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderTopRightRadius: '4px' }} />
-                      <div style={{ position: 'absolute', bottom: '-2px', left: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderBottomLeftRadius: '4px' }} />
-                      <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderBottomRightRadius: '4px' }} />
+                    {/* Corner Accents */}
+                    <div style={{ position: 'absolute', top: '-2px', left: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderTopLeftRadius: '4px' }} />
+                    <div style={{ position: 'absolute', top: '-2px', right: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderTopRightRadius: '4px' }} />
+                    <div style={{ position: 'absolute', bottom: '-2px', left: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderBottomLeftRadius: '4px' }} />
+                    <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderBottomRightRadius: '4px' }} />
 
-                      {/* QR Icon in center */}
-                      <QrCode size={48} color="#94A3B8" weight="light" style={{ opacity: 0.65 }} />
+                    {/* QR Icon in center */}
+                    <QrCode size={48} color="#94A3B8" weight="light" style={{ opacity: 0.65 }} />
 
-                      {/* Animated Laser Line */}
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: '6px',
-                          right: '6px',
-                          height: '2px',
-                          background: 'linear-gradient(90deg, transparent 0%, #38BDF8 50%, transparent 100%)',
-                          boxShadow: '0 0 8px #38BDF8',
-                          animation: 'qrLaserAnim 2s infinite ease-in-out',
-                        }}
-                      />
-                    </div>
-
-                    {/* Top Right Flashlight Button */}
-                    <button
-                      type="button"
-                      onClick={() => setIsFlashlightOn(!isFlashlightOn)}
-                      style={{
-                        position: 'absolute',
-                        top: '10px',
-                        right: '10px',
-                        border: 'none',
-                        backgroundColor: isFlashlightOn ? '#FBBF24' : 'rgba(30, 41, 59, 0.8)',
-                        color: isFlashlightOn ? '#0F172A' : '#FFFFFF',
-                        borderRadius: '9999px',
-                        padding: '4px 10px',
-                        fontSize: '0.625rem',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <Lightning size={12} weight="fill" />
-                      <span>{isFlashlightOn ? 'Flash ON' : 'Flash'}</span>
-                    </button>
-
-                    {/* Bottom Status Text */}
+                    {/* Animated Laser Line */}
                     <div
                       style={{
                         position: 'absolute',
-                        bottom: '8px',
-                        fontSize: '0.6875rem',
-                        color: '#94A3B8',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
+                        left: '6px',
+                        right: '6px',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, transparent 0%, #38BDF8 50%, transparent 100%)',
+                        boxShadow: '0 0 8px #38BDF8',
+                        animation: 'qrLaserAnim 2s infinite ease-in-out',
                       }}
-                    >
-                      <CheckCircle size={12} weight="fill" color="#22C55E" />
-                      <span>{language === 'id' ? 'QR Code Terdeteksi • Siap Validasi' : 'QR Code Detected • Ready'}</span>
-                    </div>
+                    />
                   </div>
 
-                  {/* Verification Info Box */}
-                  <div
+                  {/* Top Right Flashlight Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsFlashlightOn(!isFlashlightOn)}
                     style={{
-                      backgroundColor: '#EFF6FF',
-                      border: '1px solid #DBEAFE',
-                      borderRadius: '12px',
-                      padding: '10px 12px',
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      border: 'none',
+                      backgroundColor: isFlashlightOn ? '#FBBF24' : 'rgba(30, 41, 59, 0.8)',
+                      color: isFlashlightOn ? '#0F172A' : '#FFFFFF',
+                      borderRadius: '9999px',
+                      padding: '4px 10px',
+                      fontSize: '0.625rem',
+                      fontWeight: 700,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '0.75rem',
-                      color: '#1E40AF',
+                      gap: '4px',
+                      cursor: 'pointer',
                     }}
                   >
-                    <CheckCircle size={18} weight="fill" color="#2563EB" />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Pos QR Resmi Terverifikasi' : 'Official QR Post Verified'}</div>
-                      <div style={{ fontSize: '0.6875rem', color: '#1E3A8A' }}>{activeLocationTitle}</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setAttendanceMethod('PHOTO')}
-                      style={{
-                        border: 'none',
-                        background: '#FFFFFF',
-                        color: '#2563EB',
-                        borderRadius: '6px',
-                        padding: '4px 8px',
-                        fontSize: '0.625rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {language === 'id' ? 'Ganti Foto' : 'Switch Photo'}
-                    </button>
+                    <Lightning size={12} weight="fill" />
+                    <span>{isFlashlightOn ? 'Flash ON' : 'Flash'}</span>
+                  </button>
+
+                  {/* Bottom Status Text */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      fontSize: '0.6875rem',
+                      color: '#94A3B8',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <CheckCircle size={12} weight="fill" color="#22C55E" />
+                    <span>{language === 'id' ? 'QR Code Terdeteksi • Siap Validasi' : 'QR Code Detected • Ready'}</span>
                   </div>
                 </div>
-              ) : (
-                /* SELFIE CAMERA VIEWPORT */
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div
-                    style={{
-                      height: '180px',
-                      backgroundColor: '#0F172A',
-                      borderRadius: '16px',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#FFFFFF',
-                      border: '1.5px solid #1E293B',
-                    }}
-                  >
-                    <Camera size={38} color="#38BDF8" weight="bold" />
-                    <span style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '6px' }}>
-                      {language === 'id' ? 'Foto Selfie di Tempat • GPS Terkoneksi' : 'On-site Selfie • GPS Connected'}
-                    </span>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '10px',
-                        right: '10px',
-                        backgroundColor: 'rgba(2, 56, 138, 0.85)',
-                        padding: '3px 8px',
-                        borderRadius: '9999px',
-                        fontSize: '0.625rem',
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                        color: '#FFFFFF',
-                      }}
-                    >
-                      <NavigationArrow size={12} weight="fill" color="#38BDF8" />
-                      <span>GPS Terkunci</span>
-                    </div>
-                  </div>
 
-                  {/* Verification Info */}
-                  <div
+                {/* Verification Info Box */}
+                <div
+                  style={{
+                    backgroundColor: '#EFF6FF',
+                    border: '1px solid #DBEAFE',
+                    borderRadius: '12px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '0.75rem',
+                    color: '#1E40AF',
+                  }}
+                >
+                  <CheckCircle size={18} weight="fill" color="#2563EB" />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Pos QR Resmi Terverifikasi' : 'Official QR Post Verified'}</div>
+                    <div style={{ fontSize: '0.6875rem', color: '#1E3A8A' }}>{activeLocationTitle}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsActionModalOpen(false);
+                      setAttendanceMethod('PHOTO');
+                      setIsSelfieFullscreenOpen(true);
+                    }}
                     style={{
-                      backgroundColor: '#F0FDF4',
-                      border: '1px solid #DCFCE7',
-                      borderRadius: '12px',
-                      padding: '10px 12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      fontSize: '0.75rem',
-                      color: '#15803D',
+                      border: 'none',
+                      background: '#FFFFFF',
+                      color: '#2563EB',
+                      borderRadius: '6px',
+                      padding: '4px 8px',
+                      fontSize: '0.625rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
                     }}
                   >
-                    <CheckCircle size={18} weight="fill" color="#16A34A" />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Lokasi Presensi GPS Terdeteksi' : 'GPS Attendance Location Detected'}</div>
-                      <div style={{ fontSize: '0.6875rem', color: '#166534' }}>{activeLocationTitle}</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setAttendanceMethod('QR')}
-                      style={{
-                        border: 'none',
-                        background: '#FFFFFF',
-                        color: '#15803D',
-                        borderRadius: '6px',
-                        padding: '4px 8px',
-                        fontSize: '0.625rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {language === 'id' ? 'Ganti QR' : 'Switch QR'}
-                    </button>
-                  </div>
+                    {language === 'id' ? 'Ganti Foto' : 'Switch Photo'}
+                  </button>
                 </div>
-              )}
+              </div>
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
@@ -1594,24 +1607,365 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   {actionType === 'CLOCK_IN' ? (
                     <>
                       <SignIn size={18} weight="bold" />
-                      <span>
-                        {attendanceMethod === 'QR'
-                          ? (language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock In')
-                          : (language === 'id' ? 'Konfirmasi Presensi Foto' : 'Confirm Photo Clock In')}
-                      </span>
+                      <span>{language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock In'}</span>
                     </>
                   ) : (
                     <>
                       <SignOut size={18} weight="bold" />
-                      <span>
-                        {attendanceMethod === 'QR'
-                          ? (language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock Out')
-                          : (language === 'id' ? 'Konfirmasi Presensi Foto' : 'Confirm Photo Clock Out')}
-                      </span>
+                      <span>{language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock Out'}</span>
                     </>
                   )}
                 </button>
               </div>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          MODAL 1.5: FULL-SCREEN FRONT CAMERA VIEW (SELFIE ATTENDANCE)
+          ========================================================================= */}
+      {isSelfieFullscreenOpen && (() => {
+        const modalTarget = getModalTarget();
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: '#000000',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            {/* Top Bar Floating */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 10,
+                padding: '16px 16px 24px 16px',
+                background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <button
+                type="button"
+                onClick={handleCloseSelfieCamera}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#FFFFFF',
+                }}
+              >
+                <X size={24} weight="bold" />
+              </button>
+
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#FFFFFF' }}>
+                  {actionType === 'CLOCK_IN'
+                    ? (language === 'id' ? 'Selfie Clock In' : 'Selfie Clock In')
+                    : (language === 'id' ? 'Selfie Clock Out' : 'Selfie Clock Out')}
+                </div>
+                <div style={{ fontSize: '0.6875rem', color: '#94A3B8' }}>
+                  {currentTime}
+                </div>
+              </div>
+
+              {/* Live GPS badge */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  backgroundColor: '#2563EB',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                }}
+              >
+                <NavigationArrow size={12} weight="fill" color="#FFFFFF" />
+                <span>GPS</span>
+              </div>
+            </div>
+
+            {/* Video Viewport / Photo Snapshot */}
+            <div
+              style={{
+                flex: 1,
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#090D16',
+                overflow: 'hidden',
+              }}
+            >
+              {capturedSelfie && capturedSelfie !== 'simulated_photo' ? (
+                <img
+                  src={capturedSelfie}
+                  alt="Captured Selfie"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+              ) : !cameraError ? (
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transform: 'scaleX(-1)', // Front Camera Mirroring
+                  }}
+                />
+              ) : (
+                /* Interactive Front Camera Simulation View */
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'radial-gradient(circle at 50% 40%, #1E293B 0%, #090D16 80%)',
+                    position: 'relative',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '130px',
+                      height: '130px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                      border: '2px solid rgba(56, 189, 248, 0.4)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: '16px',
+                    }}
+                  >
+                    <UserCheck size={64} color="#38BDF8" weight="light" />
+                  </div>
+                  <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#FFFFFF' }}>
+                    {userName}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '4px' }}>
+                    {language === 'id' ? 'Kamera Depan Aktif' : 'Front Camera Active'}
+                  </span>
+                </div>
+              )}
+
+              {/* Center Face Guide Oval (Only when not captured) */}
+              {!capturedSelfie && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    width: '210px',
+                    height: '280px',
+                    borderRadius: '50%',
+                    border: '2px dashed rgba(255, 255, 255, 0.55)',
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    paddingBottom: '16px',
+                    boxSizing: 'border-box',
+                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.25)',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 600,
+                      color: '#FFFFFF',
+                      backgroundColor: 'rgba(15, 23, 42, 0.65)',
+                      padding: '3px 10px',
+                      borderRadius: '9999px',
+                      backdropFilter: 'blur(4px)',
+                    }}
+                  >
+                    {language === 'id' ? 'Posisikan Wajah Anda' : 'Align Face in Frame'}
+                  </span>
+                </div>
+              )}
+
+              {/* Attendance Watermark Overlay (Bottom-Left) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '16px',
+                  left: '16px',
+                  right: '16px',
+                  pointerEvents: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                    padding: '4px 8px',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    fontSize: '0.6875rem',
+                    fontWeight: 700,
+                    width: 'fit-content',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  <MapPin size={13} color="#38BDF8" weight="fill" />
+                  <span>{activeLocationTitle}</span>
+                </div>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+                    padding: '4px 8px',
+                    borderRadius: '8px',
+                    color: '#94A3B8',
+                    fontSize: '0.625rem',
+                    width: 'fit-content',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  <span>{userName} ({empId}) • {currentTime}, 28 Sep 2026</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Controls Bar */}
+            <div
+              style={{
+                padding: '24px 20px 32px 20px',
+                backgroundColor: '#000000',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+              }}
+            >
+              {!capturedSelfie ? (
+                <>
+                  {/* Shutter Button */}
+                  <button
+                    type="button"
+                    onClick={handleTakeSelfie}
+                    style={{
+                      width: '72px',
+                      height: '72px',
+                      borderRadius: '50%',
+                      backgroundColor: 'transparent',
+                      border: '4px solid #FFFFFF',
+                      padding: '4px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      outline: 'none',
+                      transition: 'transform 0.1s ease',
+                    }}
+                    onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.92)'; }}
+                    onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                  >
+                    <div
+                      style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '50%',
+                        backgroundColor: '#FFFFFF',
+                      }}
+                    />
+                  </button>
+                  <span style={{ fontSize: '0.6875rem', color: '#94A3B8' }}>
+                    {language === 'id' ? 'Ketuk untuk mengambil foto selfie' : 'Tap shutter to capture selfie'}
+                  </span>
+                </>
+              ) : (
+                /* After Capture Controls */
+                <div style={{ display: 'flex', gap: '12px', width: '100%', maxWidth: '360px' }}>
+                  <button
+                    type="button"
+                    onClick={handleRetakeSelfie}
+                    style={{
+                      flex: 1,
+                      height: '46px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                      color: '#FFFFFF',
+                      borderRadius: '12px',
+                      fontSize: '0.875rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <ArrowsClockwise size={18} weight="bold" />
+                    <span>{language === 'id' ? 'Foto Ulang' : 'Retake'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSubmitSelfie}
+                    style={{
+                      flex: 2,
+                      height: '46px',
+                      backgroundColor: actionType === 'CLOCK_IN' ? '#16A34A' : '#D97706',
+                      border: 'none',
+                      color: '#FFFFFF',
+                      borderRadius: '12px',
+                      fontSize: '0.875rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <Check size={20} weight="bold" />
+                    <span>
+                      {actionType === 'CLOCK_IN'
+                        ? (language === 'id' ? 'Kirim Clock In' : 'Submit Clock In')
+                        : (language === 'id' ? 'Kirim Clock Out' : 'Submit Clock Out')}
+                    </span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         );
