@@ -57,6 +57,36 @@ import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
  */
 export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 28) }) => {
   const { language } = useLanguage();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.android-scroll-content') || window;
+    const handleScroll = () => {
+      const scrollY = scrollContainer === window ? window.scrollY : scrollContainer.scrollTop;
+      if (scrollY > 15) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    if (scrollContainer === window) {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    } else {
+      scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    // Initial check
+    handleScroll();
+
+    return () => {
+      if (scrollContainer === window) {
+        window.removeEventListener('scroll', handleScroll);
+      } else {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
 
   const formattedDate = currentDate.toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US', {
     weekday: 'long',
@@ -73,9 +103,13 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
         justifyContent: 'space-between',
         width: '100%',
         padding: '16px 20px',
-        backgroundColor: '#02388A',
-        color: '#FFFFFF',
+        backgroundColor: isScrolled ? '#FFFFFF' : '#02388A',
+        color: isScrolled ? '#0F172A' : '#FFFFFF',
         boxSizing: 'border-box',
+        boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.08)' : 'none',
+        borderBottom: isScrolled ? '1px solid #E2E8F0' : 'none',
+        transition: 'background-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, border-bottom 0.25s ease',
+        zIndex: 50,
       }}
     >
       <button
@@ -84,13 +118,14 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
         style={{
           background: 'none',
           border: 'none',
-          color: '#FFFFFF',
+          color: isScrolled ? '#0F172A' : '#FFFFFF',
           cursor: 'pointer',
           padding: '4px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: '8px',
+          transition: 'color 0.25s ease',
         }}
       >
         <CaretLeft size={24} weight="bold" />
@@ -101,10 +136,11 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
           fontSize: '1.125rem',
           fontWeight: 700,
           margin: 0,
-          color: '#FFFFFF',
+          color: isScrolled ? '#0F172A' : '#FFFFFF',
           letterSpacing: '-0.2px',
           textAlign: 'center',
           flex: 1,
+          transition: 'color 0.25s ease',
         }}
       >
         {language === 'id' ? 'Presensi Kerja' : 'Work Attendance'}
