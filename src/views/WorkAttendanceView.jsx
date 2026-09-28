@@ -1178,8 +1178,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
                       {language === 'id'
-                        ? 'Pindai barcode QR yang terpasang di pos atau lokasi kerja'
-                        : 'Scan the QR barcode located at the workstation or post'}
+                        ? 'Pindai barcode QR yang tertempel di area pos atau radius presensi'
+                        : 'Scan the official QR barcode placed at the workstation radius'}
                     </div>
                   </div>
                   <CaretRight size={18} weight="bold" color="#94A3B8" />
@@ -1237,8 +1237,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
                       {language === 'id'
-                        ? 'Ambil foto selfie dengan verifikasi pengenalan wajah otomatis'
-                        : 'Take a selfie photo with instant facial verification'}
+                        ? 'Ambil foto selfie di tempat, lokasi presensi akan terdeteksi otomatis via GPS'
+                        : 'Take a selfie on-site, your attendance location will be captured via GPS'}
                     </div>
                   </div>
                   <CaretRight size={18} weight="bold" color="#94A3B8" />
@@ -1494,14 +1494,14 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   >
                     <Camera size={38} color="#38BDF8" weight="bold" />
                     <span style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '6px' }}>
-                      {language === 'id' ? 'Wajah Terverifikasi Otomatis' : 'Face Verified Automatically'}
+                      {language === 'id' ? 'Foto Selfie di Tempat • GPS Terkoneksi' : 'On-site Selfie • GPS Connected'}
                     </span>
                     <div
                       style={{
                         position: 'absolute',
                         top: '10px',
                         right: '10px',
-                        backgroundColor: 'rgba(22, 163, 74, 0.85)',
+                        backgroundColor: 'rgba(2, 56, 138, 0.85)',
                         padding: '3px 8px',
                         borderRadius: '9999px',
                         fontSize: '0.625rem',
@@ -1509,10 +1509,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '4px',
+                        color: '#FFFFFF',
                       }}
                     >
-                      <CheckCircle size={12} weight="fill" />
-                      <span>Match 99.4%</span>
+                      <NavigationArrow size={12} weight="fill" color="#38BDF8" />
+                      <span>GPS Terkunci</span>
                     </div>
                   </div>
 
@@ -1532,8 +1533,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   >
                     <CheckCircle size={18} weight="fill" color="#16A34A" />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Verifikasi Kehadiran Siap' : 'Attendance Verification Ready'}</div>
-                      <div style={{ fontSize: '0.6875rem', color: '#166534' }}>{userName} • {activeShiftTitle}</div>
+                      <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Lokasi Presensi GPS Terdeteksi' : 'GPS Attendance Location Detected'}</div>
+                      <div style={{ fontSize: '0.6875rem', color: '#166534' }}>{activeLocationTitle}</div>
                     </div>
                     <button
                       type="button"
