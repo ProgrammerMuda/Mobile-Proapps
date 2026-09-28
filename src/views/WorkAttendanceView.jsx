@@ -2774,30 +2774,67 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </p>
               </div>
 
-              {/* Summary Detail Card */}
+              {/* Redesigned Clean Attendance Time Card */}
               <div
                 style={{
-                  backgroundColor: '#F8FAFC',
-                  borderRadius: '14px',
-                  padding: '12px 14px',
                   width: '100%',
+                  backgroundColor: 'var(--color-background-surface, #F8FAFC)',
+                  borderRadius: '16px',
                   border: '1px solid var(--color-border-default, #E2E8F0)',
+                  padding: '12px 16px',
                   display: 'flex',
-                  flexDirection: 'column',
-                  gap: '4px',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                   boxSizing: 'border-box',
-                  textAlign: 'center',
                 }}
               >
-                <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)' }}>
-                  {currentTime} • {userName}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div
+                    style={{
+                      width: '38px',
+                      height: '38px',
+                      borderRadius: '10px',
+                      backgroundColor: 'var(--color-selected-background, #EAF7FF)',
+                      border: '1px solid #BAE6FD',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--color-primary, #053079)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {actionType === 'CLOCK_IN' ? (
+                      <SignIn size={18} weight="bold" color="var(--color-primary, #053079)" />
+                    ) : (
+                      <SignOut size={18} weight="bold" color="var(--color-primary, #053079)" />
+                    )}
+                  </div>
+                  <div style={{ textAlign: 'left' }}>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '2px' }}>
+                      {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Waktu Masuk' : 'Clock In Time') : (language === 'id' ? 'Waktu Pulang' : 'Clock Out Time')}
+                    </div>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)' }}>
+                      {checkInSnapshot?.time || currentTime || '08:14:00 WIB'}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary, #64748B)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                  <span>{activeShiftName}</span>
-                  <span>•</span>
-                  <span style={{ fontWeight: 700, color: attendanceMethod === 'QR' ? '#2563EB' : 'var(--color-primary, #053079)' }}>
-                    {attendanceMethod === 'QR' ? 'Via Scan QR' : 'Via Foto Selfie'}
-                  </span>
+
+                <div
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: '20px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid var(--color-border-default, #E2E8F0)',
+                    fontSize: '0.6875rem',
+                    fontWeight: 700,
+                    color: 'var(--color-text-secondary, #64748B)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <CalendarBlank size={12} weight="bold" color="var(--color-primary, #053079)" />
+                  <span>{checkInSnapshot?.date || '28 Sep 2026'}</span>
                 </div>
               </div>
 
