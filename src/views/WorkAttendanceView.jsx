@@ -2092,31 +2092,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   />
                 </svg>
 
-                {/* Status Badge Top-Right */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                    border: '1px solid #DCFCE7',
-                    padding: '4px 10px',
-                    borderRadius: '9999px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
-                    backdropFilter: 'blur(4px)',
-                    fontSize: '0.625rem',
-                    fontWeight: 700,
-                    color: '#16A34A',
-                    zIndex: 5,
-                  }}
-                >
-                  <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
-                  <span>{language === 'id' ? 'Dalam Radius Presensi' : 'Inside Radius'}</span>
-                </div>
-
                 {/* Center User Pin inside Radius */}
                 <div
                   style={{
