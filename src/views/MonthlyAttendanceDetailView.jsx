@@ -362,8 +362,8 @@ export const MonthlyAttendanceDetailView = ({
         return (
           <span
             style={{
-              backgroundColor: '#FEF3C7',
-              color: '#D97706',
+              backgroundColor: '#D97706',
+              color: '#FFFFFF',
               fontSize: '0.6875rem',
               fontWeight: 700,
               padding: '2px 8px',
@@ -392,8 +392,8 @@ export const MonthlyAttendanceDetailView = ({
         return (
           <span
             style={{
-              backgroundColor: '#FEE2E2',
-              color: '#DC2626',
+              backgroundColor: '#DC2626',
+              color: '#FFFFFF',
               fontSize: '0.6875rem',
               fontWeight: 700,
               padding: '2px 8px',
@@ -698,18 +698,37 @@ export const MonthlyAttendanceDetailView = ({
             const dayName = language === 'id' ? DAY_NAMES_ID[log.date.getDay()] : DAY_NAMES[log.date.getDay()];
             const monthStr = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
             const dateDisplay = `${dayName}, ${log.dayNumber} ${monthStr} ${selectedYear}`;
+            const isLate = log.status === 'late';
+            const isAlpha = log.status === 'alpha';
+
+            let cardBg = '#FFFFFF';
+            let cardBorder = '1px solid #E2E8F0';
+            let tileBg = '#F8FAFC';
+            let tileBorder = '1px solid #F1F5F9';
+
+            if (isLate) {
+              cardBg = '#FFFBEB';
+              cardBorder = '1px solid #FDE68A';
+              tileBg = '#FFFFFF';
+              tileBorder = '1px solid #FEF3C7';
+            } else if (isAlpha) {
+              cardBg = '#FEF2F2';
+              cardBorder = '1px solid #FECACA';
+              tileBg = '#FFFFFF';
+              tileBorder = '1px solid #FEE2E2';
+            }
 
             return (
               <div
                 key={log.id}
                 style={{
-                  backgroundColor: '#FFFFFF',
+                  backgroundColor: cardBg,
                   borderRadius: '14px',
                   padding: '14px 16px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '10px',
-                  border: '1px solid #E2E8F0',
+                  border: cardBorder,
                 }}
               >
                 {/* Date & Status Header */}
@@ -726,10 +745,10 @@ export const MonthlyAttendanceDetailView = ({
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
                     gap: '10px',
-                    backgroundColor: '#F8FAFC',
+                    backgroundColor: tileBg,
                     borderRadius: '10px',
                     padding: '8px 12px',
-                    border: '1px solid #F1F5F9',
+                    border: tileBorder,
                   }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -753,7 +772,9 @@ export const MonthlyAttendanceDetailView = ({
 
                 {/* Footer Notes & Duration */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                  <span>{log.notes}</span>
+                  <span style={{ color: isLate ? '#B45309' : isAlpha ? '#DC2626' : '#64748B', fontWeight: (isLate || isAlpha) ? 600 : 400 }}>
+                    {log.notes}
+                  </span>
                   <span style={{ fontWeight: 600, color: '#334155' }}>
                     {language === 'id' ? `Durasi: ${log.workDuration}` : `Duration: ${log.workDuration}`}
                   </span>
