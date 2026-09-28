@@ -128,6 +128,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [capturedSelfie, setCapturedSelfie] = useState(null);
   const [cameraError, setCameraError] = useState(false);
   const [actionType, setActionType] = useState('CLOCK_IN'); // 'CLOCK_IN' | 'CLOCK_OUT'
+  const [isCheckInPageOpen, setIsCheckInPageOpen] = useState(false);
+  const [isPreviewPhotoOpen, setIsPreviewPhotoOpen] = useState(false);
+  const [checkInSnapshot, setCheckInSnapshot] = useState(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
@@ -227,13 +230,27 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     setCapturedSelfie(null);
   };
 
-  const handleSubmitSelfie = () => {
-    setIsSelfieFullscreenOpen(false);
-    setCapturedSelfie(null);
+  const handleUsePhoto = () => {
+    const photoToUse = capturedSelfie || 'simulated_photo';
+    setCheckInSnapshot({
+      photo: photoToUse,
+      time: currentTime || '08:14:00 WIB',
+      timeShort: currentTime ? currentTime.substring(0, 5) : '08:14',
+      date: '28 Sep 2026',
+      location: baseLocationName,
+      coords: userCoords,
+      actionType: actionType,
+    });
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
+    setIsSelfieFullscreenOpen(false);
+    setIsCheckInPageOpen(true);
+  };
+
+  const handleFinalCheckIn = () => {
+    setIsCheckInPageOpen(false);
     handleConfirmClock();
   };
 
@@ -1919,11 +1936,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   </button>
                   <button
                     type="button"
-                    onClick={handleSubmitSelfie}
+                    onClick={handleUsePhoto}
                     style={{
                       flex: 2,
                       height: '46px',
-                      backgroundColor: actionType === 'CLOCK_IN' ? '#16A34A' : '#D97706',
+                      backgroundColor: 'var(--primary, #053079)',
                       border: 'none',
                       color: '#FFFFFF',
                       borderRadius: '12px',
@@ -1937,14 +1954,588 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     }}
                   >
                     <Check size={20} weight="bold" />
-                    <span>
-                      {actionType === 'CLOCK_IN'
-                        ? (language === 'id' ? 'Kirim Clock In' : 'Submit Clock In')
-                        : (language === 'id' ? 'Kirim Clock Out' : 'Submit Clock Out')}
-                    </span>
+                    <span>Use Photo</span>
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          MODAL 1.8: CHECK IN CONFIRMATION SCREEN (MAP & RADIUS)
+          ========================================================================= */}
+      {isCheckInPageOpen && (() => {
+        const modalTarget = getModalTarget();
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: '#F8FAFC',
+              zIndex: 99998,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            {/* Top Bar Header */}
+            <div
+              style={{
+                height: '56px',
+                backgroundColor: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 16px',
+                zIndex: 20,
+                borderBottom: '1px solid #F1F5F9',
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setIsCheckInPageOpen(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#0F172A',
+                }}
+              >
+                <CaretLeft size={24} weight="bold" />
+              </button>
+
+              <h2 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                {actionType === 'CLOCK_IN' ? 'Check In' : 'Check Out'}
+              </h2>
+
+              <div style={{ width: '36px' }} />
+            </div>
+
+            {/* Upper Map Area */}
+            <div
+              style={{
+                flex: 1,
+                position: 'relative',
+                backgroundColor: '#EBE7DE',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Stylized Vector Map Background */}
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 400 480"
+                preserveAspectRatio="xMidYMid slice"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+              >
+                {/* Background base */}
+                <rect width="400" height="480" fill="#EFECE6" />
+
+                {/* Park / Greenery Areas */}
+                <path d="M0,0 L160,0 L140,110 L50,130 L0,80 Z" fill="#D4EAD6" opacity="0.9" />
+                <path d="M-20,100 Q80,120 70,220 L0,230 Z" fill="#CBE5CD" opacity="0.85" />
+                <path d="M240,120 Q320,80 420,130 L420,240 Q330,220 250,210 Z" fill="#E2EFE3" opacity="0.8" />
+                <path d="M260,250 L420,270 L420,440 L280,420 Z" fill="#E5EFE6" opacity="0.75" />
+
+                {/* Street Networks / Roads */}
+                <path d="M-20,140 Q180,180 420,160" stroke="#FFFFFF" strokeWidth="22" fill="none" strokeLinecap="round" />
+                <path d="M-20,140 Q180,180 420,160" stroke="#DDD6C8" strokeWidth="24" fill="none" strokeLinecap="round" style={{ zIndex: -1 }} />
+
+                <path d="M200,-20 Q220,180 180,500" stroke="#FFFFFF" strokeWidth="26" fill="none" />
+                <path d="M200,-20 Q220,180 180,500" stroke="#DDD6C8" strokeWidth="28" fill="none" />
+
+                <path d="M20,320 Q160,300 420,330" stroke="#FFFFFF" strokeWidth="18" fill="none" />
+                <path d="M20,320 Q160,300 420,330" stroke="#DDD6C8" strokeWidth="20" fill="none" />
+
+                {/* Secondary Alleys */}
+                <path d="M120,40 Q180,140 120,260" stroke="#FFFFFF" strokeWidth="12" fill="none" />
+                <path d="M250,80 Q320,180 270,360" stroke="#FFFFFF" strokeWidth="14" fill="none" />
+                <path d="M300,100 Q360,200 350,380" stroke="#FFFFFF" strokeWidth="10" fill="none" />
+                <path d="M40,240 Q140,260 220,360" stroke="#FFFFFF" strokeWidth="10" fill="none" />
+
+                {/* City Blocks */}
+                <rect x="250" y="220" width="70" height="90" rx="6" fill="#E6E0D5" opacity="0.6" />
+                <rect x="250" y="325" width="70" height="70" rx="6" fill="#E6E0D5" opacity="0.6" />
+                <rect x="80" y="270" width="80" height="70" rx="6" fill="#E6E0D5" opacity="0.6" />
+                <rect x="175" y="210" width="50" height="40" rx="6" fill="#E6E0D5" opacity="0.6" />
+
+                {/* Geofence Circular Radius Area */}
+                <circle
+                  cx="165"
+                  cy="235"
+                  r="88"
+                  fill="rgba(9, 178, 255, 0.22)"
+                  stroke="#09B2FF"
+                  strokeWidth="2"
+                  strokeDasharray="4 2"
+                />
+              </svg>
+
+              {/* Metro Station Pill Badge (Istora) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '18px',
+                  left: '48%',
+                  transform: 'translateX(-50%)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                  fontSize: '0.6875rem',
+                  fontWeight: 800,
+                  color: '#2563EB',
+                }}
+              >
+                <div style={{ width: '14px', height: '14px', borderRadius: '3px', backgroundColor: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ color: '#FFFFFF', fontSize: '9px', fontWeight: 900 }}>M</span>
+                </div>
+                <span>Istora</span>
+              </div>
+
+              {/* Area label text */}
+              <div
+                style={{
+                  position: 'absolute',
+                  right: '16px',
+                  top: '45%',
+                  fontSize: '1.125rem',
+                  fontWeight: 800,
+                  color: 'rgba(15, 23, 42, 0.25)',
+                  letterSpacing: '0.05em',
+                  pointerEvents: 'none',
+                }}
+              >
+                Sudirman
+              </div>
+
+              {/* Center Building Pin */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '165px',
+                  top: '235px',
+                  transform: 'translate(-50%, -50%)',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '50%',
+                  backgroundColor: '#0A5C67',
+                  border: '3px solid #FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(10, 92, 103, 0.35)',
+                  zIndex: 8,
+                }}
+              >
+                <Buildings size={20} weight="fill" color="#FFFFFF" />
+              </div>
+
+              {/* User Location Pin (Inside Radius) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '198px',
+                  top: '202px',
+                  transform: 'translate(-50%, -100%)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  zIndex: 10,
+                }}
+              >
+                {/* Teardrop Pin */}
+                <div
+                  style={{
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '50% 50% 50% 0',
+                    transform: 'rotate(-45deg)',
+                    backgroundColor: '#0F172A',
+                    border: '3px solid #FFFFFF',
+                    boxShadow: '0 6px 14px rgba(15, 23, 42, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ transform: 'rotate(45deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {checkInSnapshot?.photo && checkInSnapshot.photo !== 'simulated_photo' ? (
+                      <img
+                        src={checkInSnapshot.photo}
+                        alt="Pin User"
+                        style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <UserCheck size={20} weight="bold" color="#FFFFFF" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Radar Ground Shadow */}
+                <div
+                  style={{
+                    width: '12px',
+                    height: '4px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(15, 23, 42, 0.3)',
+                    marginTop: '2px',
+                  }}
+                />
+              </div>
+
+              {/* Floating Status Pill: Didalam Radius */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '18px',
+                  right: '16px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                  border: '1px solid rgba(22, 163, 74, 0.2)',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                  backdropFilter: 'blur(6px)',
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  color: '#16A34A',
+                }}
+              >
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
+                <span>Didalam Radius</span>
+              </div>
+            </div>
+
+            {/* Bottom Information Cards (Matching Reference Image) */}
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 16px 28px 16px',
+                boxShadow: '0 -8px 24px rgba(0, 0, 0, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                zIndex: 20,
+              }}
+            >
+              {/* Row 1: Check In Time & Photo */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                {/* Left Card: Check In Time */}
+                <div
+                  style={{
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #F1F5F9',
+                    borderRadius: '14px',
+                    padding: '12px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginBottom: '2px' }}>
+                      {actionType === 'CLOCK_IN' ? 'Check In' : 'Check Out'}
+                    </div>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
+                      {checkInSnapshot?.timeShort || '08:14'} WIB
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      backgroundColor: '#0A5C67',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#FFFFFF',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {actionType === 'CLOCK_IN' ? (
+                      <SignIn size={20} weight="bold" />
+                    ) : (
+                      <SignOut size={20} weight="bold" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Card: Photo */}
+                <div
+                  style={{
+                    backgroundColor: '#F8FAFC',
+                    border: '1px solid #F1F5F9',
+                    borderRadius: '14px',
+                    padding: '12px 14px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginBottom: '2px' }}>
+                      Photo
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsPreviewPhotoOpen(true)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        fontSize: '0.8125rem',
+                        fontWeight: 700,
+                        color: '#09B2FF',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      See Photo
+                    </button>
+                  </div>
+                  {/* Small Square Photo Thumbnail */}
+                  <div
+                    onClick={() => setIsPreviewPhotoOpen(true)}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      border: '1px solid #CBD5E1',
+                      backgroundColor: '#0F172A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {checkInSnapshot?.photo && checkInSnapshot.photo !== 'simulated_photo' ? (
+                      <img
+                        src={checkInSnapshot.photo}
+                        alt="Thumbnail"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <UserCheck size={20} color="#38BDF8" weight="bold" />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Location Card */}
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #F1F5F9',
+                  borderRadius: '14px',
+                  padding: '12px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div style={{ flex: 1, paddingRight: '8px' }}>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginBottom: '2px' }}>
+                    Location
+                  </div>
+                  <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
+                    {checkInSnapshot?.location || baseLocationName}
+                  </div>
+                  <div style={{ fontSize: '0.625rem', color: '#94A3B8', fontFamily: 'monospace', marginTop: '2px' }}>
+                    Lat: {checkInSnapshot?.coords?.lat || userCoords.lat}, Long: {checkInSnapshot?.coords?.lng || userCoords.lng}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
+                    backgroundColor: '#0A5C67',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#FFFFFF',
+                    flexShrink: 0,
+                  }}
+                >
+                  <MapPin size={20} weight="fill" />
+                </div>
+              </div>
+
+              {/* Bottom Action Button: Check In */}
+              <button
+                type="button"
+                onClick={handleFinalCheckIn}
+                style={{
+                  width: '100%',
+                  height: '50px',
+                  backgroundColor: '#082032',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontSize: '0.9375rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: '4px',
+                  boxShadow: '0 4px 14px rgba(8, 32, 50, 0.35)',
+                  transition: 'opacity 0.2s ease',
+                }}
+              >
+                {actionType === 'CLOCK_IN' ? 'Check In' : 'Check Out'}
+              </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          MODAL 1.9: FULL PHOTO PREVIEW MODAL
+          ========================================================================= */}
+      {isPreviewPhotoOpen && (() => {
+        const modalTarget = getModalTarget();
+        const modalElement = (
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '20px',
+              backdropFilter: 'blur(8px)',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            {/* Close Button Top Right */}
+            <div style={{ width: '100%', maxWidth: '340px', display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+              <button
+                type="button"
+                onClick={() => setIsPreviewPhotoOpen(false)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  padding: '6px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#FFFFFF',
+                }}
+              >
+                <X size={26} weight="bold" />
+              </button>
+            </div>
+
+            {/* Photo Card Container */}
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '340px',
+                borderRadius: '20px',
+                overflow: 'hidden',
+                backgroundColor: '#0F172A',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)',
+                position: 'relative',
+              }}
+            >
+              {checkInSnapshot?.photo && checkInSnapshot.photo !== 'simulated_photo' ? (
+                <img
+                  src={checkInSnapshot.photo}
+                  alt="Full Selfie Preview"
+                  style={{ width: '100%', height: '380px', objectFit: 'cover' }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '100%',
+                    height: '380px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'radial-gradient(circle at 50% 40%, #1E293B 0%, #090D16 80%)',
+                    color: '#FFFFFF',
+                  }}
+                >
+                  <UserCheck size={72} color="#38BDF8" weight="light" />
+                  <span style={{ fontSize: '1rem', fontWeight: 800, marginTop: '12px' }}>{userName}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '4px' }}>{empId}</span>
+                </div>
+              )}
+
+              {/* Watermark Overlay on Preview */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '16px',
+                  left: '16px',
+                  right: '16px',
+                  pointerEvents: 'none',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    padding: '8px 12px',
+                    borderRadius: '10px',
+                    color: '#FFFFFF',
+                    fontSize: '0.6875rem',
+                    backdropFilter: 'blur(6px)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 700, color: '#38BDF8' }}>
+                    <MapPin size={13} weight="fill" color="#38BDF8" />
+                    <span>{checkInSnapshot?.location || baseLocationName}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#F1F5F9', fontWeight: 600 }}>
+                    <Clock size={12} weight="bold" color="#94A3B8" />
+                    <span>{checkInSnapshot?.date || '28 Sep 2026'} • {checkInSnapshot?.time || '08:14:00 WIB'}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#94A3B8', fontSize: '0.625rem', fontFamily: 'monospace' }}>
+                    <NavigationArrow size={11} weight="fill" color="#94A3B8" />
+                    <span>Lat: {checkInSnapshot?.coords?.lat || userCoords.lat}, Long: {checkInSnapshot?.coords?.lng || userCoords.lng}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );
