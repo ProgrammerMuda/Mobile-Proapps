@@ -2961,35 +2961,38 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       <SignOut size={18} weight="bold" color="var(--color-primary, #053079)" />
                     )}
                   </div>
-                  <div style={{ textAlign: 'left' }}>
-                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '2px' }}>
+                  <div style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                       {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Waktu Masuk' : 'Clock In Time') : (language === 'id' ? 'Waktu Pulang' : 'Clock Out Time')}
                     </div>
                     <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)' }}>
                       {checkInSnapshot?.time || currentTime || '08:14:00 WIB'}
                     </div>
+                    {actionType === 'CLOCK_IN' && (
+                      <div style={{ marginTop: '2px' }}>
+                        <span
+                          style={{
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            backgroundColor: checkIsLate(checkInSnapshot?.time || currentTime) ? '#FEF3C7' : '#DCFCE7',
+                            color: checkIsLate(checkInSnapshot?.time || currentTime) ? '#B45309' : '#15803D',
+                            fontSize: '0.6875rem',
+                            fontWeight: 700,
+                            display: 'inline-block',
+                          }}
+                        >
+                          {checkIsLate(checkInSnapshot?.time || currentTime)
+                            ? (language === 'id'
+                                ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
+                                : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
+                            : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {actionType === 'CLOCK_IN' && (
-                    <span
-                      style={{
-                        padding: '4px 8px',
-                        borderRadius: '20px',
-                        backgroundColor: checkIsLate(checkInSnapshot?.time || currentTime) ? '#FEF3C7' : '#DCFCE7',
-                        color: checkIsLate(checkInSnapshot?.time || currentTime) ? '#B45309' : '#15803D',
-                        fontSize: '0.6875rem',
-                        fontWeight: 700,
-                      }}
-                    >
-                      {checkIsLate(checkInSnapshot?.time || currentTime)
-                        ? (language === 'id'
-                            ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
-                            : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
-                        : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
-                    </span>
-                  )}
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <div
                     style={{
                       padding: '5px 10px',
