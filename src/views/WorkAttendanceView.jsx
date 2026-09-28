@@ -388,7 +388,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           }}
         >
           {/* Employee Profile Header Row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #E2E8F0', paddingBottom: '14px', marginBottom: '2px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div
                 style={{
@@ -412,6 +412,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </div>
             </div>
           </div>
+
+          {/* Full Edge-to-Edge Divider Outline */}
+          <div
+            style={{
+              height: '1px',
+              backgroundColor: '#E2E8F0',
+              margin: '0 -18px',
+            }}
+          />
 
           {/* Live Time & Shift Row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
