@@ -408,21 +408,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </div>
               <div>
                 <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#0F172A' }}>{userName}</div>
-                <div style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>{userDept} • #{empId}</div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>{userDept}</div>
               </div>
             </div>
-            <span
-              style={{
-                fontSize: '0.625rem',
-                fontWeight: 800,
-                padding: '3px 8px',
-                borderRadius: '6px',
-                backgroundColor: roleBadgeBg,
-                color: roleBadgeColor,
-              }}
-            >
-              {roleCode}
-            </span>
           </div>
 
           {/* Live Time & Shift Row */}
