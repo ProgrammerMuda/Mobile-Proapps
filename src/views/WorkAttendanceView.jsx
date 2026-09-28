@@ -440,7 +440,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 fontSize: '0.6875rem',
                 fontWeight: 700,
                 color: '#FFFFFF',
-                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
               }}
             >
               <NavigationArrow size={13} weight="fill" color="#FFFFFF" />
