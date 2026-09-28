@@ -792,52 +792,52 @@ export const MonthlyAttendanceDetailView = ({
         </div>
       </div>
 
-      {/* 2. Filter Tabs */}
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          overflowX: 'auto',
-          paddingBottom: '2px',
-        }}
-      >
-        {[
-          { key: 'ALL', label: language === 'id' ? `Semua (${totalLogs})` : `All (${totalLogs})` },
-          { key: 'ONTIME', label: language === 'id' ? `Tepat (${onTimeCount})` : `On Time (${onTimeCount})` },
-          { key: 'LATE', label: language === 'id' ? `Terlambat (${lateCount})` : `Late (${lateCount})` },
-          { key: 'LEAVE', label: language === 'id' ? `Izin (${leaveCount})` : `Leave (${leaveCount})` },
-          { key: 'ALPHA', label: `Alpha (${alphaCount})` },
-        ].map((tab) => {
-          const isActive = activeFilter === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveFilter(tab.key)}
-              style={{
-                backgroundColor: isActive ? '#02388A' : '#FFFFFF',
-                color: isActive ? '#FFFFFF' : '#64748B',
-                border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
-                borderRadius: '20px',
-                padding: '6px 12px',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 3. Daily Attendance Logs List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <h3 style={{ fontSize: '0.875rem', fontWeight: 700, color: '#475569', margin: '4px 0 0 0' }}>
+      {/* 2. Daily Attendance Logs List Header & Filter Tabs */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#1E293B', margin: '4px 0 0 0' }}>
           {language === 'id' ? 'Riwayat Absensi Harian' : 'Daily Attendance Records'}
         </h3>
+
+        {/* Filter Tabs */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            overflowX: 'auto',
+            paddingBottom: '2px',
+          }}
+        >
+          {[
+            { key: 'ALL', label: language === 'id' ? `Semua (${totalLogs})` : `All (${totalLogs})` },
+            { key: 'ONTIME', label: language === 'id' ? `Tepat (${onTimeCount})` : `On Time (${onTimeCount})` },
+            { key: 'LATE', label: language === 'id' ? `Terlambat (${lateCount})` : `Late (${lateCount})` },
+            { key: 'LEAVE', label: language === 'id' ? `Izin (${leaveCount})` : `Leave (${leaveCount})` },
+            { key: 'ALPHA', label: `Alpha (${alphaCount})` },
+          ].map((tab) => {
+            const isActive = activeFilter === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveFilter(tab.key)}
+                style={{
+                  backgroundColor: isActive ? '#02388A' : '#FFFFFF',
+                  color: isActive ? '#FFFFFF' : '#64748B',
+                  border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
+                  borderRadius: '20px',
+                  padding: '6px 12px',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
         {filteredLogs.length === 0 ? (
           <div
