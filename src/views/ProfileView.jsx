@@ -1825,9 +1825,9 @@ export const ProfileView = ({
                       alt="Logout Confirmation"
                       style={{
                         width: '100%',
-                        maxHeight: '210px',
-                        objectFit: 'contain',
+                        height: 'auto',
                         display: 'block',
+                        objectFit: 'contain',
                       }}
                     />
                   </div>
