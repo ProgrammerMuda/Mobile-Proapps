@@ -483,8 +483,8 @@ export const MonthlyAttendanceDetailView = ({
         <span
           key="in"
           style={{
-            backgroundColor: '#E0F2FE',
-            color: '#0369A1',
+            backgroundColor: '#DCFCE7',
+            color: '#16A34A',
             fontSize: '0.6875rem',
             fontWeight: 700,
             padding: '2px 8px',
@@ -534,8 +534,8 @@ export const MonthlyAttendanceDetailView = ({
         <span
           key="out"
           style={{
-            backgroundColor: '#FEF3C7',
-            color: '#B45309',
+            backgroundColor: '#D97706',
+            color: '#FFFFFF',
             fontSize: '0.6875rem',
             fontWeight: 700,
             padding: '2px 8px',
@@ -825,9 +825,8 @@ export const MonthlyAttendanceDetailView = ({
           </div>
         ) : (
           filteredLogs.map((log) => {
-            const dayName = language === 'id' ? DAY_NAMES_ID[log.date.getDay()] : DAY_NAMES[log.date.getDay()];
             const monthStr = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
-            const dateDisplay = `${dayName}, ${log.dayNumber} ${monthStr} ${selectedYear}`;
+            const dateDisplay = `${log.dayNumber} ${monthStr} ${selectedYear}`;
             const isLate = log.status === 'late' || log.inStatus === 'LATE' || log.outStatus === 'EARLY_OUT';
             const isAlpha = log.status === 'alpha';
 
