@@ -764,7 +764,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
         minHeight: '100%',
         backgroundColor: '#F8FAFC',
         fontFamily: 'var(--font-sans)',
-        paddingBottom: '24px',
         boxSizing: 'border-box',
       }}
     >
@@ -772,11 +771,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       <div
         style={{
           background: 'linear-gradient(180deg, #02388A 0%, #0348AF 60%, #F8FAFC 100%)',
-          padding: '16px 16px 0px 16px',
+          padding: '16px 16px 20px 16px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
-          flex: 1,
         }}
       >
         {/* =========================================================================
@@ -1129,10 +1127,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       {/* Main Container */}
       <div
         style={{
-          padding: '0 16px',
+          padding: '4px 16px 24px 16px',
           display: 'flex',
           flexDirection: 'column',
           gap: '20px',
+          flex: 1,
         }}
       >
         {/* =========================================================================
