@@ -29,6 +29,8 @@ import {
   MagnifyingGlass,
   Check,
   NavigationArrow,
+  Sun,
+  MoonStars,
 } from '@phosphor-icons/react';
 
 // Import Illustrations
@@ -151,10 +153,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [permReason, setPermReason] = useState('');
   const [permSuccess, setPermSuccess] = useState(false);
 
+  // Time of Day state (Pagi/Siang vs Malam)
+  const [isNightTime, setIsNightTime] = useState(false);
+
   // Live Clock effect
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
+      const currentHour = now.getHours();
+      setIsNightTime(currentHour < 6 || currentHour >= 18);
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
       const seconds = String(now.getSeconds()).padStart(2, '0');
@@ -393,16 +400,27 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           {/* Live Time & Date Row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div
-                style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  backgroundColor: '#16A34A',
-                  boxShadow: '0 0 0 2.5px rgba(22, 163, 74, 0.25)',
-                  animation: 'pulse 1.5s infinite',
-                }}
-              />
+              {isNightTime ? (
+                <MoonStars
+                  size={20}
+                  weight="fill"
+                  color="#6366F1"
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.35))',
+                    flexShrink: 0,
+                  }}
+                />
+              ) : (
+                <Sun
+                  size={20}
+                  weight="fill"
+                  color="#F59E0B"
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.4))',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
               <span
                 style={{
                   fontSize: '1.0625rem',
