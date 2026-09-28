@@ -448,16 +448,16 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       date: 'Minggu, 27 Sep 2026',
       dateEn: 'Sunday, 27 Sep 2026',
       isToday: false,
-      shift: 'Libur Mingguan (Off)',
+      shift: language === 'id' ? 'Tidak Ada Jadwal (Off)' : 'No Schedule (Off)',
       clockIn: '-',
       clockOut: '-',
       duration: '-',
       status: 'LIBUR',
-      statusLabel: language === 'id' ? 'Libur Reguler' : 'Day Off',
+      statusLabel: language === 'id' ? 'Libur' : 'Day Off',
       statusColor: '#64748B',
       statusBg: '#F1F5F9',
       location: '-',
-      note: 'Jadwal libur mingguan',
+      note: language === 'id' ? 'Tidak ada jadwal shift yang dibuat' : 'No shift schedule assigned for this day',
     },
     {
       id: 'att-3',
@@ -1309,7 +1309,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     }}
                   >
                     <CalendarBlank size={16} color="#64748B" />
-                    <span>{language === 'id' ? 'Jadwal hari libur resmi mingguan karyawan' : 'Official weekly day off roster'}</span>
+                    <span>{language === 'id' ? 'Tidak ada jadwal shift yang dibuat' : 'No shift schedule assigned for this day'}</span>
                   </div>
                 )}
               </div>
