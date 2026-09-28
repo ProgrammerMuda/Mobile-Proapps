@@ -138,6 +138,27 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
+  // Real GPS coordinates state with realistic fallback
+  const [userCoords, setUserCoords] = useState({ lat: -6.208824, lng: 106.845598 });
+
+  // Geolocation lookup
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (pos && pos.coords) {
+            setUserCoords({
+              lat: Number(pos.coords.latitude.toFixed(6)),
+              lng: Number(pos.coords.longitude.toFixed(6)),
+            });
+          }
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 5000 }
+      );
+    }
+  }, []);
+
   // Front Camera setup for Full-Screen Selfie
   useEffect(() => {
     if (isSelfieFullscreenOpen && !capturedSelfie) {
@@ -290,6 +311,14 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     : isSec
     ? 'Pos Gerbang Utama • Radius 15m'
     : 'Lobby Tower A • Radius 15m';
+
+  const baseLocationName = isEng
+    ? 'Workshop Engineering'
+    : isHk
+    ? 'Janitor Hub & Koridor'
+    : isSec
+    ? 'Pos Gerbang Utama'
+    : 'Lobby Tower A';
 
   // 7 Days Attendance History Mock Data adapted per role
   const last7DaysHistory = [
@@ -1775,26 +1804,42 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   right: '16px',
                   pointerEvents: 'none',
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                 }}
               >
                 <div
                   style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-                    padding: '6px 12px',
-                    borderRadius: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    backgroundColor: 'rgba(0, 0, 0, 0.72)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    padding: '8px 12px',
+                    borderRadius: '10px',
                     color: '#FFFFFF',
                     fontSize: '0.6875rem',
-                    fontWeight: 600,
-                    width: 'fit-content',
-                    backdropFilter: 'blur(4px)',
+                    backdropFilter: 'blur(6px)',
+                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.4)',
+                    maxWidth: '94%',
                   }}
                 >
-                  <Clock size={13} color="#38BDF8" weight="bold" />
-                  <span>{userName} ({empId}) • {currentTime}, 28 Sep 2026</span>
+                  {/* Lokasi (Tanpa Radius) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 700, color: '#38BDF8' }}>
+                    <MapPin size={13} weight="fill" color="#38BDF8" />
+                    <span>{baseLocationName}</span>
+                  </div>
+
+                  {/* Tanggal dan Jam */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#F1F5F9', fontWeight: 600 }}>
+                    <Clock size={12} weight="bold" color="#94A3B8" />
+                    <span>28 Sep 2026 • {currentTime || '08:14:00 WIB'}</span>
+                  </div>
+
+                  {/* Lat dan Long */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#94A3B8', fontSize: '0.625rem', fontFamily: 'monospace' }}>
+                    <NavigationArrow size={11} weight="fill" color="#94A3B8" />
+                    <span>Lat: {userCoords.lat}, Long: {userCoords.lng}</span>
+                  </div>
                 </div>
               </div>
             </div>
