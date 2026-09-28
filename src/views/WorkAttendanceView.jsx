@@ -53,6 +53,7 @@ import employeePermission3d from '../assets/menu-icons/employee-permission-3d.pn
 import workPermit3d from '../assets/menu-icons/work-permit-3d.png';
 import reportAttendance3d from '../assets/menu-icons/report-attendance-3d.png';
 import inspection3d from '../assets/menu-icons/inspection-3d.png';
+import payslip3d from '../assets/menu-icons/payslip-3d.png';
 import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
 
 /**
@@ -1106,7 +1107,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 }}
               >
                 <img
-                  src={billingPayment3d}
+                  src={payslip3d}
                   alt={language === 'id' ? 'Slip Gaji' : 'Payslip'}
                   style={{
                     width: '100%',
