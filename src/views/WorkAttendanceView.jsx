@@ -924,7 +924,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   fontSize: '0.8125rem',
                   fontWeight: 500,
                   color: '#64748B',
-                  margin: '0 0 14px 0',
+                  margin: 0,
                   lineHeight: 1.45,
                   maxWidth: '300px',
                 }}
@@ -933,25 +933,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   ? 'Tidak ada jadwal kerja untuk hari ini. Selamat beristirahat dan nikmati waktu santaimu!'
                   : 'You have no work shift scheduled for today. Take time to rest and recharge!'}
               </p>
-
-              {/* Status Info Badge */}
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  backgroundColor: '#F8FAFC',
-                  border: '1px solid #E2E8F0',
-                  borderRadius: '9999px',
-                  padding: '6px 14px',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  color: '#64748B',
-                }}
-              >
-                <Clock size={15} weight="bold" color="#64748B" />
-                <span>{language === 'id' ? 'Jadwal: Libur (Tidak Ada Jadwal)' : 'Schedule: Day Off (No Schedule)'}</span>
-              </div>
             </div>
           ) : (
             <>
