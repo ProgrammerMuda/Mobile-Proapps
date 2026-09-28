@@ -46,6 +46,12 @@ import {
   emptyStateQuestion,
 } from '../assets/illustrations';
 
+// Import 3D Menu Icons
+import attendance3d from '../assets/menu-icons/attendance-3d.png';
+import workPermit3d from '../assets/menu-icons/work-permit-3d.png';
+import inspection3d from '../assets/menu-icons/inspection-3d.png';
+import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
+
 /**
  * Top Header for Work Attendance
  */
@@ -852,183 +858,237 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
               gap: '10px',
+              width: '100%',
+              boxSizing: 'border-box',
             }}
           >
             {/* 1. Shift Schedule */}
-            <div
+            <button
+              type="button"
               onClick={() => setIsShiftModalOpen(true)}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px',
                 border: '1px solid #E2E8F0',
-                padding: '12px 6px',
+                padding: '10px 4px 10px 4px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center',
-                gap: '8px',
+                justifyContent: 'flex-start',
+                gap: '6px',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                transition: 'transform 0.15s ease',
+                outline: 'none',
+                userSelect: 'none',
+                minHeight: '102px',
+                boxSizing: 'border-box',
+                boxShadow: 'none',
               }}
             >
               <div
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)',
+                  width: '54px',
+                  height: '54px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#FFFFFF',
-                  boxShadow: '0 3px 8px rgba(37, 99, 235, 0.25)',
+                  flexShrink: 0,
                 }}
               >
-                <CalendarCheck size={22} weight="fill" />
+                <img
+                  src={attendance3d}
+                  alt={language === 'id' ? 'Jadwal Shift' : 'Shift Schedule'}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.07))',
+                  }}
+                />
               </div>
               <span
                 style={{
                   fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  color: '#1E293B',
-                  lineHeight: 1.2,
+                  fontWeight: 600,
+                  color: '#334155',
+                  textAlign: 'center',
+                  lineHeight: 1.25,
                 }}
               >
                 {language === 'id' ? 'Jadwal Shift' : 'Shift Schedule'}
               </span>
-            </div>
+            </button>
 
             {/* 2. Employee Permission */}
-            <div
+            <button
+              type="button"
               onClick={() => setIsPermissionModalOpen(true)}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px',
                 border: '1px solid #E2E8F0',
-                padding: '12px 6px',
+                padding: '10px 4px 10px 4px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center',
-                gap: '8px',
+                justifyContent: 'flex-start',
+                gap: '6px',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                transition: 'transform 0.15s ease',
+                outline: 'none',
+                userSelect: 'none',
+                minHeight: '102px',
+                boxSizing: 'border-box',
+                boxShadow: 'none',
               }}
             >
               <div
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                  width: '54px',
+                  height: '54px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#FFFFFF',
-                  boxShadow: '0 3px 8px rgba(16, 185, 129, 0.25)',
+                  flexShrink: 0,
                 }}
               >
-                <FileText size={22} weight="fill" />
+                <img
+                  src={workPermit3d}
+                  alt={language === 'id' ? 'Izin / Cuti' : 'Permission'}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.07))',
+                  }}
+                />
               </div>
               <span
                 style={{
                   fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  color: '#1E293B',
-                  lineHeight: 1.2,
+                  fontWeight: 600,
+                  color: '#334155',
+                  textAlign: 'center',
+                  lineHeight: 1.25,
                 }}
               >
                 {language === 'id' ? 'Izin / Cuti' : 'Permission'}
               </span>
-            </div>
+            </button>
 
             {/* 3. Report Attendance */}
-            <div
+            <button
+              type="button"
               onClick={() => setIsReportModalOpen(true)}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px',
                 border: '1px solid #E2E8F0',
-                padding: '12px 6px',
+                padding: '10px 4px 10px 4px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center',
-                gap: '8px',
+                justifyContent: 'flex-start',
+                gap: '6px',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                transition: 'transform 0.15s ease',
+                outline: 'none',
+                userSelect: 'none',
+                minHeight: '102px',
+                boxSizing: 'border-box',
+                boxShadow: 'none',
               }}
             >
               <div
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+                  width: '54px',
+                  height: '54px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#FFFFFF',
-                  boxShadow: '0 3px 8px rgba(139, 92, 246, 0.25)',
+                  flexShrink: 0,
                 }}
               >
-                <ChartLineUp size={22} weight="fill" />
+                <img
+                  src={inspection3d}
+                  alt={language === 'id' ? 'Laporan Absensi' : 'Report'}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.07))',
+                  }}
+                />
               </div>
               <span
                 style={{
                   fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  color: '#1E293B',
-                  lineHeight: 1.2,
+                  fontWeight: 600,
+                  color: '#334155',
+                  textAlign: 'center',
+                  lineHeight: 1.25,
                 }}
               >
                 {language === 'id' ? 'Laporan Absensi' : 'Report'}
               </span>
-            </div>
+            </button>
 
             {/* 4. Payslip */}
-            <div
+            <button
+              type="button"
               onClick={() => setIsPayslipModalOpen(true)}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px',
                 border: '1px solid #E2E8F0',
-                padding: '12px 6px',
+                padding: '10px 4px 10px 4px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center',
-                gap: '8px',
+                justifyContent: 'flex-start',
+                gap: '6px',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                transition: 'transform 0.15s ease',
+                outline: 'none',
+                userSelect: 'none',
+                minHeight: '102px',
+                boxSizing: 'border-box',
+                boxShadow: 'none',
               }}
             >
               <div
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                  width: '54px',
+                  height: '54px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#FFFFFF',
-                  boxShadow: '0 3px 8px rgba(245, 158, 11, 0.25)',
+                  flexShrink: 0,
                 }}
               >
-                <Receipt size={22} weight="fill" />
+                <img
+                  src={billingPayment3d}
+                  alt={language === 'id' ? 'Slip Gaji' : 'Payslip'}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.07))',
+                  }}
+                />
               </div>
               <span
                 style={{
                   fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  color: '#1E293B',
-                  lineHeight: 1.2,
+                  fontWeight: 600,
+                  color: '#334155',
+                  textAlign: 'center',
+                  lineHeight: 1.25,
                 }}
               >
                 {language === 'id' ? 'Slip Gaji' : 'Payslip'}
               </span>
-            </div>
+            </button>
           </div>
         </div>
 
