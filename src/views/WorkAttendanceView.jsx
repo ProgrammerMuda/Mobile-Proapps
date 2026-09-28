@@ -2696,106 +2696,129 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       })()}
 
       {/* =========================================================================
-          MODAL 2: SUCCESS PRESENCE POPUP
+          MODAL 2: SUCCESS PRESENCE BOTTOM SHEET
           ========================================================================= */}
       {isSuccessModalOpen && (() => {
         const modalTarget = getModalTarget();
         const modalElement = (
           <div
+            onClick={() => setIsSuccessModalOpen(false)}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(15, 23, 42, 0.7)',
-              zIndex: 9999,
+              backgroundColor: 'rgba(15, 23, 42, 0.65)',
+              zIndex: 99998,
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '20px',
-              backdropFilter: 'blur(3px)',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              backdropFilter: 'blur(4px)',
+              fontFamily: 'var(--font-sans)',
             }}
           >
             <div
+              onClick={(e) => e.stopPropagation()}
               style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '24px',
-                padding: '24px',
-                width: '100%',
-                maxWidth: '340px',
-                textAlign: 'center',
+                backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '16px 20px 32px 20px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '14px',
-                boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-                animation: 'scaleIn 0.2s ease-out',
+                animation: 'slideUp 0.25s ease-out',
+                boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.16)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
               }}
             >
-              <img
-                src={successCheck}
-                alt="Success"
-                style={{
-                  width: '130px',
-                  height: 'auto',
-                  objectFit: 'contain',
-                }}
-              />
-              <div>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+              {/* Drag Handle Bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-4px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '4px',
+                    backgroundColor: '#E2E8F0',
+                    borderRadius: '9999px',
+                  }}
+                />
+              </div>
+
+              {/* 3D Success Illustration (Full Width up to padding) */}
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '4px 0 2px 0' }}>
+                <img
+                  src={successCheck}
+                  alt="Success"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                  }}
+                />
+              </div>
+
+              {/* Title & Subtitle */}
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)', margin: 0 }}>
                   {actionType === 'CLOCK_IN'
                     ? (language === 'id' ? 'Clock In Berhasil!' : 'Clock In Successful!')
                     : (language === 'id' ? 'Clock Out Berhasil!' : 'Clock Out Successful!')}
                 </h3>
-                <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '6px 0 0 0' }}>
+                <p style={{ fontSize: '0.78125rem', color: 'var(--color-text-secondary, #64748B)', margin: '6px 0 0 0', lineHeight: 1.4 }}>
                   {actionType === 'CLOCK_IN'
                     ? (language === 'id' ? 'Selamat bekerja! Kehadiran Anda telah dicatat pada sistem.' : 'Have a great workday! Your attendance is recorded.')
                     : (language === 'id' ? 'Terima kasih atas kerja keras Anda hari ini. Sampai jumpa besok!' : 'Thank you for your hard work today. See you tomorrow!')}
                 </p>
               </div>
 
+              {/* Summary Detail Card */}
               <div
                 style={{
                   backgroundColor: '#F8FAFC',
-                  borderRadius: '12px',
-                  padding: '10px 12px',
+                  borderRadius: '14px',
+                  padding: '12px 14px',
                   width: '100%',
-                  border: '1px solid #E2E8F0',
+                  border: '1px solid var(--color-border-default, #E2E8F0)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '4px',
                   boxSizing: 'border-box',
+                  textAlign: 'center',
                 }}
               >
-                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0F172A' }}>
+                <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)' }}>
                   {currentTime} • {userName}
                 </div>
-                <div style={{ fontSize: '0.6875rem', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary, #64748B)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                   <span>{activeShiftName}</span>
                   <span>•</span>
-                  <span style={{ fontWeight: 600, color: attendanceMethod === 'QR' ? '#2563EB' : '#059669' }}>
+                  <span style={{ fontWeight: 700, color: attendanceMethod === 'QR' ? '#2563EB' : 'var(--color-primary, #053079)' }}>
                     {attendanceMethod === 'QR' ? 'Via Scan QR' : 'Via Foto Selfie'}
                   </span>
                 </div>
               </div>
 
+              {/* Primary Action Button */}
               <button
                 type="button"
                 onClick={() => setIsSuccessModalOpen(false)}
                 style={{
                   width: '100%',
-                  height: '42px',
-                  backgroundColor: '#02388A',
+                  height: '48px',
+                  backgroundColor: 'var(--color-primary, #053079)',
                   color: '#FFFFFF',
                   borderRadius: '12px',
                   border: 'none',
-                  fontSize: '0.875rem',
-                  fontWeight: 700,
+                  fontSize: '0.9375rem',
+                  fontWeight: 800,
                   cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(5, 48, 121, 0.25)',
                 }}
               >
-                {language === 'id' ? 'Tutup' : 'Close'}
+                {language === 'id' ? 'Selesai' : 'Done'}
               </button>
             </div>
           </div>
