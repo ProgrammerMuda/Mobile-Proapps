@@ -2381,12 +2381,27 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 />
               </div>
 
+              {/* 3D Illustration: Out of Range Location (Full Width up to padding) */}
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '2px 0 4px 0' }}>
+                <img
+                  src={outOfRangeLocation}
+                  alt="Outside Radius"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                    maxHeight: '190px',
+                    objectFit: 'contain',
+                    display: 'block',
+                  }}
+                />
+              </div>
+
               {/* Header (Clean, No X button as requested) */}
-              <div>
-                <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)', margin: 0 }}>
+              <div style={{ textAlign: 'center' }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)', margin: 0 }}>
                   {language === 'id' ? 'Di Luar Radius Presensi' : 'Outside Attendance Radius'}
                 </h3>
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary, #64748B)', margin: '4px 0 0 0' }}>
+                <p style={{ fontSize: '0.78125rem', color: 'var(--color-text-secondary, #64748B)', margin: '4px 0 0 0', lineHeight: 1.4 }}>
                   {language === 'id'
                     ? 'Posisi Anda saat ini berada di luar batas area radius kerja'
                     : 'Your current location is outside the workplace radius boundary'}
