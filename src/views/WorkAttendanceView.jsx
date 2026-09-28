@@ -397,30 +397,55 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             gap: '16px',
           }}
         >
-          {/* Live Time & Date Row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Live Time & Date Unified Block */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div
+              style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '12px',
+                backgroundColor: isNightTime ? '#EEF2FF' : '#FEF3C7',
+                border: `1px solid ${isNightTime ? '#C7D2FE' : '#FDE68A'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
               {isNightTime ? (
                 <MoonStars
-                  size={20}
+                  size={22}
                   weight="fill"
                   color="#6366F1"
                   style={{
                     filter: 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.35))',
-                    flexShrink: 0,
                   }}
                 />
               ) : (
                 <Sun
-                  size={20}
+                  size={22}
                   weight="fill"
-                  color="#F59E0B"
+                  color="#D97706"
                   style={{
-                    filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.4))',
-                    flexShrink: 0,
+                    filter: 'drop-shadow(0 0 4px rgba(217, 119, 6, 0.35))',
                   }}
                 />
               )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+              {/* Tanggal di Atas */}
+              <span
+                style={{
+                  fontSize: '0.6875rem',
+                  fontWeight: 600,
+                  color: '#64748B',
+                }}
+              >
+                {language === 'id' ? 'Senin, 28 Sep 2026' : 'Monday, Sep 28, 2026'}
+              </span>
+
+              {/* Jam di Bawah */}
               <span
                 style={{
                   fontSize: '1.0625rem',
@@ -428,30 +453,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   color: '#0F172A',
                   letterSpacing: '-0.2px',
                   fontVariantNumeric: 'tabular-nums',
+                  marginTop: '2px',
                 }}
               >
                 {currentTime || '08:14:00 WIB'}
-              </span>
-            </div>
-
-            {/* Date Pill inside card */}
-            <div
-              style={{
-                backgroundColor: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-                borderRadius: '8px',
-                padding: '4px 8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: '0.6875rem',
-                fontWeight: 700,
-                color: '#475569',
-              }}
-            >
-              <CalendarBlank size={14} weight="bold" color="#64748B" />
-              <span>
-                {language === 'id' ? 'Senin, 28 Sep 2026' : 'Monday, Sep 28, 2026'}
               </span>
             </div>
           </div>
