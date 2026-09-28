@@ -1173,22 +1173,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     <QrCode size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                      <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
-                        {language === 'id' ? 'Scan QR Code' : 'Scan QR Code'}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '0.5625rem',
-                          fontWeight: 700,
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          backgroundColor: '#EAF7FF',
-                          color: '#0284C7',
-                        }}
-                      >
-                        {language === 'id' ? 'Cepat' : 'Fast'}
-                      </span>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
+                      {language === 'id' ? 'Scan QR Code' : 'Scan QR Code'}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
                       {language === 'id'
@@ -1246,22 +1232,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     <Camera size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                      <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
-                        {language === 'id' ? 'Foto Selfie' : 'Selfie Photo'}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '0.5625rem',
-                          fontWeight: 700,
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          backgroundColor: '#EAF7FF',
-                          color: '#0284C7',
-                        }}
-                      >
-                        {language === 'id' ? 'Face Match' : 'Face Match'}
-                      </span>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
+                      {language === 'id' ? 'Foto Selfie' : 'Selfie Photo'}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
                       {language === 'id'
