@@ -1147,22 +1147,30 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     textAlign: 'left',
                     transition: 'all 0.15s ease',
                   }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-secondary, #09B2FF)';
+                    e.currentTarget.style.backgroundColor = '#F8FAFC';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#E2E8F0';
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  }}
                 >
                   <div
                     style={{
                       width: '46px',
                       height: '46px',
                       borderRadius: '14px',
-                      backgroundColor: '#EFF6FF',
-                      border: '1px solid #DBEAFE',
+                      backgroundColor: '#EAF7FF',
+                      border: '1px solid #BAE6FD',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#2563EB',
+                      color: 'var(--color-secondary, #09B2FF)',
                       flexShrink: 0,
                     }}
                   >
-                    <QrCode size={24} weight="bold" />
+                    <QrCode size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
@@ -1175,8 +1183,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                           fontWeight: 700,
                           padding: '2px 6px',
                           borderRadius: '4px',
-                          backgroundColor: '#EFF6FF',
-                          color: '#2563EB',
+                          backgroundColor: '#EAF7FF',
+                          color: '#0284C7',
                         }}
                       >
                         {language === 'id' ? 'Cepat' : 'Fast'}
@@ -1212,22 +1220,30 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     textAlign: 'left',
                     transition: 'all 0.15s ease',
                   }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-secondary, #09B2FF)';
+                    e.currentTarget.style.backgroundColor = '#F8FAFC';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#E2E8F0';
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  }}
                 >
                   <div
                     style={{
                       width: '46px',
                       height: '46px',
                       borderRadius: '14px',
-                      backgroundColor: '#ECFDF5',
-                      border: '1px solid #A7F3D0',
+                      backgroundColor: '#EAF7FF',
+                      border: '1px solid #BAE6FD',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#059669',
+                      color: 'var(--color-secondary, #09B2FF)',
                       flexShrink: 0,
                     }}
                   >
-                    <Camera size={24} weight="bold" />
+                    <Camera size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
@@ -1240,8 +1256,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                           fontWeight: 700,
                           padding: '2px 6px',
                           borderRadius: '4px',
-                          backgroundColor: '#DCFCE7',
-                          color: '#15803D',
+                          backgroundColor: '#EAF7FF',
+                          color: '#0284C7',
                         }}
                       >
                         {language === 'id' ? 'Face Match' : 'Face Match'}
