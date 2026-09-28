@@ -1285,12 +1285,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       </div>
                     </div>
 
-                    {/* Footer: Notes & Duration */}
+                    {/* Footer: Schedule & Duration */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
-                        {item.note || item.location}
+                      <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                        {item.shift}
                       </span>
-                      <span style={{ fontWeight: 600, color: '#334155' }}>
+                      <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
                         {language === 'id' ? `Durasi: ${item.duration}` : `Duration: ${item.duration}`}
                       </span>
                     </div>
