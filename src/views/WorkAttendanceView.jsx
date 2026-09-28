@@ -46,7 +46,6 @@ import {
   emptyStateQuestion,
 } from '../assets/illustrations';
 
-// Import 3D Menu Icons
 import shiftSchedule3d from '../assets/menu-icons/shift-schedule-3d.png';
 import attendance3d from '../assets/menu-icons/attendance-3d.png';
 import employeePermission3d from '../assets/menu-icons/employee-permission-3d.png';
@@ -55,6 +54,7 @@ import reportAttendance3d from '../assets/menu-icons/report-attendance-3d.png';
 import inspection3d from '../assets/menu-icons/inspection-3d.png';
 import payslip3d from '../assets/menu-icons/payslip-3d.png';
 import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
+import dayOffIllustration from '../assets/day-off-illustration.png';
 
 /**
  * Top Header for Work Attendance
@@ -351,6 +351,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const isHk = roleCode === 'HK';
   const isSec = roleCode === 'SEC';
 
+  // Housekeeping is configured as Off Day (Libur) case
+  const isOffDay = isHk;
+
   const userName = user?.name || (isEng ? 'Dedi Kurniawan' : isHk ? 'Rina Melati' : isSec ? 'Bambang Wijaya' : 'Ahmad Pratama');
   const userDept = user?.unitOrDept || (isEng ? 'Engineering Division' : isHk ? 'Housekeeping Division' : isSec ? 'Security Division' : 'Building Management');
   const empId = isEng ? 'ENG-8821' : isHk ? 'HK-4419' : isSec ? 'SEC-1092' : 'BM-0012';
@@ -358,23 +361,29 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const roleBadgeBg = isEng ? '#FFEDD5' : isHk ? '#FEF3C7' : isSec ? '#FEE2E2' : '#F3E8FF';
   const roleBadgeColor = isEng ? '#C2410C' : isHk ? '#B45309' : isSec ? '#B91C1C' : '#6B21A8';
 
-  const activeShiftName = isEng
-    ? 'Shift Pagi'
-    : isHk
+  const activeShiftName = isOffDay
+    ? (language === 'id' ? 'Libur (Day Off)' : 'Day Off')
+    : isEng
       ? 'Shift Pagi'
-      : isSec
+      : isHk
         ? 'Shift Pagi'
-        : 'Shift Reguler';
+        : isSec
+          ? 'Shift Pagi'
+          : 'Shift Reguler';
 
-  const activeShiftHours = isEng
-    ? '08.00 - 17.00'
-    : isHk
-      ? '06.30 - 15.30'
-      : isSec
-        ? '07.00 - 19.00'
-        : '08.00 - 17.00';
+  const activeShiftHours = isOffDay
+    ? '-'
+    : isEng
+      ? '08.00 - 17.00'
+      : isHk
+        ? '06.30 - 15.30'
+        : isSec
+          ? '07.00 - 19.00'
+          : '08.00 - 17.00';
 
-  const activeShiftTitle = `${activeShiftName} (${activeShiftHours})`;
+  const activeShiftTitle = isOffDay
+    ? (language === 'id' ? 'Tidak Ada Jadwal (Off)' : 'No Schedule (Off)')
+    : `${activeShiftName} (${activeShiftHours})`;
 
   const activeLocationTitle = isEng
     ? 'Workshop Engineering • Radius 15m'
@@ -431,20 +440,24 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       dateEn: 'Monday, 28 Sep 2026',
       isToday: true,
       shift: activeShiftTitle,
-      clockIn: clockInTime || '08:14',
-      clockOut: clockOutTime || (isClockedIn ? 'Sedang Bekerja...' : '--:--'),
-      duration: isClockedIn ? elapsedDuration : clockOutTime ? '08j 50m' : '-',
-      status: isClockedIn ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : clockOutTime ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : 'TODAY',
-      inStatus: isClockInLate ? 'LATE' : (clockInTime && clockInTime < '08:00' ? 'EARLY_IN' : 'ON_TIME'),
-      outStatus: clockOutTime ? (clockOutTime < '17:00' ? 'EARLY_OUT' : 'ON_TIME') : null,
-      lateMinutes: isClockInLate ? clockInLateMinutes : 0,
-      statusLabel: language === 'id'
-        ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Hari Ini')
-        : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Today'),
-      statusColor: isClockInLate ? '#FFFFFF' : (!isClockedIn && !clockOutTime) ? '#1D4ED8' : '#16A34A',
-      statusBg: isClockInLate ? '#D97706' : (!isClockedIn && !clockOutTime) ? '#EFF6FF' : '#DCFCE7',
-      location: activeLocationTitle,
-      note: isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola',
+      clockIn: isOffDay ? '-' : (clockInTime || '08:14'),
+      clockOut: isOffDay ? '-' : (clockOutTime || (isClockedIn ? 'Sedang Bekerja...' : '--:--')),
+      duration: isOffDay ? '-' : (isClockedIn ? elapsedDuration : clockOutTime ? '08j 50m' : '-'),
+      status: isOffDay ? 'LIBUR' : (isClockedIn ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : clockOutTime ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : 'TODAY'),
+      inStatus: isOffDay ? null : (isClockInLate ? 'LATE' : (clockInTime && clockInTime < '08:00' ? 'EARLY_IN' : 'ON_TIME')),
+      outStatus: isOffDay ? null : (clockOutTime ? (clockOutTime < '17:00' ? 'EARLY_OUT' : 'ON_TIME') : null),
+      lateMinutes: isOffDay ? 0 : (isClockInLate ? clockInLateMinutes : 0),
+      statusLabel: isOffDay
+        ? (language === 'id' ? 'Libur' : 'Day Off')
+        : (language === 'id'
+            ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Hari Ini')
+            : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Today')),
+      statusColor: isOffDay ? '#64748B' : (isClockInLate ? '#FFFFFF' : (!isClockedIn && !clockOutTime) ? '#1D4ED8' : '#16A34A'),
+      statusBg: isOffDay ? '#F1F5F9' : (isClockInLate ? '#D97706' : (!isClockedIn && !clockOutTime) ? '#EFF6FF' : '#DCFCE7'),
+      location: isOffDay ? '-' : activeLocationTitle,
+      note: isOffDay
+        ? (language === 'id' ? 'Hari Libur Housekeeping' : 'Housekeeping Day Off')
+        : (isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola'),
     },
     {
       id: 'att-2',
@@ -832,207 +845,300 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </div>
             </div>
 
-            {/* Live GPS Badge disamping jam */}
-            <div
-              style={{
-                backgroundColor: '#2563EB',
-                borderRadius: '9999px',
-                padding: '5px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                fontSize: '0.6875rem',
-                fontWeight: 700,
-                color: '#FFFFFF',
-              }}
-            >
-              <NavigationArrow size={13} weight="fill" color="#FFFFFF" />
-              <span>Live GPS</span>
-            </div>
-          </div>
-
-          {/* Clock In vs Clock Out Dual Boxes */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '10px',
-            }}
-          >
-            {/* Clock In Box */}
-            <div
-              style={{
-                backgroundColor: '#F8FAFC',
-                borderRadius: '14px',
-                border: '1px solid #E2E8F0',
-                padding: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <SignIn size={14} weight="bold" color="#2563EB" />
-                  Clock In
-                </span>
-                {clockInTime ? (
-                  <span
-                    style={{
-                      fontSize: '0.5625rem',
-                      fontWeight: 700,
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      backgroundColor: isClockInLate ? '#FEF3C7' : '#DCFCE7',
-                      color: isClockInLate ? '#B45309' : '#15803D',
-                    }}
-                  >
-                    {isClockInLate
-                      ? (language === 'id' ? (clockInLateMinutes > 0 ? `Terlambat (${clockInLateMinutes}m)` : 'Terlambat') : (clockInLateMinutes > 0 ? `Late (${clockInLateMinutes}m)` : 'Late'))
-                      : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
-                  </span>
-                ) : null}
+            {/* Badge Status / Live GPS disamping jam */}
+            {isOffDay ? (
+              <div
+                style={{
+                  backgroundColor: '#F1F5F9',
+                  borderRadius: '9999px',
+                  padding: '5px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  color: '#64748B',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <CalendarBlank size={13} weight="bold" color="#64748B" />
+                <span>{language === 'id' ? 'Libur' : 'Day Off'}</span>
               </div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockInTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
-                {clockInTime || '--:--'}
-              </div>
-              <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
-                {clockInTime ? '28 Sep 2026' : (language === 'id' ? 'Belum Clock In' : 'Not yet clocked in')}
-              </div>
-            </div>
-
-            {/* Clock Out Box */}
-            <div
-              style={{
-                backgroundColor: '#F8FAFC',
-                borderRadius: '14px',
-                border: '1px solid #E2E8F0',
-                padding: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '6px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <SignOut size={14} weight="bold" color="#D97706" />
-                  Clock Out
-                </span>
-                {clockOutTime ? (
-                  <span
-                    style={{
-                      fontSize: '0.5625rem',
-                      fontWeight: 700,
-                      padding: '2px 6px',
-                      borderRadius: '4px',
-                      backgroundColor: '#DCFCE7',
-                      color: '#15803D',
-                    }}
-                  >
-                    {language === 'id' ? 'Selesai' : 'Done'}
-                  </span>
-                ) : null}
-              </div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockOutTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
-                {clockOutTime || '--:--'}
-              </div>
-              <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
-                {clockOutTime ? '28 Sep 2026' : (language === 'id' ? 'Belum Clock Out' : 'Not yet clocked out')}
-              </div>
-            </div>
-          </div>
-
-          {/* Shift Info (Sebelah Kiri) & Working Duration (Sebelah Kanan) Dual Row */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: '10px',
-            }}
-          >
-            {/* Shift Info Box */}
-            <div
-              style={{
-                backgroundColor: '#EFF6FF',
-                borderRadius: '12px',
-                padding: '10px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                border: '1px solid #DBEAFE',
-              }}
-            >
-              <Clock size={20} weight="fill" color="#2563EB" />
-              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#1E40AF' }}>
-                  {activeShiftName}
-                </div>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#1E3A8A', marginTop: '1px' }}>
-                  {activeShiftHours}
-                </div>
-              </div>
-            </div>
-
-            {/* Working Duration Box */}
-            <div
-              style={{
-                backgroundColor: '#F0FDF4',
-                borderRadius: '12px',
-                padding: '10px 12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                border: '1px solid #DCFCE7',
-              }}
-            >
-              <Hourglass size={20} weight="fill" color="#16A34A" />
-              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#166534' }}>
-                  {language === 'id' ? 'Durasi Kehadiran' : 'Work Duration'}
-                </div>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#14532D', marginTop: '1px' }}>
-                  {isClockedIn ? elapsedDuration : clockOutTime ? '08j 51m' : '00j 00m'}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Big Action Clock In / Clock Out Button */}
-          <button
-            type="button"
-            onClick={() => {
-              setActionType(isClockedIn ? 'CLOCK_OUT' : 'CLOCK_IN');
-              setIsMethodSheetOpen(true);
-            }}
-            style={{
-              width: '100%',
-              height: '46px',
-              backgroundColor: isClockedIn ? '#D97706' : '#16A34A',
-              color: '#FFFFFF',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '0.9375rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              transition: 'transform 0.15s ease',
-            }}
-          >
-            {isClockedIn ? (
-              <>
-                <SignOut size={20} weight="bold" />
-                <span>{language === 'id' ? 'Clock Out Sekarang' : 'Clock Out Now'}</span>
-              </>
             ) : (
-              <>
-                <SignIn size={20} weight="bold" />
-                <span>{language === 'id' ? 'Clock In Sekarang' : 'Clock In Now'}</span>
-              </>
+              <div
+                style={{
+                  backgroundColor: '#2563EB',
+                  borderRadius: '9999px',
+                  padding: '5px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                }}
+              >
+                <NavigationArrow size={13} weight="fill" color="#FFFFFF" />
+                <span>Live GPS</span>
+              </div>
             )}
-          </button>
+          </div>
+
+          {/* Conditional Body: Day Off vs Active Attendance */}
+          {isOffDay ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                padding: '10px 8px 6px 8px',
+              }}
+            >
+              <img
+                src={dayOffIllustration}
+                alt={language === 'id' ? 'Hari Libur' : 'Day Off'}
+                style={{
+                  width: '185px',
+                  maxWidth: '80%',
+                  height: 'auto',
+                  objectFit: 'contain',
+                  marginBottom: '12px',
+                  filter: 'drop-shadow(0 8px 18px rgba(2, 56, 138, 0.08))',
+                }}
+              />
+              <h3
+                style={{
+                  fontSize: '1.0625rem',
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  margin: '0 0 6px 0',
+                  letterSpacing: '-0.3px',
+                }}
+              >
+                {language === 'id' ? 'Hari Ini Kamu Libur!' : 'Today is Your Day Off!'}
+              </h3>
+              <p
+                style={{
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  color: '#64748B',
+                  margin: '0 0 14px 0',
+                  lineHeight: 1.45,
+                  maxWidth: '300px',
+                }}
+              >
+                {language === 'id'
+                  ? 'Tidak ada jadwal kerja untuk hari ini. Selamat beristirahat dan nikmati waktu santaimu!'
+                  : 'You have no work shift scheduled for today. Take time to rest and recharge!'}
+              </p>
+
+              {/* Status Info Badge */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '9999px',
+                  padding: '6px 14px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: '#64748B',
+                }}
+              >
+                <Clock size={15} weight="bold" color="#64748B" />
+                <span>{language === 'id' ? 'Jadwal: Libur (Tidak Ada Jadwal)' : 'Schedule: Day Off (No Schedule)'}</span>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Clock In vs Clock Out Dual Boxes */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '10px',
+                }}
+              >
+                {/* Clock In Box */}
+                <div
+                  style={{
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '14px',
+                    border: '1px solid #E2E8F0',
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <SignIn size={14} weight="bold" color="#2563EB" />
+                      Clock In
+                    </span>
+                    {clockInTime ? (
+                      <span
+                        style={{
+                          fontSize: '0.5625rem',
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          backgroundColor: isClockInLate ? '#FEF3C7' : '#DCFCE7',
+                          color: isClockInLate ? '#B45309' : '#15803D',
+                        }}
+                      >
+                        {isClockInLate
+                          ? (language === 'id' ? (clockInLateMinutes > 0 ? `Terlambat (${clockInLateMinutes}m)` : 'Terlambat') : (clockInLateMinutes > 0 ? `Late (${clockInLateMinutes}m)` : 'Late'))
+                          : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockInTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
+                    {clockInTime || '--:--'}
+                  </div>
+                  <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
+                    {clockInTime ? '28 Sep 2026' : (language === 'id' ? 'Belum Clock In' : 'Not yet clocked in')}
+                  </div>
+                </div>
+
+                {/* Clock Out Box */}
+                <div
+                  style={{
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '14px',
+                    border: '1px solid #E2E8F0',
+                    padding: '12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '6px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#64748B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <SignOut size={14} weight="bold" color="#D97706" />
+                      Clock Out
+                    </span>
+                    {clockOutTime ? (
+                      <span
+                        style={{
+                          fontSize: '0.5625rem',
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          backgroundColor: '#DCFCE7',
+                          color: '#15803D',
+                        }}
+                      >
+                        {language === 'id' ? 'Selesai' : 'Done'}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockOutTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
+                    {clockOutTime || '--:--'}
+                  </div>
+                  <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
+                    {clockOutTime ? '28 Sep 2026' : (language === 'id' ? 'Belum Clock Out' : 'Not yet clocked out')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Shift Info (Sebelah Kiri) & Working Duration (Sebelah Kanan) Dual Row */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '10px',
+                }}
+              >
+                {/* Shift Info Box */}
+                <div
+                  style={{
+                    backgroundColor: '#EFF6FF',
+                    borderRadius: '12px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    border: '1px solid #DBEAFE',
+                  }}
+                >
+                  <Clock size={20} weight="fill" color="#2563EB" />
+                  <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#1E40AF' }}>
+                      {activeShiftName}
+                    </div>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#1E3A8A', marginTop: '1px' }}>
+                      {activeShiftHours}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Working Duration Box */}
+                <div
+                  style={{
+                    backgroundColor: '#F0FDF4',
+                    borderRadius: '12px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    border: '1px solid #DCFCE7',
+                  }}
+                >
+                  <Hourglass size={20} weight="fill" color="#16A34A" />
+                  <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#166534' }}>
+                      {language === 'id' ? 'Durasi Kehadiran' : 'Work Duration'}
+                    </div>
+                    <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#14532D', marginTop: '1px' }}>
+                      {isClockedIn ? elapsedDuration : clockOutTime ? '08j 51m' : '00j 00m'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Big Action Clock In / Clock Out Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setActionType(isClockedIn ? 'CLOCK_OUT' : 'CLOCK_IN');
+                  setIsMethodSheetOpen(true);
+                }}
+                style={{
+                  width: '100%',
+                  height: '46px',
+                  backgroundColor: isClockedIn ? '#D97706' : '#16A34A',
+                  color: '#FFFFFF',
+                  borderRadius: '12px',
+                  border: 'none',
+                  fontSize: '0.9375rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'transform 0.15s ease',
+                }}
+              >
+                {isClockedIn ? (
+                  <>
+                    <SignOut size={20} weight="bold" />
+                    <span>{language === 'id' ? 'Clock Out Sekarang' : 'Clock Out Now'}</span>
+                  </>
+                ) : (
+                  <>
+                    <SignIn size={20} weight="bold" />
+                    <span>{language === 'id' ? 'Clock In Sekarang' : 'Clock In Now'}</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -3298,10 +3404,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 {[
                   {
                     day: 'Senin, 28 Sep',
-                    shift: isSec ? 'Shift Pagi' : isHk ? 'Shift Pagi' : isEng ? 'Shift Pagi' : 'Shift Normal',
-                    time: isSec ? '07:00 - 19:00' : isHk ? '06:30 - 15:30' : '08:00 - 17:00',
-                    role: isSec ? 'Pos Gerbang Utama' : isHk ? 'Lobby & Public Area' : isEng ? 'Engineering On-Duty' : 'Office On-Duty',
-                    status: 'Hari Ini',
+                    shift: isHk ? (language === 'id' ? 'Libur (Day Off)' : 'Day Off') : isSec ? 'Shift Pagi' : isEng ? 'Shift Pagi' : 'Shift Normal',
+                    time: isHk ? '-' : (isSec ? '07:00 - 19:00' : '08:00 - 17:00'),
+                    role: isHk ? 'Off Duty' : isSec ? 'Pos Gerbang Utama' : isEng ? 'Engineering On-Duty' : 'Office On-Duty',
+                    status: isHk ? (language === 'id' ? 'Libur' : 'Off') : (language === 'id' ? 'Hari Ini' : 'Today'),
                   },
                   {
                     day: 'Selasa, 29 Sep',
