@@ -3409,7 +3409,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <ChartLineUp size={20} color="#6D28D9" weight="fill" />
                   <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                    {language === 'id' ? 'Laporan Absensi Bulan Ini' : 'Monthly Attendance Report'}
+                    {language === 'id' ? 'Laporan Presensi' : 'Report Attendance'}
                   </h3>
                 </div>
                 <button

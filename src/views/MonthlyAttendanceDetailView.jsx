@@ -132,7 +132,7 @@ export const MonthlyAttendanceDetailHeader = ({
 }) => {
   const { language } = useLanguage();
   const monthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
-  const headerTitle = language === 'id' ? 'Kehadiran Bulanan' : 'Monthly Attendance';
+  const headerTitle = language === 'id' ? 'Laporan Presensi' : 'Report Attendance';
 
   return (
     <header
@@ -148,13 +148,13 @@ export const MonthlyAttendanceDetailHeader = ({
         boxShadow: 'none',
       }}
     >
-      {/* 1. Title Row */}
+      {/* 1. Title Row (Centered Title) */}
       <div
         style={{
           padding: '0 16px',
           display: 'flex',
           alignItems: 'center',
-          gap: '12px',
+          justifyContent: 'space-between',
           height: '52px',
           borderBottom: '1px solid #F1F5F9',
         }}
@@ -188,10 +188,14 @@ export const MonthlyAttendanceDetailHeader = ({
             color: '#1E293B',
             margin: 0,
             letterSpacing: '-0.2px',
+            textAlign: 'center',
+            flex: 1,
           }}
         >
           {headerTitle}
         </h1>
+
+        <div style={{ width: '32px' }} />
       </div>
 
       {/* 2. Date/Month Navigator Filter Row (Identical to BM Attendance Detail) */}
