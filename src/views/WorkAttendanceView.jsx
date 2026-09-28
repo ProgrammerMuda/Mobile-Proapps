@@ -346,6 +346,37 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     ? 'Pos Gerbang Utama'
     : 'Lobby Tower A';
 
+  // Helper to parse time in minutes
+  const getMinutesFromTime = (timeStr) => {
+    if (!timeStr) return 0;
+    const match = timeStr.match(/(\d{1,2})[:.](\d{2})/);
+    if (!match) return 0;
+    return parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+  };
+
+  const getShiftStartMinutes = () => {
+    if (isHk) return 6 * 60 + 30; // 06:30
+    if (isSec) return 7 * 60; // 07:00
+    return 8 * 60; // 08:00
+  };
+
+  const checkIsLate = (timeStr) => {
+    if (!timeStr) return false;
+    const timeMins = getMinutesFromTime(timeStr);
+    const startMins = getShiftStartMinutes();
+    return timeMins > startMins;
+  };
+
+  const getLateMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    const timeMins = getMinutesFromTime(timeStr);
+    const startMins = getShiftStartMinutes();
+    return Math.max(0, timeMins - startMins);
+  };
+
+  const isClockInLate = clockInTime ? checkIsLate(clockInTime) : false;
+  const clockInLateMinutes = clockInTime ? getLateMinutes(clockInTime) : 0;
+
   // 7 Days Attendance History Mock Data adapted per role
   const last7DaysHistory = [
     {
@@ -357,10 +388,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       clockIn: clockInTime || '08:14',
       clockOut: clockOutTime || (isClockedIn ? 'Sedang Bekerja...' : '--:--'),
       duration: isClockedIn ? elapsedDuration : clockOutTime ? '08j 50m' : '-',
-      status: isClockedIn ? 'HADIR' : clockOutTime ? 'HADIR' : 'BELUM_ABSEN',
-      statusLabel: language === 'id' ? (isClockedIn ? 'Hadir Aktif' : clockOutTime ? 'Selesai' : 'Belum Absen') : (isClockedIn ? 'Active In' : clockOutTime ? 'Completed' : 'Pending'),
-      statusColor: '#16A34A',
-      statusBg: '#DCFCE7',
+      status: isClockedIn ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : clockOutTime ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : 'BELUM_ABSEN',
+      statusLabel: language === 'id'
+        ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Belum Absen')
+        : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Pending'),
+      statusColor: isClockInLate ? '#D97706' : '#16A34A',
+      statusBg: isClockInLate ? '#FEF3C7' : '#DCFCE7',
       location: activeLocationTitle,
       note: isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola',
     },
@@ -636,11 +669,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       fontWeight: 700,
                       padding: '2px 6px',
                       borderRadius: '4px',
-                      backgroundColor: '#DCFCE7',
-                      color: '#15803D',
+                      backgroundColor: isClockInLate ? '#FEF3C7' : '#DCFCE7',
+                      color: isClockInLate ? '#B45309' : '#15803D',
                     }}
                   >
-                    {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+                    {isClockInLate
+                      ? (language === 'id' ? (clockInLateMinutes > 0 ? `Terlambat (${clockInLateMinutes}m)` : 'Terlambat') : (clockInLateMinutes > 0 ? `Late (${clockInLateMinutes}m)` : 'Late'))
+                      : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
                   </span>
                 ) : null}
               </div>
@@ -2169,8 +2204,29 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Waktu Masuk' : 'Clock In') : (language === 'id' ? 'Waktu Pulang' : 'Clock Out')}
                     </div>
                     <div style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
-                      {checkInSnapshot?.timeShort || '08:14'} WIB
+                      {checkInSnapshot?.timeShort || (currentTime ? currentTime.substring(0, 5) : '08:14')} WIB
                     </div>
+                    {actionType === 'CLOCK_IN' && (
+                      <div style={{ marginTop: '2px' }}>
+                        <span
+                          style={{
+                            fontSize: '0.5625rem',
+                            fontWeight: 700,
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            backgroundColor: checkIsLate(checkInSnapshot?.time || currentTime) ? '#FEF3C7' : '#DCFCE7',
+                            color: checkIsLate(checkInSnapshot?.time || currentTime) ? '#B45309' : '#15803D',
+                            display: 'inline-block',
+                          }}
+                        >
+                          {checkIsLate(checkInSnapshot?.time || currentTime)
+                            ? (language === 'id'
+                                ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
+                                : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
+                            : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div
                     style={{
@@ -2819,22 +2875,42 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    padding: '5px 10px',
-                    borderRadius: '20px',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid var(--color-border-default, #E2E8F0)',
-                    fontSize: '0.6875rem',
-                    fontWeight: 700,
-                    color: 'var(--color-text-secondary, #64748B)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <CalendarBlank size={12} weight="bold" color="var(--color-primary, #053079)" />
-                  <span>{checkInSnapshot?.date || '28 Sep 2026'}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {actionType === 'CLOCK_IN' && (
+                    <span
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '20px',
+                        backgroundColor: checkIsLate(checkInSnapshot?.time || currentTime) ? '#FEF3C7' : '#DCFCE7',
+                        color: checkIsLate(checkInSnapshot?.time || currentTime) ? '#B45309' : '#15803D',
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {checkIsLate(checkInSnapshot?.time || currentTime)
+                        ? (language === 'id'
+                            ? (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Terlambat (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Terlambat')
+                            : (getLateMinutes(checkInSnapshot?.time || currentTime) > 0 ? `Late (${getLateMinutes(checkInSnapshot?.time || currentTime)}m)` : 'Late'))
+                        : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
+                    </span>
+                  )}
+                  <div
+                    style={{
+                      padding: '5px 10px',
+                      borderRadius: '20px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid var(--color-border-default, #E2E8F0)',
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      color: 'var(--color-text-secondary, #64748B)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
+                  >
+                    <CalendarBlank size={12} weight="bold" color="var(--color-primary, #053079)" />
+                    <span>{checkInSnapshot?.date || '28 Sep 2026'}</span>
+                  </div>
                 </div>
               </div>
 
