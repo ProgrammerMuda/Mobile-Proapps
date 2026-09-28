@@ -2439,11 +2439,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <path d="M200,-20 Q210,100 190,220" stroke="#E2E8F0" strokeWidth="28" fill="none" />
                   <path d="M40,140 Q180,130 360,140" stroke="#FFFFFF" strokeWidth="18" fill="none" />
 
-                  {/* Workplace Radius Circle (15m radius) */}
+                  {/* Workplace Radius Circle (15m radius centered) */}
                   <circle
-                    cx="135"
-                    cy="120"
-                    r="48"
+                    cx="185"
+                    cy="105"
+                    r="52"
                     fill="rgba(9, 178, 255, 0.15)"
                     stroke="#09B2FF"
                     strokeWidth="2"
@@ -2452,22 +2452,22 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
                   {/* Dotted Connection Line between office and user */}
                   <line
-                    x1="135"
-                    y1="120"
-                    x2="295"
-                    y2="55"
+                    x1="185"
+                    y1="105"
+                    x2="335"
+                    y2="45"
                     stroke="#EF4444"
                     strokeWidth="2"
                     strokeDasharray="4 3"
                   />
                 </svg>
 
-                {/* Office / Workplace Pin at Center of Radius */}
+                {/* Office / Apartment Pin at Center of Radius */}
                 <div
                   style={{
                     position: 'absolute',
-                    left: '135px',
-                    top: '120px',
+                    left: '46.25%',
+                    top: '52.5%',
                     transform: 'translate(-50%, -50%)',
                     display: 'flex',
                     flexDirection: 'column',
@@ -2477,18 +2477,18 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 >
                   <div
                     style={{
-                      width: '24px',
-                      height: '24px',
+                      width: '28px',
+                      height: '28px',
                       borderRadius: '50%',
                       backgroundColor: 'var(--color-primary, #053079)',
-                      border: '2px solid #FFFFFF',
+                      border: '2.5px solid #FFFFFF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 2px 6px rgba(5, 48, 121, 0.4)',
+                      boxShadow: '0 2px 8px rgba(5, 48, 121, 0.45)',
                     }}
                   >
-                    <Buildings size={12} weight="bold" color="#FFFFFF" />
+                    <Buildings size={14} weight="bold" color="#FFFFFF" />
                   </div>
                 </div>
 
@@ -2496,8 +2496,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <div
                   style={{
                     position: 'absolute',
-                    left: '295px',
-                    top: '55px',
+                    left: '83.75%',
+                    top: '22.5%',
                     transform: 'translate(-50%, -50%)',
                     display: 'flex',
                     flexDirection: 'column',
