@@ -1161,16 +1161,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '4px',
-                backgroundColor: '#EFF6FF',
-                border: '1px solid #DBEAFE',
-                padding: '5px 12px',
-                borderRadius: '9999px',
+                gap: '2px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                padding: '4px 0',
                 fontSize: '0.75rem',
                 fontWeight: 700,
                 color: '#02388A',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                transition: 'opacity 0.15s ease',
                 outline: 'none',
               }}
             >
