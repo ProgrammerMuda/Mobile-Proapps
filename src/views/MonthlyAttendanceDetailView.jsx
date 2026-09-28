@@ -75,30 +75,77 @@ const generateMonthlyLogs = (year, monthIndex) => {
     // Skip weekends (Sunday = 0, Saturday = 6)
     if (dayOfWeek === 0 || dayOfWeek === 6) continue;
 
-    if (day === 24 || day === 14) {
-      // Late days
-      const lateMins = day === 24 ? 18 : 14;
+    if (day === 24) {
+      // Late In, On Time Out
       logs.push({
         id: `att-${year}-${monthIndex}-${day}`,
         date: dateObj,
         dayNumber: day,
         status: 'late',
-        clockIn: `08:${lateMins} WIB`,
+        inStatus: 'LATE',
+        outStatus: 'ON_TIME',
+        lateMinutes: 18,
+        clockIn: '08:18 WIB',
         clockOut: '17:05 WIB',
-        workDuration: '8h 51m',
-        notes: `Terlambat ${lateMins} menit`,
+        workDuration: '8h 47m',
+        notes: 'Terlambat 18 menit (Macet Tol)',
       });
-    } else if (day === 17 || day === 3) {
-      // Alpha days
+    } else if (day === 21) {
+      // Early In, Early Out
+      logs.push({
+        id: `att-${year}-${monthIndex}-${day}`,
+        date: dateObj,
+        dayNumber: day,
+        status: 'early_out',
+        inStatus: 'EARLY_IN',
+        outStatus: 'EARLY_OUT',
+        clockIn: '07:48 WIB',
+        clockOut: '16:45 WIB',
+        workDuration: '8h 57m',
+        notes: 'Pulang 15 menit awal (Izin Urusan Keluarga)',
+      });
+    } else if (day === 18) {
+      // Early In, On Time Out
+      logs.push({
+        id: `att-${year}-${monthIndex}-${day}`,
+        date: dateObj,
+        dayNumber: day,
+        status: 'early_in',
+        inStatus: 'EARLY_IN',
+        outStatus: 'ON_TIME',
+        clockIn: '07:50 WIB',
+        clockOut: '17:02 WIB',
+        workDuration: '9h 12m',
+        notes: 'Shift Pagi (Masuk Awal)',
+      });
+    } else if (day === 17) {
+      // Alpha day
       logs.push({
         id: `att-${year}-${monthIndex}-${day}`,
         date: dateObj,
         dayNumber: day,
         status: 'alpha',
+        inStatus: null,
+        outStatus: null,
         clockIn: '-- : --',
         clockOut: '-- : --',
         workDuration: '0h 0m',
         notes: 'Tanpa Keterangan (Alpha)',
+      });
+    } else if (day === 14) {
+      // Late day
+      logs.push({
+        id: `att-${year}-${monthIndex}-${day}`,
+        date: dateObj,
+        dayNumber: day,
+        status: 'late',
+        inStatus: 'LATE',
+        outStatus: 'ON_TIME',
+        lateMinutes: 14,
+        clockIn: '08:14 WIB',
+        clockOut: '17:05 WIB',
+        workDuration: '8h 51m',
+        notes: 'Terlambat 14 menit',
       });
     } else if (day === 8) {
       // 1 Leave day
@@ -107,23 +154,39 @@ const generateMonthlyLogs = (year, monthIndex) => {
         date: dateObj,
         dayNumber: day,
         status: 'leave',
+        inStatus: null,
+        outStatus: null,
         clockIn: '-- : --',
         clockOut: '-- : --',
         workDuration: '0h 0m',
         notes: 'Cuti Tahunan (Disetujui)',
       });
+    } else if (day === 3) {
+      // 1 Alpha day
+      logs.push({
+        id: `att-${year}-${monthIndex}-${day}`,
+        date: dateObj,
+        dayNumber: day,
+        status: 'alpha',
+        inStatus: null,
+        outStatus: null,
+        clockIn: '-- : --',
+        clockOut: '-- : --',
+        workDuration: '0h 0m',
+        notes: 'Tanpa Keterangan (Alpha)',
+      });
     } else {
       // On time days
-      const clockInMin = Math.floor(45 + ((day * 7) % 14));
-      const clockOutMin = Math.floor(1 + ((day * 3) % 15));
       logs.push({
         id: `att-${year}-${monthIndex}-${day}`,
         date: dateObj,
         dayNumber: day,
         status: 'ontime',
-        clockIn: `07:${clockInMin < 10 ? '0' + clockInMin : clockInMin} WIB`,
-        clockOut: `17:${clockOutMin < 10 ? '0' + clockOutMin : clockOutMin} WIB`,
-        workDuration: '9h 10m',
+        inStatus: 'ON_TIME',
+        outStatus: 'ON_TIME',
+        clockIn: '08:00 WIB',
+        clockOut: '17:00 WIB',
+        workDuration: '9h 00m',
         notes: 'Shift Pagi (08:00 - 17:00)',
       });
     }
@@ -341,87 +404,154 @@ export const MonthlyAttendanceDetailView = ({
     setIsPickerOpen(false);
   };
 
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'ontime':
-        return (
-          <span
-            style={{
-              backgroundColor: '#DCFCE7',
-              color: '#16A34A',
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: '9999px',
-            }}
-          >
-            {language === 'id' ? 'Tepat Waktu' : 'On Time'}
-          </span>
-        );
-      case 'late':
-        return (
-          <span
-            style={{
-              backgroundColor: '#D97706',
-              color: '#FFFFFF',
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: '9999px',
-            }}
-          >
-            {language === 'id' ? 'Terlambat' : 'Late'}
-          </span>
-        );
-      case 'leave':
-        return (
-          <span
-            style={{
-              backgroundColor: '#F1F5F9',
-              color: '#64748B',
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: '9999px',
-            }}
-          >
-            {language === 'id' ? 'Izin / Cuti' : 'Leave'}
-          </span>
-        );
-      case 'alpha':
-        return (
-          <span
-            style={{
-              backgroundColor: '#DC2626',
-              color: '#FFFFFF',
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: '9999px',
-            }}
-          >
-            Alpha
-          </span>
-        );
-      case 'today':
-      case 'pending':
-        return (
-          <span
-            style={{
-              backgroundColor: '#EFF6FF',
-              color: '#1D4ED8',
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              padding: '2px 8px',
-              borderRadius: '9999px',
-            }}
-          >
-            {language === 'id' ? 'Hari Ini' : 'Today'}
-          </span>
-        );
-      default:
-        return null;
+  const renderLogBadges = (log) => {
+    if (log.status === 'leave') {
+      return (
+        <span
+          style={{
+            backgroundColor: '#F1F5F9',
+            color: '#64748B',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Izin / Cuti' : 'Leave'}
+        </span>
+      );
     }
+    if (log.status === 'alpha') {
+      return (
+        <span
+          style={{
+            backgroundColor: '#DC2626',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          Alpha
+        </span>
+      );
+    }
+    if (log.status === 'today' || log.status === 'pending') {
+      return (
+        <span
+          style={{
+            backgroundColor: '#EFF6FF',
+            color: '#1D4ED8',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Hari Ini' : 'Today'}
+        </span>
+      );
+    }
+
+    const inStatus = log.inStatus || (log.status === 'late' ? 'LATE' : 'ON_TIME');
+    const outStatus = log.outStatus || 'ON_TIME';
+
+    // Rule: Jika clock in dan clock out keduanya on time, hanya tampilkan 1 badge On Time
+    if (inStatus === 'ON_TIME' && outStatus === 'ON_TIME') {
+      return (
+        <span
+          style={{
+            backgroundColor: '#DCFCE7',
+            color: '#16A34A',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+        </span>
+      );
+    }
+
+    const badges = [];
+
+    // 1. Clock In Badge (Early In / Late / On Time)
+    if (inStatus === 'EARLY_IN') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            backgroundColor: '#E0F2FE',
+            color: '#0369A1',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Masuk Awal' : 'Early In'}
+        </span>
+      );
+    } else if (inStatus === 'LATE') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            backgroundColor: '#D97706',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {log.lateMinutes ? (language === 'id' ? `Terlambat (${log.lateMinutes}m)` : `Late (${log.lateMinutes}m)`) : (language === 'id' ? 'Terlambat' : 'Late')}
+        </span>
+      );
+    } else if (inStatus === 'ON_TIME') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            backgroundColor: '#DCFCE7',
+            color: '#16A34A',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+        </span>
+      );
+    }
+
+    // 2. Clock Out Badge (Early Out / On Time)
+    if (outStatus === 'EARLY_OUT') {
+      badges.push(
+        <span
+          key="out"
+          style={{
+            backgroundColor: '#FEF3C7',
+            color: '#B45309',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Pulang Awal' : 'Early Out'}
+        </span>
+      );
+    }
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+        {badges}
+      </div>
+    );
   };
 
   return (
@@ -698,7 +828,7 @@ export const MonthlyAttendanceDetailView = ({
             const dayName = language === 'id' ? DAY_NAMES_ID[log.date.getDay()] : DAY_NAMES[log.date.getDay()];
             const monthStr = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
             const dateDisplay = `${dayName}, ${log.dayNumber} ${monthStr} ${selectedYear}`;
-            const isLate = log.status === 'late';
+            const isLate = log.status === 'late' || log.inStatus === 'LATE' || log.outStatus === 'EARLY_OUT';
             const isAlpha = log.status === 'alpha';
 
             let cardBg = '#FFFFFF';
@@ -736,7 +866,7 @@ export const MonthlyAttendanceDetailView = ({
                   <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
                     {dateDisplay}
                   </span>
-                  {getStatusBadge(log.status)}
+                  {renderLogBadges(log)}
                 </div>
 
                 {/* Clock In & Clock Out Tiles */}

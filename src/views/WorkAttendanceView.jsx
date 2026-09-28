@@ -435,6 +435,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       clockOut: clockOutTime || (isClockedIn ? 'Sedang Bekerja...' : '--:--'),
       duration: isClockedIn ? elapsedDuration : clockOutTime ? '08j 50m' : '-',
       status: isClockedIn ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : clockOutTime ? (isClockInLate ? 'TERLAMBAT' : 'HADIR') : 'TODAY',
+      inStatus: isClockInLate ? 'LATE' : (clockInTime && clockInTime < '08:00' ? 'EARLY_IN' : 'ON_TIME'),
+      outStatus: clockOutTime ? (clockOutTime < '17:00' ? 'EARLY_OUT' : 'ON_TIME') : null,
+      lateMinutes: isClockInLate ? clockInLateMinutes : 0,
       statusLabel: language === 'id'
         ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Hari Ini')
         : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Today'),
@@ -453,6 +456,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       clockOut: '-',
       duration: '-',
       status: 'LIBUR',
+      inStatus: null,
+      outStatus: null,
       statusLabel: language === 'id' ? 'Libur' : 'Day Off',
       statusColor: '#64748B',
       statusBg: '#F1F5F9',
@@ -465,13 +470,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       dateEn: 'Saturday, 26 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
-      clockIn: '07:58',
+      clockIn: '07:48',
       clockOut: '17:05',
-      duration: '09j 07m',
+      duration: '09j 17m',
       status: 'HADIR',
-      statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
-      statusColor: '#16A34A',
-      statusBg: '#DCFCE7',
+      inStatus: 'EARLY_IN',
+      outStatus: 'ON_TIME',
+      statusLabel: language === 'id' ? 'Masuk Awal' : 'Early In',
+      statusColor: '#0369A1',
+      statusBg: '#E0F2FE',
       location: isEng ? 'Ruang Panel B1 • Radius 12m' : isHk ? 'Koridor Lantai 5-10 • Radius 12m' : isSec ? 'Pos Timur • Radius 12m' : 'Pintu Masuk Staff • Radius 12m',
       note: isEng ? 'Pekerjaan perbaikan lift lantai 10' : isHk ? 'General cleaning koridor' : isSec ? 'Patroli perimeter malam & CCTV' : 'Briefing vendor maintenance',
     },
@@ -485,6 +492,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       clockOut: '--:--',
       duration: '-',
       status: 'ALPHA',
+      inStatus: null,
+      outStatus: null,
       statusLabel: 'Alpha',
       statusColor: '#FFFFFF',
       statusBg: '#DC2626',
@@ -501,6 +510,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       clockOut: '17:30',
       duration: '09j 12m',
       status: 'TERLAMBAT',
+      inStatus: 'LATE',
+      outStatus: 'ON_TIME',
+      lateMinutes: 18,
       statusLabel: language === 'id' ? 'Terlambat (18m)' : 'Late (18m)',
       statusColor: '#FFFFFF',
       statusBg: '#D97706',
@@ -513,15 +525,17 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       dateEn: 'Wednesday, 23 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
-      clockIn: '08:02',
-      clockOut: '17:15',
-      duration: '09j 13m',
+      clockIn: '07:55',
+      clockOut: '16:40',
+      duration: '08j 45m',
       status: 'HADIR',
-      statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
-      statusColor: '#16A34A',
-      statusBg: '#DCFCE7',
+      inStatus: 'EARLY_IN',
+      outStatus: 'EARLY_OUT',
+      statusLabel: language === 'id' ? 'Pulang Awal' : 'Early Out',
+      statusColor: '#B45309',
+      statusBg: '#FEF3C7',
       location: isEng ? 'Ruang STP • Radius 10m' : isHk ? 'Void Lobby • Radius 10m' : isSec ? 'Pintu Darurat • Radius 10m' : 'Lobby Tower A • Radius 10m',
-      note: isEng ? 'Inspeksi pompa air & panel STP' : isHk ? 'Pembersihan kaca void lobby' : isSec ? 'Inspeksi hydrant & pintu darurat' : 'Inspeksi operasional gedung',
+      note: isEng ? 'Izin pulang awal keperluan keluarga' : isHk ? 'Izin pulang awal keperluan keluarga' : isSec ? 'Izin pulang awal keperluan keluarga' : 'Izin pulang awal keperluan keluarga',
     },
     {
       id: 'att-7',
@@ -529,10 +543,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       dateEn: 'Tuesday, 22 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
-      clockIn: '07:55',
+      clockIn: '08:00',
       clockOut: '17:04',
-      duration: '09j 09m',
+      duration: '09j 04m',
       status: 'HADIR',
+      inStatus: 'ON_TIME',
+      outStatus: 'ON_TIME',
       statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
       statusColor: '#16A34A',
       statusBg: '#DCFCE7',
@@ -540,6 +556,157 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       note: isEng ? 'Perbaikan instalasi listrik unit 14B' : isHk ? 'Restock chemical & inventory' : isSec ? 'Pengawalan bongkar muatan logistik' : 'Review laporan keuangan IPL',
     },
   ];
+
+  // Helper to render multiple status badges
+  const renderHistoryBadges = (item) => {
+    if (item.status === 'LIBUR') {
+      return (
+        <span
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#F1F5F9',
+            color: '#64748B',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Libur' : 'Day Off'}
+        </span>
+      );
+    }
+    if (item.status === 'ALPHA') {
+      return (
+        <span
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#DC2626',
+            color: '#FFFFFF',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          Alpha
+        </span>
+      );
+    }
+    if (item.status === 'TODAY' && !isClockedIn && !clockOutTime) {
+      return (
+        <span
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#EFF6FF',
+            color: '#1D4ED8',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Hari Ini' : 'Today'}
+        </span>
+      );
+    }
+
+    const inStatus = item.inStatus || (item.status === 'TERLAMBAT' ? 'LATE' : 'ON_TIME');
+    const outStatus = item.outStatus || (item.clockOut && item.clockOut !== '--:--' && item.clockOut < '17:00' ? 'EARLY_OUT' : 'ON_TIME');
+
+    // Rule: Jika keduanya ON_TIME, hanya tampilkan 1 badge ON_TIME
+    if (inStatus === 'ON_TIME' && outStatus === 'ON_TIME') {
+      return (
+        <span
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#DCFCE7',
+            color: '#16A34A',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+        </span>
+      );
+    }
+
+    const badges = [];
+
+    // 1. Clock In Badge
+    if (inStatus === 'EARLY_IN') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#E0F2FE',
+            color: '#0369A1',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Masuk Awal' : 'Early In'}
+        </span>
+      );
+    } else if (inStatus === 'LATE') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#D97706',
+            color: '#FFFFFF',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {item.lateMinutes ? (language === 'id' ? `Terlambat (${item.lateMinutes}m)` : `Late (${item.lateMinutes}m)`) : (language === 'id' ? 'Terlambat' : 'Late')}
+        </span>
+      );
+    } else if (inStatus === 'ON_TIME') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#DCFCE7',
+            color: '#16A34A',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+        </span>
+      );
+    }
+
+    // 2. Clock Out Badge
+    if (outStatus === 'EARLY_OUT') {
+      badges.push(
+        <span
+          key="out"
+          style={{
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            backgroundColor: '#FEF3C7',
+            color: '#B45309',
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Pulang Awal' : 'Early Out'}
+        </span>
+      );
+    }
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+        {badges}
+      </div>
+    );
+  };
 
   // Filter history
   const filteredHistory = last7DaysHistory.filter((item) => {
@@ -1224,7 +1391,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           {/* History Cards List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {filteredHistory.map((item) => {
-              const isLate = item.status === 'TERLAMBAT';
+              const isLate = item.status === 'TERLAMBAT' || item.inStatus === 'LATE' || item.outStatus === 'EARLY_OUT';
               const isAlpha = item.status === 'ALPHA';
 
               let cardBg = '#FFFFFF';
@@ -1232,16 +1399,16 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               let tileBg = '#F8FAFC';
               let tileBorder = '1px solid #F1F5F9';
 
-              if (isLate) {
-                cardBg = '#FFFBEB';
-                cardBorder = item.isToday ? '1.5px solid #D97706' : '1px solid #FDE68A';
-                tileBg = '#FFFFFF';
-                tileBorder = '1px solid #FEF3C7';
-              } else if (isAlpha) {
+              if (isAlpha) {
                 cardBg = '#FEF2F2';
                 cardBorder = item.isToday ? '1.5px solid #DC2626' : '1px solid #FECACA';
                 tileBg = '#FFFFFF';
                 tileBorder = '1px solid #FEE2E2';
+              } else if (isLate) {
+                cardBg = '#FFFBEB';
+                cardBorder = item.isToday ? '1.5px solid #D97706' : '1px solid #FDE68A';
+                tileBg = '#FFFFFF';
+                tileBorder = '1px solid #FEF3C7';
               }
 
               return (
@@ -1281,18 +1448,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       )}
                     </div>
 
-                    <span
-                      style={{
-                        fontSize: '0.6875rem',
-                        fontWeight: 700,
-                        backgroundColor: isLate ? '#D97706' : isAlpha ? '#DC2626' : item.statusBg,
-                        color: (isLate || isAlpha) ? '#FFFFFF' : item.statusColor,
-                        padding: '2px 8px',
-                        borderRadius: '9999px',
-                      }}
-                    >
-                      {item.statusLabel}
-                    </span>
+                    {renderHistoryBadges(item)}
                   </div>
 
                   {/* Body: 2-Column Clock In & Clock Out Tiles (Matching Daily Attendance Record) */}
