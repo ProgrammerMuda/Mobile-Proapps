@@ -108,7 +108,7 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
         width: '100%',
         padding: '16px 20px',
         backgroundColor: isScrolled ? '#FFFFFF' : '#02388A',
-        color: isScrolled ? '#0F172A' : '#FFFFFF',
+        color: isScrolled ? '#334155' : '#FFFFFF',
         boxSizing: 'border-box',
         boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.08)' : 'none',
         borderBottom: isScrolled ? '1px solid #E2E8F0' : 'none',
@@ -122,7 +122,7 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
         style={{
           background: 'none',
           border: 'none',
-          color: isScrolled ? '#0F172A' : '#FFFFFF',
+          color: isScrolled ? '#334155' : '#FFFFFF',
           cursor: 'pointer',
           padding: '4px',
           display: 'flex',
@@ -140,7 +140,7 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
           fontSize: '1.125rem',
           fontWeight: 700,
           margin: 0,
-          color: isScrolled ? '#0F172A' : '#FFFFFF',
+          color: isScrolled ? '#334155' : '#FFFFFF',
           letterSpacing: '-0.2px',
           textAlign: 'center',
           flex: 1,
@@ -834,7 +834,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   style={{
                     fontSize: '1.0625rem',
                     fontWeight: 800,
-                    color: '#0F172A',
+                    color: '#334155',
                     letterSpacing: '-0.2px',
                     fontVariantNumeric: 'tabular-nums',
                     marginTop: '2px',
@@ -913,7 +913,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 style={{
                   fontSize: '1.125rem',
                   fontWeight: 800,
-                  color: '#0F172A',
+                  color: '#334155',
                   margin: '0 0 6px 0',
                   letterSpacing: '-0.3px',
                 }}
@@ -979,7 +979,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       </span>
                     ) : null}
                   </div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockInTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockInTime ? '#334155' : '#94A3B8', letterSpacing: '-0.3px' }}>
                     {clockInTime || '--:--'}
                   </div>
                   <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
@@ -1019,7 +1019,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       </span>
                     ) : null}
                   </div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockOutTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
+                  <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockOutTime ? '#334155' : '#94A3B8', letterSpacing: '-0.3px' }}>
                     {clockOutTime || '--:--'}
                   </div>
                   <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
@@ -1141,7 +1141,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             style={{
               fontSize: '0.9375rem',
               fontWeight: 700,
-              color: '#1E293B',
+              color: '#334155',
               margin: 0,
               letterSpacing: '-0.2px',
             }}
@@ -1405,7 +1405,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 style={{
                   fontSize: '0.9375rem',
                   fontWeight: 700,
-                  color: '#1E293B',
+                  color: '#334155',
                   margin: 0,
                   letterSpacing: '-0.2px',
                 }}
@@ -1522,7 +1522,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   {/* Header: Date & Status Badge */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#334155' }}>
                         {language === 'id' ? item.date : item.dateEn}
                       </span>
                       {item.isToday && (isClockedIn || clockOutTime) && (
@@ -1563,7 +1563,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                           <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
                             {language === 'id' ? 'Masuk' : 'Clock In'}
                           </span>
-                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                             {item.clockIn}
                           </div>
                         </div>
@@ -1572,7 +1572,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                           <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
                             {language === 'id' ? 'Keluar' : 'Clock Out'}
                           </span>
-                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                             {item.clockOut}
                           </div>
                         </div>
@@ -1664,7 +1664,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#334155', margin: 0 }}>
                     {actionType === 'CLOCK_IN'
                       ? (language === 'id' ? 'Pilih Metode Clock In' : 'Select Clock In Method')
                       : (language === 'id' ? 'Pilih Metode Clock Out' : 'Select Clock Out Method')}
@@ -1743,7 +1743,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     <QrCode size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155', marginBottom: '2px' }}>
                       {language === 'id' ? 'Scan QR Code' : 'Scan QR Code'}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
@@ -1802,7 +1802,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     <Camera size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A', marginBottom: '2px' }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155', marginBottom: '2px' }}>
                       {language === 'id' ? 'Foto Selfie' : 'Selfie Photo'}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
@@ -1867,7 +1867,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                    <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#334155', margin: 0 }}>
                       {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Scan QR Clock In' : 'Scan QR Clock In') : (language === 'id' ? 'Scan QR Clock Out' : 'Scan QR Clock Out')}
                     </h3>
                     <span
@@ -3368,7 +3368,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <CalendarCheck size={20} color="#2563EB" weight="fill" />
-                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
                     {language === 'id' ? 'Jadwal Shift Minggu Ini' : 'This Week Shift Schedule'}
                   </h3>
                 </div>
@@ -3447,7 +3447,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0F172A' }}>{s.day}</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>{s.day}</div>
                       <div style={{ fontSize: '0.6875rem', color: '#64748B' }}>{s.role} • {s.time}</div>
                     </div>
                     <span
@@ -3509,7 +3509,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <FileText size={20} color="#059669" weight="fill" />
-                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
                     {language === 'id' ? 'Pengajuan Izin / Cuti' : 'Submit Permission / Leave'}
                   </h3>
                 </div>
@@ -3695,7 +3695,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <ChartLineUp size={20} color="#6D28D9" weight="fill" />
-                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
                     {language === 'id' ? 'Laporan Presensi' : 'Report Attendance'}
                   </h3>
                 </div>
@@ -3778,7 +3778,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Receipt size={20} color="#D97706" weight="fill" />
-                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
                     {language === 'id' ? 'Slip Gaji • Sep 2026' : 'Payslip • Sep 2026'}
                   </h3>
                 </div>

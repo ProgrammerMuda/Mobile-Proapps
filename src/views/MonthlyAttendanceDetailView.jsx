@@ -291,7 +291,7 @@ export const MonthlyAttendanceDetailHeader = ({
           style={{
             fontSize: '1.0625rem',
             fontWeight: 700,
-            color: '#1E293B',
+            color: '#334155',
             margin: 0,
             letterSpacing: '-0.2px',
             textAlign: 'center',
@@ -353,7 +353,7 @@ export const MonthlyAttendanceDetailHeader = ({
             borderRadius: '9999px',
             fontSize: '0.875rem',
             fontWeight: 700,
-            color: '#1E293B',
+            color: '#334155',
             cursor: 'pointer',
             outline: 'none',
             fontFamily: 'var(--font-sans)',
@@ -613,7 +613,7 @@ export const MonthlyAttendanceDetailView = ({
         }}
       >
         <div>
-          <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#1E293B', margin: 0 }}>
+          <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
             {language === 'id' ? 'Ringkasan Kehadiran' : 'Attendance Summary'}
           </h2>
           <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
@@ -794,7 +794,7 @@ export const MonthlyAttendanceDetailView = ({
 
       {/* 2. Daily Attendance Logs List Header & Filter Tabs */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#1E293B', margin: '4px 0 0 0' }}>
+        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
           {language === 'id' ? 'Riwayat Absensi Harian' : 'Daily Attendance Records'}
         </h3>
 
@@ -899,7 +899,7 @@ export const MonthlyAttendanceDetailView = ({
               >
                 {/* Date & Status Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
+                  <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#334155' }}>
                     {dateDisplay}
                   </span>
                   {renderLogBadges(log)}
@@ -921,7 +921,7 @@ export const MonthlyAttendanceDetailView = ({
                     <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
                       {language === 'id' ? 'Masuk' : 'Clock In'}
                     </span>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                       {log.clockIn}
                     </div>
                   </div>
@@ -930,7 +930,7 @@ export const MonthlyAttendanceDetailView = ({
                     <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
                       {language === 'id' ? 'Keluar' : 'Clock Out'}
                     </span>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                       {log.clockOut}
                     </div>
                   </div>
@@ -1005,7 +1005,7 @@ export const MonthlyAttendanceDetailView = ({
 
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#1E293B', margin: 0 }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
                   {language === 'id' ? 'Pilih Periode Bulan' : 'Select Month Period'}
                 </h3>
                 <button
@@ -1053,7 +1053,7 @@ export const MonthlyAttendanceDetailView = ({
                 >
                   <CaretLeft size={16} weight="bold" />
                 </button>
-                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
+                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                   {pickerTempYear}
                 </span>
                 <button
