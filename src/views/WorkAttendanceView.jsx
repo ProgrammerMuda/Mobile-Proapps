@@ -893,24 +893,25 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 textAlign: 'center',
-                padding: '10px 8px 6px 8px',
+                padding: '4px 0 6px 0',
+                width: '100%',
               }}
             >
               <img
                 src={dayOffIllustration}
                 alt={language === 'id' ? 'Hari Libur' : 'Day Off'}
                 style={{
-                  width: '185px',
-                  maxWidth: '80%',
+                  width: '100%',
                   height: 'auto',
+                  maxHeight: '220px',
                   objectFit: 'contain',
-                  marginBottom: '12px',
+                  marginBottom: '14px',
                   filter: 'drop-shadow(0 8px 18px rgba(2, 56, 138, 0.08))',
                 }}
               />
               <h3
                 style={{
-                  fontSize: '1.0625rem',
+                  fontSize: '1.125rem',
                   fontWeight: 800,
                   color: '#0F172A',
                   margin: '0 0 6px 0',
@@ -926,7 +927,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   color: '#64748B',
                   margin: 0,
                   lineHeight: 1.45,
-                  maxWidth: '300px',
+                  maxWidth: '320px',
                 }}
               >
                 {language === 'id'
