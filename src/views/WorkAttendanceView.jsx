@@ -96,7 +96,7 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
             {language === 'id' ? 'Presensi Kerja' : 'Work Attendance'}
           </h1>
           <div style={{ fontSize: '0.6875rem', color: '#93C5FD', fontWeight: 500, marginTop: '1px' }}>
-            {formattedDate}
+            {language === 'id' ? 'Sistem Presensi Karyawan' : 'Employee Attendance'}
           </div>
         </div>
       </div>
@@ -115,7 +115,7 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
         }}
       >
         <ShieldCheck size={14} weight="fill" color="#38BDF8" />
-        <span>Live GPS</span>
+        <span>Online</span>
       </div>
     </div>
   );
@@ -390,7 +390,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             gap: '16px',
           }}
         >
-          {/* Live Time & Shift Row */}
+          {/* Live Time & Date Row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div
@@ -416,26 +416,25 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </span>
             </div>
 
+            {/* Date Pill inside card */}
             <div
               style={{
-                backgroundColor: '#EFF6FF',
-                border: '1px solid #DBEAFE',
-                borderRadius: '10px',
-                padding: '6px 10px',
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                borderRadius: '8px',
+                padding: '4px 8px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '5px',
+                fontSize: '0.6875rem',
+                fontWeight: 700,
+                color: '#475569',
               }}
             >
-              <Clock size={16} weight="bold" color="#1D4ED8" />
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.15 }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1D4ED8' }}>
-                  {activeShiftName}
-                </span>
-                <span style={{ fontSize: '0.625rem', fontWeight: 600, color: '#3B82F6', marginTop: '1px' }}>
-                  {activeShiftHours}
-                </span>
-              </div>
+              <CalendarBlank size={14} weight="bold" color="#64748B" />
+              <span>
+                {language === 'id' ? 'Senin, 28 Sep 2026' : 'Monday, Sep 28, 2026'}
+              </span>
             </div>
           </div>
 
@@ -524,33 +523,58 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             </div>
           </div>
 
-          {/* Working Duration Banner */}
+          {/* Shift Info (Sebelah Kiri) & Working Duration (Sebelah Kanan) Dual Row */}
           <div
             style={{
-              backgroundColor: '#EFF6FF',
-              borderRadius: '12px',
-              padding: '10px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              border: '1px solid #DBEAFE',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Hourglass size={18} weight="fill" color="#2563EB" />
-              <div>
+            {/* Shift Info Box */}
+            <div
+              style={{
+                backgroundColor: '#EFF6FF',
+                borderRadius: '12px',
+                padding: '10px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                border: '1px solid #DBEAFE',
+              }}
+            >
+              <Clock size={20} weight="fill" color="#2563EB" />
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
                 <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#1E40AF' }}>
-                  {language === 'id' ? 'Durasi Kehadiran Hari Ini' : 'Today Working Duration'}
+                  {activeShiftName}
                 </div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#1E3A8A' }}>
-                  {isClockedIn ? elapsedDuration : clockOutTime ? '08 Jam 51 Menit' : '00 Jam 00 Menit'}
+                <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#1E3A8A', marginTop: '1px' }}>
+                  {activeShiftHours}
                 </div>
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#2563EB' }}>
-                Target: 08j 00m
-              </span>
+
+            {/* Working Duration Box */}
+            <div
+              style={{
+                backgroundColor: '#F0FDF4',
+                borderRadius: '12px',
+                padding: '10px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                border: '1px solid #DCFCE7',
+              }}
+            >
+              <Hourglass size={20} weight="fill" color="#16A34A" />
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#166534' }}>
+                  {language === 'id' ? 'Durasi Kehadiran' : 'Work Duration'}
+                </div>
+                <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#14532D', marginTop: '1px' }}>
+                  {isClockedIn ? elapsedDuration : clockOutTime ? '08j 51m' : '00j 00m'}
+                </div>
+              </div>
             </div>
           </div>
 
