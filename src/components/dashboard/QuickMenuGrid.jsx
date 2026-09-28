@@ -405,6 +405,63 @@ export const HOUSEKEEPING_CATEGORIZED_FEATURES = [
   },
 ];
 
+// 6 Items for Security Dashboard:
+// Work Attendance, Visitor Information, Incident Report, Inspection, In Out Goods, Package
+export const SECURITY_DASHBOARD_MENU_ITEMS = [
+  {
+    id: 'attendance',
+    title: 'Work\nAttendance',
+    icon: attendanceImg,
+    category: 'Operations',
+  },
+  {
+    id: 'visitor-information',
+    title: 'Visitor\nInformation',
+    icon: visitorInformationImg,
+    category: 'Security',
+  },
+  {
+    id: 'incident-report',
+    title: 'Incidental\nReport',
+    icon: incidentReportImg,
+    category: 'Security',
+  },
+  {
+    id: 'inspection',
+    title: 'Inspection',
+    icon: inspectionImg,
+    category: 'Operations',
+  },
+  {
+    id: 'in-out-goods',
+    title: 'In / Out\nGoods',
+    icon: inOutGoodsImg,
+    category: 'Operations',
+  },
+  {
+    id: 'package',
+    title: 'Package',
+    icon: packageImg,
+    category: 'Security',
+  },
+];
+
+// Categorized Full Features for Security "All Menu" Bottom Sheet
+export const SECURITY_CATEGORIZED_FEATURES = [
+  {
+    id: 'security-operations',
+    name: 'Security & Guard Operations',
+    items: [
+      { id: 'attendance', title: 'Work\nAttendance', icon: attendanceImg, desc: 'Staff shift clock-in & attendance tracking' },
+      { id: 'visitor-information', title: 'Visitor\nInformation', icon: visitorInformationImg, desc: 'Guest logs & digital visitor pass QR' },
+      { id: 'incident-report', title: 'Incidental\nReport', icon: incidentReportImg, desc: 'Emergency reports & incident logging' },
+      { id: 'inspection', title: 'Inspection', icon: inspectionImg, desc: 'Patrol & perimeter inspection check' },
+      { id: 'in-out-goods', title: 'In / Out\nGoods', icon: inOutGoodsImg, desc: 'Material & goods movement tracking' },
+      { id: 'package', title: 'Package', icon: packageImg, desc: 'Resident package & parcel receipt' },
+    ],
+  },
+];
+
 export const CATEGORIZED_FEATURES = BM_CATEGORIZED_FEATURES;
 
 export const QuickMenuGrid = ({ onMenuItemClick, isTenant = false, isEngineering = false, isHousekeeping = false, isSecurity = false, roleCode }) => {
@@ -420,8 +477,8 @@ export const QuickMenuGrid = ({ onMenuItemClick, isTenant = false, isEngineering
   let currentCategories = BM_CATEGORIZED_FEATURES;
 
   if (effectiveIsSec) {
-    currentMenuItems = [];
-    currentCategories = [];
+    currentMenuItems = SECURITY_DASHBOARD_MENU_ITEMS;
+    currentCategories = SECURITY_CATEGORIZED_FEATURES;
   } else if (effectiveIsHk) {
     currentMenuItems = HOUSEKEEPING_DASHBOARD_MENU_ITEMS;
     currentCategories = HOUSEKEEPING_CATEGORIZED_FEATURES;

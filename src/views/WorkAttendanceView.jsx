@@ -170,14 +170,42 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // 7 Days Attendance History Mock Data
+  const roleCode = user?.roleCode || 'BM';
+  const isEng = roleCode === 'ENG';
+  const isHk = roleCode === 'HK';
+  const isSec = roleCode === 'SEC';
+
+  const userName = user?.name || (isEng ? 'Dedi Kurniawan' : isHk ? 'Rina Melati' : isSec ? 'Bambang Wijaya' : 'Ahmad Pratama');
+  const userDept = user?.unitOrDept || (isEng ? 'Engineering Division' : isHk ? 'Housekeeping Division' : isSec ? 'Security Division' : 'Building Management');
+  const empId = isEng ? 'ENG-8821' : isHk ? 'HK-4419' : isSec ? 'SEC-1092' : 'BM-0012';
+
+  const roleBadgeBg = isEng ? '#FFEDD5' : isHk ? '#FEF3C7' : isSec ? '#FEE2E2' : '#F3E8FF';
+  const roleBadgeColor = isEng ? '#C2410C' : isHk ? '#B45309' : isSec ? '#B91C1C' : '#6B21A8';
+
+  const activeShiftTitle = isEng
+    ? 'Shift Pagi (08:00 - 17:00)'
+    : isHk
+    ? 'Shift Pagi (06:30 - 15:30)'
+    : isSec
+    ? 'Shift Pagi (07:00 - 19:00)'
+    : 'Shift Normal (08:00 - 17:00)';
+
+  const activeLocationTitle = isEng
+    ? 'Workshop Engineering • Radius 15m'
+    : isHk
+    ? 'Janitor Hub & Koridor • Radius 15m'
+    : isSec
+    ? 'Pos Gerbang Utama • Radius 15m'
+    : 'Lobby Tower A • Radius 15m';
+
+  // 7 Days Attendance History Mock Data adapted per role
   const last7DaysHistory = [
     {
       id: 'att-1',
       date: 'Senin, 28 Sep 2026',
       dateEn: 'Monday, 28 Sep 2026',
       isToday: true,
-      shift: 'Shift Pagi (08:00 - 17:00)',
+      shift: activeShiftTitle,
       clockIn: clockInTime || '08:14',
       clockOut: clockOutTime || (isClockedIn ? 'Sedang Bekerja...' : '--:--'),
       duration: isClockedIn ? elapsedDuration : clockOutTime ? '08j 50m' : '-',
@@ -185,8 +213,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id' ? (isClockedIn ? 'Hadir Aktif' : clockOutTime ? 'Selesai' : 'Belum Absen') : (isClockedIn ? 'Active In' : clockOutTime ? 'Completed' : 'Pending'),
       statusColor: '#16A34A',
       statusBg: '#DCFCE7',
-      location: 'Lobby Tower A • Radius 15m',
-      note: 'Presensi harian via Mobile App',
+      location: activeLocationTitle,
+      note: isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola',
     },
     {
       id: 'att-2',
@@ -209,7 +237,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       date: 'Sabtu, 26 Sep 2026',
       dateEn: 'Saturday, 26 Sep 2026',
       isToday: false,
-      shift: 'Shift Pagi (08:00 - 17:00)',
+      shift: activeShiftTitle,
       clockIn: '07:58',
       clockOut: '17:05',
       duration: '09j 07m',
@@ -217,15 +245,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
       statusColor: '#2563EB',
       statusBg: '#DBEAFE',
-      location: 'Pintu Masuk Staff • Radius 12m',
-      note: 'Pekerjaan perbaikan lift lantai 10',
+      location: isEng ? 'Ruang Panel B1 • Radius 12m' : isHk ? 'Koridor Lantai 5-10 • Radius 12m' : isSec ? 'Pos Timur • Radius 12m' : 'Pintu Masuk Staff • Radius 12m',
+      note: isEng ? 'Pekerjaan perbaikan lift lantai 10' : isHk ? 'General cleaning koridor' : isSec ? 'Patroli perimeter malam & CCTV' : 'Briefing vendor maintenance',
     },
     {
       id: 'att-4',
       date: 'Jumat, 25 Sep 2026',
       dateEn: 'Friday, 25 Sep 2026',
       isToday: false,
-      shift: 'Shift Pagi (08:00 - 17:00)',
+      shift: activeShiftTitle,
       clockIn: '07:50',
       clockOut: '17:00',
       duration: '09j 10m',
@@ -233,15 +261,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
       statusColor: '#2563EB',
       statusBg: '#DBEAFE',
-      location: 'Engineering Room B1 • Radius 8m',
-      note: 'Pemeliharaan genset rutin mingguan',
+      location: isEng ? 'Engineering Room B1 • Radius 8m' : isHk ? 'Area Kolam & Gym • Radius 8m' : isSec ? 'Screening Tamu Basement • Radius 8m' : 'Kantor Pengelola • Radius 8m',
+      note: isEng ? 'Pemeliharaan genset rutin mingguan' : isHk ? 'Sanitasi fasilitas fitness' : isSec ? 'Screening tamu VIP & akses basement' : 'Audit kepuasan tenant mingguan',
     },
     {
       id: 'att-5',
       date: 'Kamis, 24 Sep 2026',
       dateEn: 'Thursday, 24 Sep 2026',
       isToday: false,
-      shift: 'Shift Pagi (08:00 - 17:00)',
+      shift: activeShiftTitle,
       clockIn: '08:18',
       clockOut: '17:30',
       duration: '09j 12m',
@@ -249,7 +277,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id' ? 'Terlambat (18m)' : 'Late (18m)',
       statusColor: '#D97706',
       statusBg: '#FEF3C7',
-      location: 'Lobby Tower A • Radius 18m',
+      location: isEng ? 'Ruang Chiller • Radius 18m' : isHk ? 'Lobby Barat • Radius 18m' : isSec ? 'Pos Barat • Radius 18m' : 'Lobby Tower A • Radius 18m',
       note: 'Macet jalur tol lingkar luar',
     },
     {
@@ -257,7 +285,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       date: 'Rabu, 23 Sep 2026',
       dateEn: 'Wednesday, 23 Sep 2026',
       isToday: false,
-      shift: 'Shift Pagi (08:00 - 17:00)',
+      shift: activeShiftTitle,
       clockIn: '08:02',
       clockOut: '17:15',
       duration: '09j 13m',
@@ -265,15 +293,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
       statusColor: '#2563EB',
       statusBg: '#DBEAFE',
-      location: 'Lobby Tower A • Radius 10m',
-      note: 'Inspeksi pompa air & panel STP',
+      location: isEng ? 'Ruang STP • Radius 10m' : isHk ? 'Void Lobby • Radius 10m' : isSec ? 'Pintu Darurat • Radius 10m' : 'Lobby Tower A • Radius 10m',
+      note: isEng ? 'Inspeksi pompa air & panel STP' : isHk ? 'Pembersihan kaca void lobby' : isSec ? 'Inspeksi hydrant & pintu darurat' : 'Inspeksi operasional gedung',
     },
     {
       id: 'att-7',
       date: 'Selasa, 22 Sep 2026',
       dateEn: 'Tuesday, 22 Sep 2026',
       isToday: false,
-      shift: 'Shift Pagi (08:00 - 17:00)',
+      shift: activeShiftTitle,
       clockIn: '07:55',
       clockOut: '17:04',
       duration: '09j 09m',
@@ -281,8 +309,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
       statusColor: '#2563EB',
       statusBg: '#DBEAFE',
-      location: 'Lobby Tower A • Radius 14m',
-      note: 'Perbaikan instalasi listrik unit 14B',
+      location: isEng ? 'Unit 14B • Radius 14m' : isHk ? 'Linen Room • Radius 14m' : isSec ? 'Gerbang Logistik • Radius 14m' : 'Lobby Tower A • Radius 14m',
+      note: isEng ? 'Perbaikan instalasi listrik unit 14B' : isHk ? 'Restock chemical & inventory' : isSec ? 'Pengawalan bongkar muatan logistik' : 'Review laporan keuangan IPL',
     },
   ];
 
@@ -359,7 +387,45 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             gap: '16px',
           }}
         >
-          {/* Top Live Time & Shift Row */}
+          {/* Employee Profile Header Row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #F1F5F9', paddingBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  backgroundColor: roleBadgeBg,
+                  color: roleBadgeColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '0.875rem',
+                }}
+              >
+                {userName.charAt(0)}
+              </div>
+              <div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#0F172A' }}>{userName}</div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>{userDept} • #{empId}</div>
+              </div>
+            </div>
+            <span
+              style={{
+                fontSize: '0.625rem',
+                fontWeight: 800,
+                padding: '3px 8px',
+                borderRadius: '6px',
+                backgroundColor: roleBadgeBg,
+                color: roleBadgeColor,
+              }}
+            >
+              {roleCode}
+            </span>
+          </div>
+
+          {/* Live Time & Shift Row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div
@@ -400,7 +466,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               }}
             >
               <Clock size={13} weight="bold" />
-              <span>Shift Pagi (08:00 - 17:00)</span>
+              <span>{activeShiftTitle}</span>
             </div>
           </div>
 
@@ -1401,13 +1467,55 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               {/* Shift Roster List */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {[
-                  { day: 'Senin, 28 Sep', shift: 'Shift Pagi', time: '08:00 - 17:00', role: 'Engineering On-Duty', status: 'Hari Ini' },
-                  { day: 'Selasa, 29 Sep', shift: 'Shift Pagi', time: '08:00 - 17:00', role: 'Engineering On-Duty', status: 'Besok' },
-                  { day: 'Rabu, 30 Sep', shift: 'Shift Siang', time: '13:00 - 22:00', role: 'Engineering Standby', status: 'Mendatang' },
-                  { day: 'Kamis, 01 Okt', shift: 'Shift Siang', time: '13:00 - 22:00', role: 'Engineering Standby', status: 'Mendatang' },
-                  { day: 'Jumat, 02 Okt', shift: 'Shift Malam', time: '22:00 - 07:00', role: 'Night Patrol & System Check', status: 'Mendatang' },
-                  { day: 'Sabtu, 03 Okt', shift: 'Libur Reguler', time: '-', role: 'Off Duty', status: 'Libur' },
-                  { day: 'Minggu, 04 Okt', shift: 'Libur Reguler', time: '-', role: 'Off Duty', status: 'Libur' },
+                  {
+                    day: 'Senin, 28 Sep',
+                    shift: isSec ? 'Shift Pagi' : isHk ? 'Shift Pagi' : isEng ? 'Shift Pagi' : 'Shift Normal',
+                    time: isSec ? '07:00 - 19:00' : isHk ? '06:30 - 15:30' : '08:00 - 17:00',
+                    role: isSec ? 'Pos Gerbang Utama' : isHk ? 'Lobby & Public Area' : isEng ? 'Engineering On-Duty' : 'Office On-Duty',
+                    status: 'Hari Ini',
+                  },
+                  {
+                    day: 'Selasa, 29 Sep',
+                    shift: isSec ? 'Shift Pagi' : isHk ? 'Shift Pagi' : isEng ? 'Shift Pagi' : 'Shift Normal',
+                    time: isSec ? '07:00 - 19:00' : isHk ? '06:30 - 15:30' : '08:00 - 17:00',
+                    role: isSec ? 'Patroli Basement & CCTV' : isHk ? 'Floor Corridor Cleaning' : isEng ? 'MEP & Genset Check' : 'Tenant Supervision',
+                    status: 'Besok',
+                  },
+                  {
+                    day: 'Rabu, 30 Sep',
+                    shift: isSec ? 'Shift Malam' : isHk ? 'Shift Siang' : isEng ? 'Shift Siang' : 'Shift Normal',
+                    time: isSec ? '19:00 - 07:00' : isHk ? '13:00 - 21:00' : isEng ? '13:00 - 22:00' : '08:00 - 17:00',
+                    role: isSec ? 'Night Guard & Gate' : isHk ? 'Sanitasi Kolam & Gym' : isEng ? 'Engineering Standby' : 'Executive Duty',
+                    status: 'Mendatang',
+                  },
+                  {
+                    day: 'Kamis, 01 Okt',
+                    shift: isSec ? 'Shift Malam' : isHk ? 'Shift Siang' : isEng ? 'Shift Siang' : 'Shift Normal',
+                    time: isSec ? '19:00 - 07:00' : isHk ? '13:00 - 21:00' : isEng ? '13:00 - 22:00' : '08:00 - 17:00',
+                    role: isSec ? 'Night Perimeter Patrol' : isHk ? 'Deep Cleaning Koridor' : isEng ? 'Engineering Standby' : 'Supervision & Audit',
+                    status: 'Mendatang',
+                  },
+                  {
+                    day: 'Jumat, 02 Okt',
+                    shift: isSec ? 'Libur Reguler' : isHk ? 'Shift Pagi' : isEng ? 'Shift Malam' : 'Shift Normal',
+                    time: isSec ? '-' : isHk ? '06:30 - 15:30' : isEng ? '22:00 - 07:00' : '08:00 - 17:00',
+                    role: isSec ? 'Off Duty' : isHk ? 'Restroom & Waste Mgmt' : isEng ? 'Night System Check' : 'Management Office',
+                    status: isSec ? 'Libur' : 'Mendatang',
+                  },
+                  {
+                    day: 'Sabtu, 03 Okt',
+                    shift: isSec ? 'Shift Pagi' : 'Libur Reguler',
+                    time: isSec ? '07:00 - 19:00' : '-',
+                    role: isSec ? 'Weekend Guard' : 'Off Duty',
+                    status: isSec ? 'Mendatang' : 'Libur',
+                  },
+                  {
+                    day: 'Minggu, 04 Okt',
+                    shift: 'Libur Reguler',
+                    time: '-',
+                    role: 'Off Duty',
+                    status: 'Libur',
+                  },
                 ].map((s, idx) => (
                   <div
                     key={idx}
@@ -1779,32 +1887,36 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 }}
               >
                 <div style={{ fontSize: '0.6875rem', color: '#93C5FD', fontWeight: 600 }}>Total Gaji Bersih (Take Home Pay)</div>
-                <div style={{ fontSize: '1.375rem', fontWeight: 800, letterSpacing: '-0.3px' }}>Rp 6.850.000</div>
-                <div style={{ fontSize: '0.625rem', color: '#DBEAFE', marginTop: '4px' }}>Periode: 01 Sep 2026 - 30 Sep 2026 • BCA ***-4910</div>
+                <div style={{ fontSize: '1.375rem', fontWeight: 800, letterSpacing: '-0.3px' }}>
+                  {isEng ? 'Rp 6.850.000' : isSec ? 'Rp 6.150.000' : isHk ? 'Rp 5.650.000' : 'Rp 10.450.000'}
+                </div>
+                <div style={{ fontSize: '0.625rem', color: '#DBEAFE', marginTop: '4px' }}>
+                  {userName} ({userDept}) • Periode: 01 Sep 2026 - 30 Sep 2026
+                </div>
               </div>
 
               {/* Payslip Items */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.75rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#334155' }}>
                   <span>Gaji Pokok</span>
-                  <span style={{ fontWeight: 700 }}>Rp 5.200.000</span>
+                  <span style={{ fontWeight: 700 }}>{isEng ? 'Rp 5.200.000' : isSec ? 'Rp 4.600.000' : isHk ? 'Rp 4.300.000' : 'Rp 8.000.000'}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#334155' }}>
-                  <span>Tunjangan Kehadiran Penuh</span>
-                  <span style={{ fontWeight: 700 }}>Rp 850.000</span>
+                  <span>Tunjangan Kehadiran & Shift</span>
+                  <span style={{ fontWeight: 700 }}>{isEng ? 'Rp 850.000' : isSec ? 'Rp 900.000' : isHk ? 'Rp 800.000' : 'Rp 2.000.000'}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#334155' }}>
-                  <span>Uang Makan & Transport</span>
-                  <span style={{ fontWeight: 700 }}>Rp 900.000</span>
+                  <span>Uang Makan & Operasional</span>
+                  <span style={{ fontWeight: 700 }}>{isEng ? 'Rp 900.000' : isSec ? 'Rp 850.000' : isHk ? 'Rp 750.000' : 'Rp 1.000.000'}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#334155' }}>
-                  <span>Insentif On-Call & Shift</span>
-                  <span style={{ fontWeight: 700 }}>Rp 350.000</span>
+                  <span>Insentif Roster / Jabatan</span>
+                  <span style={{ fontWeight: 700 }}>{isEng ? 'Rp 350.000' : isSec ? 'Rp 250.000' : isHk ? 'Rp 200.000' : 'Rp 0'}</span>
                 </div>
                 <div style={{ height: '1px', backgroundColor: '#E2E8F0', margin: '4px 0' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: '#DC2626' }}>
                   <span>Potongan BPJS Ketenagakerjaan & Kes</span>
-                  <span style={{ fontWeight: 700 }}>- Rp 450.000</span>
+                  <span style={{ fontWeight: 700 }}>{isEng ? '- Rp 450.000' : isSec ? '- Rp 450.000' : isHk ? '- Rp 400.000' : '- Rp 550.000'}</span>
                 </div>
               </div>
             </div>
