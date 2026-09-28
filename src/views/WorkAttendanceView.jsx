@@ -2054,7 +2054,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               {/* Mini Map Preview Card (Matching Screenshot Reference) */}
               <div
                 style={{
-                  height: '140px',
+                  height: '185px',
                   borderRadius: '16px',
                   overflow: 'hidden',
                   position: 'relative',
@@ -2067,22 +2067,24 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <svg
                   width="100%"
                   height="100%"
-                  viewBox="0 0 400 160"
+                  viewBox="0 0 400 200"
                   preserveAspectRatio="xMidYMid slice"
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                 >
-                  <rect width="400" height="160" fill="#F8FAFC" />
-                  <path d="M0,0 L120,0 L100,60 L0,50 Z" fill="#DCFCE7" opacity="0.8" />
-                  <path d="M280,0 L400,0 L400,70 L300,50 Z" fill="#F0FDF4" opacity="0.9" />
-                  <path d="M-20,60 Q180,80 420,70" stroke="#FFFFFF" strokeWidth="22" fill="none" />
-                  <path d="M-20,60 Q180,80 420,70" stroke="#E2E8F0" strokeWidth="24" fill="none" style={{ zIndex: -1 }} />
-                  <path d="M200,-20 Q210,80 190,180" stroke="#FFFFFF" strokeWidth="24" fill="none" />
-                  <path d="M200,-20 Q210,80 190,180" stroke="#E2E8F0" strokeWidth="26" fill="none" />
-                  <path d="M40,110 Q180,100 360,110" stroke="#FFFFFF" strokeWidth="16" fill="none" />
+                  <rect width="400" height="200" fill="#F8FAFC" />
+                  <path d="M0,0 L140,0 L110,80 L0,65 Z" fill="#DCFCE7" opacity="0.8" />
+                  <path d="M260,0 L400,0 L400,90 L280,65 Z" fill="#F0FDF4" opacity="0.9" />
+                  <path d="M0,150 L120,130 L100,200 L0,200 Z" fill="#F0FDF4" opacity="0.75" />
+                  <path d="M280,140 L400,160 L400,200 L260,200 Z" fill="#DCFCE7" opacity="0.75" />
+                  <path d="M-20,75 Q180,100 420,85" stroke="#FFFFFF" strokeWidth="24" fill="none" />
+                  <path d="M-20,75 Q180,100 420,85" stroke="#E2E8F0" strokeWidth="26" fill="none" style={{ zIndex: -1 }} />
+                  <path d="M200,-20 Q210,100 190,220" stroke="#FFFFFF" strokeWidth="26" fill="none" />
+                  <path d="M200,-20 Q210,100 190,220" stroke="#E2E8F0" strokeWidth="28" fill="none" />
+                  <path d="M40,140 Q180,130 360,140" stroke="#FFFFFF" strokeWidth="18" fill="none" />
                   <circle
                     cx="200"
-                    cy="90"
-                    r="55"
+                    cy="100"
+                    r="65"
                     fill="rgba(9, 178, 255, 0.16)"
                     stroke="#09B2FF"
                     strokeWidth="2"
@@ -2094,8 +2096,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <div
                   style={{
                     position: 'absolute',
-                    top: '10px',
-                    right: '10px',
+                    top: '12px',
+                    right: '12px',
                     backgroundColor: 'rgba(255, 255, 255, 0.92)',
                     border: '1px solid #DCFCE7',
                     padding: '4px 10px',
@@ -2120,7 +2122,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   style={{
                     position: 'absolute',
                     left: '200px',
-                    top: '90px',
+                    top: '100px',
                     transform: 'translate(-50%, -50%)',
                     display: 'flex',
                     flexDirection: 'column',
