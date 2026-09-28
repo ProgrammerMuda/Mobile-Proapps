@@ -395,20 +395,20 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div
                 style={{
-                  width: '10px',
-                  height: '10px',
+                  width: '8px',
+                  height: '8px',
                   borderRadius: '50%',
                   backgroundColor: '#16A34A',
-                  boxShadow: '0 0 0 3px rgba(22, 163, 74, 0.25)',
+                  boxShadow: '0 0 0 2.5px rgba(22, 163, 74, 0.25)',
                   animation: 'pulse 1.5s infinite',
                 }}
               />
               <span
                 style={{
-                  fontSize: '1.25rem',
+                  fontSize: '1.0625rem',
                   fontWeight: 800,
                   color: '#0F172A',
-                  letterSpacing: '-0.3px',
+                  letterSpacing: '-0.2px',
                   fontVariantNumeric: 'tabular-nums',
                 }}
               >
