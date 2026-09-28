@@ -860,22 +860,28 @@ export const MonthlyAttendanceDetailView = ({
             const dateDisplay = `${dayName}, ${log.dayNumber} ${monthStr} ${selectedYear}`;
             const isLate = log.status === 'late' || log.inStatus === 'LATE' || log.outStatus === 'EARLY_OUT';
             const isAlpha = log.status === 'alpha';
+            const isOff = log.status === 'leave' || log.status === 'off' || log.status === 'LIBUR';
 
             let cardBg = '#FFFFFF';
             let cardBorder = '1px solid #E2E8F0';
             let tileBg = '#F8FAFC';
             let tileBorder = '1px solid #F1F5F9';
 
-            if (isLate) {
-              cardBg = '#FFFBEB';
-              cardBorder = '1px solid #FDE68A';
-              tileBg = '#FFFFFF';
-              tileBorder = '1px solid #FEF3C7';
-            } else if (isAlpha) {
+            if (isAlpha) {
               cardBg = '#FEF2F2';
               cardBorder = '1px solid #FECACA';
               tileBg = '#FFFFFF';
               tileBorder = '1px solid #FEE2E2';
+            } else if (isLate) {
+              cardBg = '#FFFBEB';
+              cardBorder = '1px solid #FDE68A';
+              tileBg = '#FFFFFF';
+              tileBorder = '1px solid #FEF3C7';
+            } else if (isOff) {
+              cardBg = '#F1F5F9';
+              cardBorder = '1px solid #E2E8F0';
+              tileBg = '#FFFFFF';
+              tileBorder = '1px solid #E2E8F0';
             }
 
             return (

@@ -1393,6 +1393,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             {filteredHistory.map((item) => {
               const isLate = item.status === 'TERLAMBAT' || item.inStatus === 'LATE' || item.outStatus === 'EARLY_OUT';
               const isAlpha = item.status === 'ALPHA';
+              const isOff = item.status === 'LIBUR';
 
               let cardBg = '#FFFFFF';
               let cardBorder = item.isToday ? '1.5px solid #2563EB' : '1px solid #E2E8F0';
@@ -1409,6 +1410,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 cardBorder = item.isToday ? '1.5px solid #D97706' : '1px solid #FDE68A';
                 tileBg = '#FFFFFF';
                 tileBorder = '1px solid #FEF3C7';
+              } else if (isOff) {
+                cardBg = '#F1F5F9';
+                cardBorder = '1px solid #E2E8F0';
+                tileBg = '#FFFFFF';
+                tileBorder = '1px solid #E2E8F0';
               }
 
               return (
@@ -1485,11 +1491,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       </div>
 
                       {/* Footer: Schedule & Duration */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                        <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
                           {item.shift}
                         </span>
-                        <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
+                        <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#334155', flexShrink: 0 }}>
                           {language === 'id' ? `Durasi: ${item.duration}` : `Duration: ${item.duration}`}
                         </span>
                       </div>
@@ -1497,7 +1503,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   ) : (
                     <div
                       style={{
-                        backgroundColor: '#F8FAFC',
+                        backgroundColor: '#FFFFFF',
                         borderRadius: '10px',
                         padding: '10px',
                         display: 'flex',
@@ -1505,6 +1511,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         gap: '8px',
                         color: '#64748B',
                         fontSize: '0.75rem',
+                        border: '1px solid #E2E8F0',
                       }}
                     >
                       <CalendarBlank size={16} color="#64748B" />
