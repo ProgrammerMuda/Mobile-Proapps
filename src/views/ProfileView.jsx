@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLanguage } from '../context/LanguageContext';
 import avatarUserImg from '../assets/avatar-user.jpg';
-import logoutIllustrationImg from '../assets/logout-illustration.jpg';
+import { emptyStateQuestion } from '../assets/illustrations';
 import { DEMO_ACCOUNTS } from '../models/accounts';
 import {
   UserCircle,
@@ -1810,30 +1810,24 @@ export const ProfileView = ({
                     }}
                   />
 
-                  {/* Thinking Character Illustration (Full width matching sheet padding) */}
+                  {/* Confirmation Character Illustration (Full width matching sheet padding) */}
                   <div
                     style={{
                       width: '100%',
-                      height: '210px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      marginBottom: '16px',
-                      overflow: 'hidden',
-                      borderRadius: '16px',
-                      backgroundColor: '#E0F2FE',
+                      margin: '4px 0 12px 0',
                     }}
                   >
                     <img
-                      src={logoutIllustrationImg}
+                      src={emptyStateQuestion}
                       alt="Logout Confirmation"
                       style={{
                         width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center 12%',
+                        maxHeight: '210px',
+                        objectFit: 'contain',
                         display: 'block',
-                        borderRadius: '16px',
                       }}
                     />
                   </div>
