@@ -2362,8 +2362,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 padding: '16px 20px 32px 20px',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                gap: '12px',
+                gap: '14px',
                 animation: 'slideUp 0.25s ease-out',
                 boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.16)',
                 maxHeight: '90vh',
@@ -2371,7 +2370,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               }}
             >
               {/* Drag Handle Bar */}
-              <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginBottom: '-4px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-4px' }}>
                 <div
                   style={{
                     width: '36px',
@@ -2382,72 +2381,324 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 />
               </div>
 
-              {/* Close Button Row */}
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '-4px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsOutOfRadiusSheetOpen(false)}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    padding: '4px',
-                    cursor: 'pointer',
-                    color: 'var(--color-text-secondary, #64748B)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <X size={20} weight="bold" />
-                </button>
-              </div>
-
-              {/* 3D Illustration: Out of Range Location */}
-              <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '4px 0 6px 0' }}>
-                <img
-                  src={outOfRangeLocation}
-                  alt="Outside Radius"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '220px',
-                    objectFit: 'contain',
-                    display: 'block',
-                  }}
-                />
-              </div>
-
-              {/* Title & Subtitle */}
-              <div style={{ textAlign: 'center', padding: '0 8px' }}>
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)', margin: 0 }}>
+              {/* Header (Clean, No X button as requested) */}
+              <div>
+                <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)', margin: 0 }}>
                   {language === 'id' ? 'Di Luar Radius Presensi' : 'Outside Attendance Radius'}
                 </h3>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary, #64748B)', margin: '6px 0 0 0', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary, #64748B)', margin: '4px 0 0 0' }}>
                   {language === 'id'
-                    ? `Anda saat ini terdeteksi berada di luar jangkauan radius presensi (${checkInSnapshot?.location || baseLocationName}). Silakan mendekat ke lokasi kerja untuk melakukan absensi.`
-                    : `You are currently outside the designated workplace presence radius (${checkInSnapshot?.location || baseLocationName}). Please move closer to the radius to clock in.`}
+                    ? 'Posisi Anda saat ini berada di luar batas area radius kerja'
+                    : 'Your current location is outside the workplace radius boundary'}
                 </p>
               </div>
 
-              {/* Distance Warning Card */}
+              {/* Mini Map Preview Card with Out of Radius Marker */}
+              <div
+                style={{
+                  height: '185px',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid var(--color-border-default, #E5E7EB)',
+                  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.02)',
+                }}
+              >
+                {/* SVG Vector Map */}
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 400 200"
+                  preserveAspectRatio="xMidYMid slice"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                >
+                  <rect width="400" height="200" fill="#F8FAFC" />
+                  <path d="M0,0 L140,0 L110,80 L0,65 Z" fill="#DCFCE7" opacity="0.8" />
+                  <path d="M260,0 L400,0 L400,90 L280,65 Z" fill="#F0FDF4" opacity="0.9" />
+                  <path d="M0,150 L120,130 L100,200 L0,200 Z" fill="#F0FDF4" opacity="0.75" />
+                  <path d="M280,140 L400,160 L400,200 L260,200 Z" fill="#DCFCE7" opacity="0.75" />
+                  <path d="M-20,75 Q180,100 420,85" stroke="#FFFFFF" strokeWidth="24" fill="none" />
+                  <path d="M-20,75 Q180,100 420,85" stroke="#E2E8F0" strokeWidth="26" fill="none" />
+                  <path d="M200,-20 Q210,100 190,220" stroke="#FFFFFF" strokeWidth="26" fill="none" />
+                  <path d="M200,-20 Q210,100 190,220" stroke="#E2E8F0" strokeWidth="28" fill="none" />
+                  <path d="M40,140 Q180,130 360,140" stroke="#FFFFFF" strokeWidth="18" fill="none" />
+
+                  {/* Workplace Radius Circle (15m radius) */}
+                  <circle
+                    cx="135"
+                    cy="120"
+                    r="48"
+                    fill="rgba(9, 178, 255, 0.15)"
+                    stroke="#09B2FF"
+                    strokeWidth="2"
+                    strokeDasharray="4 2"
+                  />
+
+                  {/* Dotted Connection Line between office and user */}
+                  <line
+                    x1="135"
+                    y1="120"
+                    x2="295"
+                    y2="55"
+                    stroke="#EF4444"
+                    strokeWidth="2"
+                    strokeDasharray="4 3"
+                  />
+                </svg>
+
+                {/* Office / Workplace Pin at Center of Radius */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '135px',
+                    top: '120px',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    zIndex: 3,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--color-primary, #053079)',
+                      border: '2px solid #FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 6px rgba(5, 48, 121, 0.4)',
+                    }}
+                  >
+                    <Buildings size={12} weight="bold" color="#FFFFFF" />
+                  </div>
+                </div>
+
+                {/* User Pin Outside Radius (Red / Warning) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '295px',
+                    top: '55px',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    zIndex: 4,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: '#DC2626',
+                      border: '2.5px solid #FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(220, 38, 38, 0.5)',
+                      position: 'relative',
+                    }}
+                  >
+                    <UserCheck size={14} weight="bold" color="#FFFFFF" />
+                  </div>
+                </div>
+
+                {/* Floating Distance Badge on Map */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                    backgroundColor: 'rgba(220, 38, 38, 0.92)',
+                    color: '#FFFFFF',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    fontSize: '0.6875rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backdropFilter: 'blur(4px)',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                  }}
+                >
+                  <WarningCircle size={13} weight="fill" />
+                  <span>{language === 'id' ? 'Di Luar Radius (~125m)' : 'Out of Radius (~125m)'}</span>
+                </div>
+              </div>
+
+              {/* Grid Cards (Waktu Masuk & Foto Selfie) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {/* Waktu Presensi */}
+                <div
+                  style={{
+                    backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                    border: '1px solid var(--color-border-default, #E5E7EB)',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '2px' }}>
+                      {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Waktu Masuk' : 'Clock In') : (language === 'id' ? 'Waktu Pulang' : 'Clock Out')}
+                    </div>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
+                      {checkInSnapshot?.timeShort || '08:14'} WIB
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: 'var(--color-selected-background, #EAF7FF)',
+                      border: '1px solid #BAE6FD',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--color-primary, #053079)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {actionType === 'CLOCK_IN' ? (
+                      <SignIn size={16} weight="bold" color="var(--color-primary, #053079)" />
+                    ) : (
+                      <SignOut size={16} weight="bold" color="var(--color-primary, #053079)" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Foto Selfie */}
+                <div
+                  style={{
+                    backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                    border: '1px solid var(--color-border-default, #E5E7EB)',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '2px' }}>
+                      {language === 'id' ? 'Foto Selfie' : 'Selfie'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsPreviewPhotoOpen(true)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        color: 'var(--color-secondary, #09B2FF)',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      {language === 'id' ? 'Lihat Foto' : 'See Photo'}
+                    </button>
+                  </div>
+                  <div
+                    onClick={() => setIsPreviewPhotoOpen(true)}
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '6px',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      border: '1.5px solid var(--color-secondary, #09B2FF)',
+                      backgroundColor: 'var(--color-primary, #053079)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {checkInSnapshot?.photo && checkInSnapshot.photo !== 'simulated_photo' ? (
+                      <img
+                        src={checkInSnapshot.photo}
+                        alt="Thumbnail"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <UserCheck size={16} color="#FFFFFF" weight="bold" />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Titik Lokasi & Koordinat */}
+              <div
+                style={{
+                  backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                  border: '1px solid var(--color-border-default, #E5E7EB)',
+                  borderRadius: '14px',
+                  padding: '10px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div style={{ flex: 1, paddingRight: '8px' }}>
+                  <div style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '2px' }}>
+                    {language === 'id' ? 'Titik Lokasi & Koordinat' : 'Location & Coordinates'}
+                  </div>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
+                    {checkInSnapshot?.location || baseLocationName}
+                  </div>
+                  <div style={{ fontSize: '0.625rem', color: 'var(--color-text-secondary, #64748B)', fontFamily: 'monospace', marginTop: '2px' }}>
+                    Lat: {checkInSnapshot?.coords?.lat || userCoords.lat}, Long: {checkInSnapshot?.coords?.lng || userCoords.lng}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    backgroundColor: '#FEF2F2',
+                    border: '1px solid #FECACA',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#DC2626',
+                    flexShrink: 0,
+                  }}
+                >
+                  <MapPin size={18} weight="fill" color="#DC2626" />
+                </div>
+              </div>
+
+              {/* Distance Warning Card (Detected Distance & Max allowed radius) */}
               <div
                 style={{
                   width: '100%',
                   backgroundColor: '#FEF2F2',
                   border: '1px solid #FECACA',
                   borderRadius: '14px',
-                  padding: '10px 14px',
+                  padding: '12px 14px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
-                  marginTop: '4px',
+                  gap: '12px',
+                  boxSizing: 'border-box',
                 }}
               >
                 <div
                   style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '8px',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '10px',
                     backgroundColor: '#FEE2E2',
                     display: 'flex',
                     alignItems: 'center',
@@ -2456,67 +2707,16 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     flexShrink: 0,
                   }}
                 >
-                  <WarningCircle size={18} weight="fill" />
+                  <WarningCircle size={20} weight="fill" />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#991B1B' }}>
-                    {language === 'id' ? 'Jarak Terdeteksi: ~125 meter' : 'Detected Distance: ~125 meters'}
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#991B1B' }}>
+                    Detected Distance: ~125 meters
                   </div>
-                  <div style={{ fontSize: '0.625rem', color: '#B91C1C' }}>
-                    {language === 'id' ? 'Maksimal radius yang diizinkan: 15 meter' : 'Maximum allowed radius: 15 meters'}
+                  <div style={{ fontSize: '0.6875rem', color: '#B91C1C', marginTop: '2px' }}>
+                    Maximum allowed radius: 15 meters
                   </div>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '10px', width: '100%', marginTop: '6px' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsOutOfRadiusSheetOpen(false);
-                    setIsSelfieFullscreenOpen(true);
-                  }}
-                  style={{
-                    flex: 1,
-                    height: '46px',
-                    backgroundColor: 'var(--color-primary, #053079)',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    boxShadow: '0 4px 14px rgba(5, 48, 121, 0.25)',
-                  }}
-                >
-                  <ArrowsClockwise size={16} weight="bold" />
-                  <span>{language === 'id' ? 'Coba Lagi' : 'Try Again'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsOutOfRadiusSheetOpen(false)}
-                  style={{
-                    flex: 1,
-                    height: '46px',
-                    backgroundColor: '#F1F5F9',
-                    color: '#475569',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: '12px',
-                    fontSize: '0.875rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <span>{language === 'id' ? 'Tutup' : 'Close'}</span>
-                </button>
               </div>
             </div>
           </div>
