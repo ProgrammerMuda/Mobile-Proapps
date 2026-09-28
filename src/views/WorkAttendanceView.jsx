@@ -543,21 +543,21 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             {/* Shift Info Box */}
             <div
               style={{
-                backgroundColor: '#F8FAFC',
+                backgroundColor: '#EFF6FF',
                 borderRadius: '12px',
                 padding: '10px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                border: '1px solid #E2E8F0',
+                border: '1px solid #DBEAFE',
               }}
             >
-              <Clock size={18} weight="fill" color="#64748B" />
+              <Clock size={20} weight="fill" color="#2563EB" />
               <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B' }}>
+                <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#1E40AF' }}>
                   {activeShiftName}
                 </div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#0F172A', marginTop: '1px' }}>
+                <div style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#1E3A8A', marginTop: '1px' }}>
                   {activeShiftHours}
                 </div>
               </div>
