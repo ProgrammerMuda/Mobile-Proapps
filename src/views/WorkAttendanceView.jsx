@@ -85,22 +85,17 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
         >
           <CaretLeft size={24} weight="bold" />
         </button>
-        <div>
-          <h1
-            style={{
-              fontSize: '1.125rem',
-              fontWeight: 700,
-              margin: 0,
-              color: '#FFFFFF',
-              letterSpacing: '-0.2px',
-            }}
-          >
-            {language === 'id' ? 'Presensi Kerja' : 'Work Attendance'}
-          </h1>
-          <div style={{ fontSize: '0.6875rem', color: '#93C5FD', fontWeight: 500, marginTop: '1px' }}>
-            {language === 'id' ? 'Sistem Presensi Karyawan' : 'Employee Attendance'}
-          </div>
-        </div>
+        <h1
+          style={{
+            fontSize: '1.125rem',
+            fontWeight: 700,
+            margin: 0,
+            color: '#FFFFFF',
+            letterSpacing: '-0.2px',
+          }}
+        >
+          {language === 'id' ? 'Presensi Kerja' : 'Work Attendance'}
+        </h1>
       </div>
     </div>
   );
