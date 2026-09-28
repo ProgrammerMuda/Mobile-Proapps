@@ -206,6 +206,12 @@ export const BMDashboardView = ({ user, onLogout, onNavigateToOverview, onNaviga
             onMenuItemClick={(item) => {
               if (item.id === 'tenant-unit' && onNavigateMenu) {
                 onNavigateMenu('tenant-unit');
+              } else if ((item.id === 'attendance' || item.id === 'work-attendance') && onNavigateMenu) {
+                onNavigateMenu('attendance');
+              } else if (item.id === 'work-order' && onNavigateMenu) {
+                onNavigateMenu('work-order');
+              } else if (item.id === 'home-service' && onNavigateMenu) {
+                onNavigateMenu('home-service');
               } else {
                 alert(t('dashboard.openModule', { name: item.title }));
               }
