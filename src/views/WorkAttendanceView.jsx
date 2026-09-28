@@ -1108,10 +1108,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   onClick={() => setIsMethodSheetOpen(false)}
                   style={{
                     border: 'none',
-                    background: '#F1F5F9',
-                    borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
+                    background: 'transparent',
+                    padding: '4px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1120,7 +1118,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     flexShrink: 0,
                   }}
                 >
-                  <X size={18} weight="bold" />
+                  <X size={20} weight="bold" />
                 </button>
               </div>
 
@@ -1324,18 +1322,17 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   onClick={() => setIsActionModalOpen(false)}
                   style={{
                     border: 'none',
-                    background: '#F1F5F9',
-                    borderRadius: '50%',
-                    width: '32px',
-                    height: '32px',
+                    background: 'transparent',
+                    padding: '4px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
                     color: '#64748B',
+                    flexShrink: 0,
                   }}
                 >
-                  <X size={18} weight="bold" />
+                  <X size={20} weight="bold" />
                 </button>
               </div>
 
@@ -1775,9 +1772,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <button
                   type="button"
                   onClick={() => setIsShiftModalOpen(false)}
-                  style={{ border: 'none', background: '#F1F5F9', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ border: 'none', background: 'transparent', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B' }}
                 >
-                  <X size={16} weight="bold" />
+                  <X size={18} weight="bold" />
                 </button>
               </div>
 
@@ -1919,9 +1916,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     setIsPermissionModalOpen(false);
                     setPermSuccess(false);
                   }}
-                  style={{ border: 'none', background: '#F1F5F9', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ border: 'none', background: 'transparent', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B' }}
                 >
-                  <X size={16} weight="bold" />
+                  <X size={18} weight="bold" />
                 </button>
               </div>
 
@@ -2102,9 +2099,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <button
                   type="button"
                   onClick={() => setIsReportModalOpen(false)}
-                  style={{ border: 'none', background: '#F1F5F9', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ border: 'none', background: 'transparent', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B' }}
                 >
-                  <X size={16} weight="bold" />
+                  <X size={18} weight="bold" />
                 </button>
               </div>
 
@@ -2185,9 +2182,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <button
                   type="button"
                   onClick={() => setIsPayslipModalOpen(false)}
-                  style={{ border: 'none', background: '#F1F5F9', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ border: 'none', background: 'transparent', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B' }}
                 >
-                  <X size={16} weight="bold" />
+                  <X size={18} weight="bold" />
                 </button>
               </div>
 
