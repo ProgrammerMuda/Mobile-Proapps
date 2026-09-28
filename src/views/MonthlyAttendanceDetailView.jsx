@@ -43,6 +43,36 @@ const MONTH_NAMES_ID = [
   'Desember',
 ];
 
+const MONTH_SHORT = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const MONTH_SHORT_ID = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mei',
+  'Jun',
+  'Jul',
+  'Agu',
+  'Sep',
+  'Okt',
+  'Nov',
+  'Des',
+];
+
 const DAY_NAMES = [
   'Sunday',
   'Monday',
@@ -825,8 +855,9 @@ export const MonthlyAttendanceDetailView = ({
           </div>
         ) : (
           filteredLogs.map((log) => {
-            const monthStr = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
-            const dateDisplay = `${log.dayNumber} ${monthStr} ${selectedYear}`;
+            const dayName = language === 'id' ? DAY_NAMES_ID[log.date.getDay()] : DAY_NAMES[log.date.getDay()];
+            const monthStr = language === 'id' ? MONTH_SHORT_ID[selectedMonth] : MONTH_SHORT[selectedMonth];
+            const dateDisplay = `${dayName}, ${log.dayNumber} ${monthStr} ${selectedYear}`;
             const isLate = log.status === 'late' || log.inStatus === 'LATE' || log.outStatus === 'EARLY_OUT';
             const isAlpha = log.status === 'alpha';
 

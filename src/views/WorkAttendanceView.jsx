@@ -427,8 +427,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const last7DaysHistory = [
     {
       id: 'att-1',
-      date: '28 Sep 2026',
-      dateEn: '28 Sep 2026',
+      date: 'Senin, 28 Sep 2026',
+      dateEn: 'Monday, 28 Sep 2026',
       isToday: true,
       shift: activeShiftTitle,
       clockIn: clockInTime || '08:14',
@@ -448,8 +448,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     },
     {
       id: 'att-2',
-      date: '27 Sep 2026',
-      dateEn: '27 Sep 2026',
+      date: 'Minggu, 27 Sep 2026',
+      dateEn: 'Sunday, 27 Sep 2026',
       isToday: false,
       shift: language === 'id' ? 'Tidak Ada Jadwal (Off)' : 'No Schedule (Off)',
       clockIn: '-',
@@ -466,8 +466,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     },
     {
       id: 'att-3',
-      date: '26 Sep 2026',
-      dateEn: '26 Sep 2026',
+      date: 'Sabtu, 26 Sep 2026',
+      dateEn: 'Saturday, 26 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
       clockIn: '07:48',
@@ -484,8 +484,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     },
     {
       id: 'att-4',
-      date: '25 Sep 2026',
-      dateEn: '25 Sep 2026',
+      date: 'Jumat, 25 Sep 2026',
+      dateEn: 'Friday, 25 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
       clockIn: '--:--',
@@ -502,8 +502,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     },
     {
       id: 'att-5',
-      date: '24 Sep 2026',
-      dateEn: '24 Sep 2026',
+      date: 'Kamis, 24 Sep 2026',
+      dateEn: 'Thursday, 24 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
       clockIn: '08:18',
@@ -521,8 +521,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     },
     {
       id: 'att-6',
-      date: '23 Sep 2026',
-      dateEn: '23 Sep 2026',
+      date: 'Rabu, 23 Sep 2026',
+      dateEn: 'Wednesday, 23 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
       clockIn: '07:55',
@@ -539,8 +539,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     },
     {
       id: 'att-7',
-      date: '22 Sep 2026',
-      dateEn: '22 Sep 2026',
+      date: 'Selasa, 22 Sep 2026',
+      dateEn: 'Tuesday, 22 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
       clockIn: '08:00',
