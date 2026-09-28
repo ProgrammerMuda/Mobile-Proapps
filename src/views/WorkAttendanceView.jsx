@@ -131,6 +131,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [capturedSelfie, setCapturedSelfie] = useState(null);
   const [cameraError, setCameraError] = useState(false);
   const [actionType, setActionType] = useState('CLOCK_IN'); // 'CLOCK_IN' | 'CLOCK_OUT'
+  const [isOutOfRadius, setIsOutOfRadius] = useState(false);
+  const [isOutOfRadiusSheetOpen, setIsOutOfRadiusSheetOpen] = useState(false);
   const [isCheckInPageOpen, setIsCheckInPageOpen] = useState(false);
   const [isPreviewPhotoOpen, setIsPreviewPhotoOpen] = useState(false);
   const [checkInSnapshot, setCheckInSnapshot] = useState(null);
@@ -249,7 +251,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       streamRef.current = null;
     }
     setIsSelfieFullscreenOpen(false);
-    setIsCheckInPageOpen(true);
+    if (isOutOfRadius) {
+      setIsOutOfRadiusSheetOpen(true);
+    } else {
+      setIsCheckInPageOpen(true);
+    }
   };
 
   const handleFinalCheckIn = () => {
@@ -1737,8 +1743,29 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </div>
               </div>
 
-              {/* Balancing spacer */}
-              <div style={{ width: '36px' }} />
+              {/* Interactive Radius Simulation Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsOutOfRadius(!isOutOfRadius)}
+                title={isOutOfRadius ? 'Klik untuk simulasi Di Dalam Radius' : 'Klik untuk simulasi Di Luar Radius'}
+                style={{
+                  border: 'none',
+                  backgroundColor: isOutOfRadius ? 'rgba(239, 68, 68, 0.9)' : 'rgba(22, 163, 74, 0.9)',
+                  color: '#FFFFFF',
+                  padding: '4px 8px',
+                  borderRadius: '9999px',
+                  fontSize: '0.625rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  backdropFilter: 'blur(4px)',
+                }}
+              >
+                <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#FFFFFF' }} />
+                <span>{isOutOfRadius ? 'Luar Radius' : 'Dalam Radius'}</span>
+              </button>
             </div>
 
             {/* Video Viewport / Photo Snapshot */}
@@ -2296,6 +2323,198 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   ? (language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In')
                   : (language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out')}
               </button>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          MODAL 1.85: OUT OF RADIUS BOTTOM SHEET (3D ILLUSTRATION & NOTIFICATION)
+          ========================================================================= */}
+      {isOutOfRadiusSheetOpen && (() => {
+        const modalTarget = getModalTarget();
+        const modalElement = (
+          <div
+            onClick={() => setIsOutOfRadiusSheetOpen(false)}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.65)',
+              zIndex: 99998,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              backdropFilter: 'blur(4px)',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '16px 20px 32px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
+                animation: 'slideUp 0.25s ease-out',
+                boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.16)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+              }}
+            >
+              {/* Drag Handle Bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginBottom: '-4px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '4px',
+                    backgroundColor: '#E2E8F0',
+                    borderRadius: '9999px',
+                  }}
+                />
+              </div>
+
+              {/* Close Button Row */}
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', marginTop: '-4px' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsOutOfRadiusSheetOpen(false)}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    color: 'var(--color-text-secondary, #64748B)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <X size={20} weight="bold" />
+                </button>
+              </div>
+
+              {/* 3D Illustration: Out of Range Location */}
+              <img
+                src={outOfRangeLocation}
+                alt="Outside Radius"
+                style={{
+                  width: '160px',
+                  height: '160px',
+                  objectFit: 'contain',
+                  margin: '0 auto',
+                }}
+              />
+
+              {/* Title & Subtitle */}
+              <div style={{ textAlign: 'center', padding: '0 8px' }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--color-text-primary, #0F172A)', margin: 0 }}>
+                  {language === 'id' ? 'Di Luar Radius Presensi' : 'Outside Attendance Radius'}
+                </h3>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary, #64748B)', margin: '6px 0 0 0', lineHeight: 1.5 }}>
+                  {language === 'id'
+                    ? `Anda saat ini terdeteksi berada di luar jangkauan radius presensi (${checkInSnapshot?.location || baseLocationName}). Silakan mendekat ke lokasi kerja untuk melakukan absensi.`
+                    : `You are currently outside the designated workplace presence radius (${checkInSnapshot?.location || baseLocationName}). Please move closer to the radius to clock in.`}
+                </p>
+              </div>
+
+              {/* Distance Warning Card */}
+              <div
+                style={{
+                  width: '100%',
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FECACA',
+                  borderRadius: '14px',
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginTop: '4px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    backgroundColor: '#FEE2E2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#DC2626',
+                    flexShrink: 0,
+                  }}
+                >
+                  <WarningCircle size={18} weight="fill" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#991B1B' }}>
+                    {language === 'id' ? 'Jarak Terdeteksi: ~125 meter' : 'Detected Distance: ~125 meters'}
+                  </div>
+                  <div style={{ fontSize: '0.625rem', color: '#B91C1C' }}>
+                    {language === 'id' ? 'Maksimal radius yang diizinkan: 15 meter' : 'Maximum allowed radius: 15 meters'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '10px', width: '100%', marginTop: '6px' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsOutOfRadiusSheetOpen(false);
+                    setIsSelfieFullscreenOpen(true);
+                  }}
+                  style={{
+                    flex: 1,
+                    height: '46px',
+                    backgroundColor: 'var(--color-primary, #053079)',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    boxShadow: '0 4px 14px rgba(5, 48, 121, 0.25)',
+                  }}
+                >
+                  <ArrowsClockwise size={16} weight="bold" />
+                  <span>{language === 'id' ? 'Coba Lagi' : 'Try Again'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsOutOfRadiusSheetOpen(false)}
+                  style={{
+                    flex: 1,
+                    height: '46px',
+                    backgroundColor: '#F1F5F9',
+                    color: '#475569',
+                    border: '1px solid #E2E8F0',
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <span>{language === 'id' ? 'Tutup' : 'Close'}</span>
+                </button>
+              </div>
             </div>
           </div>
         );
