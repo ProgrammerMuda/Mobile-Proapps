@@ -1966,7 +1966,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       })()}
 
       {/* =========================================================================
-          MODAL 1.8: CHECK IN CONFIRMATION SCREEN (MAP & RADIUS)
+          MODAL 1.8: CHECK IN CONFIRMATION SCREEN (PROAPPS DESIGN SYSTEM)
           ========================================================================= */}
       {isCheckInPageOpen && (() => {
         const modalTarget = getModalTarget();
@@ -1978,7 +1978,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: '#F8FAFC',
+              backgroundColor: 'var(--color-background-page, #F8FAFC)',
               zIndex: 99998,
               display: 'flex',
               flexDirection: 'column',
@@ -1986,53 +1986,56 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               fontFamily: 'var(--font-sans)',
             }}
           >
-            {/* Top Bar Header */}
+            {/* Top Bar Header (ProApps Header Blue) */}
             <div
               style={{
                 height: '56px',
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#02388A',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0 16px',
                 zIndex: 20,
-                borderBottom: '1px solid #F1F5F9',
+                boxShadow: '0 2px 8px rgba(2, 56, 138, 0.15)',
               }}
             >
               <button
                 type="button"
                 onClick={() => setIsCheckInPageOpen(false)}
                 style={{
-                  background: 'transparent',
+                  background: 'none',
                   border: 'none',
                   padding: '6px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: '#0F172A',
+                  color: '#FFFFFF',
+                  borderRadius: '8px',
                 }}
               >
                 <CaretLeft size={24} weight="bold" />
               </button>
 
-              <h2 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                {actionType === 'CLOCK_IN' ? 'Check In' : 'Check Out'}
+              <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+                {actionType === 'CLOCK_IN'
+                  ? (language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In')
+                  : (language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out')}
               </h2>
 
               <div style={{ width: '36px' }} />
             </div>
 
-            {/* Upper Map Area */}
+            {/* Upper Map Area (ProApps Vector Map Theme) */}
             <div
               style={{
                 flex: 1,
                 position: 'relative',
-                backgroundColor: '#EBE7DE',
+                backgroundColor: '#F1F5F9',
                 overflow: 'hidden',
               }}
             >
-              {/* Stylized Vector Map Background */}
+              {/* Stylized Vector Map with ProApps Palette */}
               <svg
                 width="100%"
                 height="100%"
@@ -2041,117 +2044,76 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
               >
                 {/* Background base */}
-                <rect width="400" height="480" fill="#EFECE6" />
+                <rect width="400" height="480" fill="#F8FAFC" />
 
-                {/* Park / Greenery Areas */}
-                <path d="M0,0 L160,0 L140,110 L50,130 L0,80 Z" fill="#D4EAD6" opacity="0.9" />
-                <path d="M-20,100 Q80,120 70,220 L0,230 Z" fill="#CBE5CD" opacity="0.85" />
-                <path d="M240,120 Q320,80 420,130 L420,240 Q330,220 250,210 Z" fill="#E2EFE3" opacity="0.8" />
-                <path d="M260,250 L420,270 L420,440 L280,420 Z" fill="#E5EFE6" opacity="0.75" />
+                {/* Soft Greenery / Park Areas */}
+                <path d="M0,0 L160,0 L140,110 L50,130 L0,80 Z" fill="#DCFCE7" opacity="0.8" />
+                <path d="M-20,100 Q80,120 70,220 L0,230 Z" fill="#D1FAE5" opacity="0.7" />
+                <path d="M240,120 Q320,80 420,130 L420,240 Q330,220 250,210 Z" fill="#F0FDF4" opacity="0.9" />
+                <path d="M260,250 L420,270 L420,440 L280,420 Z" fill="#E2E8F0" opacity="0.5" />
 
-                {/* Street Networks / Roads */}
-                <path d="M-20,140 Q180,180 420,160" stroke="#FFFFFF" strokeWidth="22" fill="none" strokeLinecap="round" />
-                <path d="M-20,140 Q180,180 420,160" stroke="#DDD6C8" strokeWidth="24" fill="none" strokeLinecap="round" style={{ zIndex: -1 }} />
+                {/* Road Networks */}
+                <path d="M-20,140 Q180,180 420,160" stroke="#FFFFFF" strokeWidth="24" fill="none" strokeLinecap="round" />
+                <path d="M-20,140 Q180,180 420,160" stroke="#E2E8F0" strokeWidth="26" fill="none" strokeLinecap="round" style={{ zIndex: -1 }} />
 
-                <path d="M200,-20 Q220,180 180,500" stroke="#FFFFFF" strokeWidth="26" fill="none" />
-                <path d="M200,-20 Q220,180 180,500" stroke="#DDD6C8" strokeWidth="28" fill="none" />
+                <path d="M200,-20 Q220,180 180,500" stroke="#FFFFFF" strokeWidth="28" fill="none" />
+                <path d="M200,-20 Q220,180 180,500" stroke="#E2E8F0" strokeWidth="30" fill="none" />
 
-                <path d="M20,320 Q160,300 420,330" stroke="#FFFFFF" strokeWidth="18" fill="none" />
-                <path d="M20,320 Q160,300 420,330" stroke="#DDD6C8" strokeWidth="20" fill="none" />
+                <path d="M20,320 Q160,300 420,330" stroke="#FFFFFF" strokeWidth="20" fill="none" />
+                <path d="M20,320 Q160,300 420,330" stroke="#E2E8F0" strokeWidth="22" fill="none" />
 
-                {/* Secondary Alleys */}
+                {/* Secondary Avenues */}
                 <path d="M120,40 Q180,140 120,260" stroke="#FFFFFF" strokeWidth="12" fill="none" />
                 <path d="M250,80 Q320,180 270,360" stroke="#FFFFFF" strokeWidth="14" fill="none" />
                 <path d="M300,100 Q360,200 350,380" stroke="#FFFFFF" strokeWidth="10" fill="none" />
                 <path d="M40,240 Q140,260 220,360" stroke="#FFFFFF" strokeWidth="10" fill="none" />
 
-                {/* City Blocks */}
-                <rect x="250" y="220" width="70" height="90" rx="6" fill="#E6E0D5" opacity="0.6" />
-                <rect x="250" y="325" width="70" height="70" rx="6" fill="#E6E0D5" opacity="0.6" />
-                <rect x="80" y="270" width="80" height="70" rx="6" fill="#E6E0D5" opacity="0.6" />
-                <rect x="175" y="210" width="50" height="40" rx="6" fill="#E6E0D5" opacity="0.6" />
+                {/* Building Blocks Outline */}
+                <rect x="250" y="220" width="70" height="90" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
+                <rect x="250" y="325" width="70" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
+                <rect x="80" y="270" width="80" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
+                <rect x="175" y="210" width="50" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
 
-                {/* Geofence Circular Radius Area */}
+                {/* ProApps Secondary Blue Geofence Circular Radius Area */}
                 <circle
                   cx="165"
                   cy="235"
-                  r="88"
-                  fill="rgba(9, 178, 255, 0.22)"
+                  r="92"
+                  fill="rgba(9, 178, 255, 0.14)"
                   stroke="#09B2FF"
-                  strokeWidth="2"
-                  strokeDasharray="4 2"
+                  strokeWidth="2.5"
+                  strokeDasharray="5 3"
                 />
               </svg>
 
-              {/* Metro Station Pill Badge (Istora) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '18px',
-                  left: '48%',
-                  transform: 'translateX(-50%)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
-                  fontSize: '0.6875rem',
-                  fontWeight: 800,
-                  color: '#2563EB',
-                }}
-              >
-                <div style={{ width: '14px', height: '14px', borderRadius: '3px', backgroundColor: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ color: '#FFFFFF', fontSize: '9px', fontWeight: 900 }}>M</span>
-                </div>
-                <span>Istora</span>
-              </div>
-
-              {/* Area label text */}
-              <div
-                style={{
-                  position: 'absolute',
-                  right: '16px',
-                  top: '45%',
-                  fontSize: '1.125rem',
-                  fontWeight: 800,
-                  color: 'rgba(15, 23, 42, 0.25)',
-                  letterSpacing: '0.05em',
-                  pointerEvents: 'none',
-                }}
-              >
-                Sudirman
-              </div>
-
-              {/* Center Building Pin */}
+              {/* ProApps Center Building Pin (Primary Color #053079) */}
               <div
                 style={{
                   position: 'absolute',
                   left: '165px',
                   top: '235px',
                   transform: 'translate(-50%, -50%)',
-                  width: '42px',
-                  height: '42px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
-                  backgroundColor: '#0A5C67',
+                  backgroundColor: 'var(--color-primary, #053079)',
                   border: '3px solid #FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(10, 92, 103, 0.35)',
+                  boxShadow: '0 4px 14px rgba(5, 48, 121, 0.35)',
                   zIndex: 8,
                 }}
               >
-                <Buildings size={20} weight="fill" color="#FFFFFF" />
+                <Buildings size={22} weight="fill" color="#FFFFFF" />
               </div>
 
-              {/* User Location Pin (Inside Radius) */}
+              {/* User Location Pin (Inside Radius with ProApps Secondary Ring) */}
               <div
                 style={{
                   position: 'absolute',
                   left: '198px',
-                  top: '202px',
+                  top: '200px',
                   transform: 'translate(-50%, -100%)',
                   display: 'flex',
                   flexDirection: 'column',
@@ -2166,9 +2128,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     height: '42px',
                     borderRadius: '50% 50% 50% 0',
                     transform: 'rotate(-45deg)',
-                    backgroundColor: '#0F172A',
-                    border: '3px solid #FFFFFF',
-                    boxShadow: '0 6px 14px rgba(15, 23, 42, 0.4)',
+                    backgroundColor: 'var(--color-primary, #053079)',
+                    border: '3px solid #09B2FF',
+                    boxShadow: '0 6px 16px rgba(5, 48, 121, 0.4)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -2191,48 +2153,48 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 {/* Radar Ground Shadow */}
                 <div
                   style={{
-                    width: '12px',
-                    height: '4px',
+                    width: '14px',
+                    height: '5px',
                     borderRadius: '50%',
-                    backgroundColor: 'rgba(15, 23, 42, 0.3)',
+                    backgroundColor: 'rgba(9, 178, 255, 0.4)',
                     marginTop: '2px',
                   }}
                 />
               </div>
 
-              {/* Floating Status Pill: Didalam Radius */}
+              {/* Floating Status Pill: Didalam Radius (ProApps Token Style) */}
               <div
                 style={{
                   position: 'absolute',
-                  top: '18px',
+                  top: '16px',
                   right: '16px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                  border: '1px solid rgba(22, 163, 74, 0.2)',
-                  padding: '4px 10px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #DCFCE7',
+                  padding: '6px 12px',
                   borderRadius: '9999px',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '6px',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-                  backdropFilter: 'blur(6px)',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.06)',
                   fontSize: '0.6875rem',
                   fontWeight: 700,
                   color: '#16A34A',
                 }}
               >
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
-                <span>Didalam Radius</span>
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
+                <span>{language === 'id' ? 'Dalam Radius Presensi' : 'Inside Attendance Radius'}</span>
               </div>
             </div>
 
-            {/* Bottom Information Cards (Matching Reference Image) */}
+            {/* Bottom Information Cards (ProApps MaterialCard Standards) */}
             <div
               style={{
-                backgroundColor: '#FFFFFF',
+                backgroundColor: 'var(--color-background-surface, #FFFFFF)',
                 borderTopLeftRadius: '24px',
                 borderTopRightRadius: '24px',
+                borderTop: '1px solid var(--color-border-default, #E5E7EB)',
                 padding: '20px 16px 28px 16px',
-                boxShadow: '0 -8px 24px rgba(0, 0, 0, 0.08)',
+                boxShadow: '0 -6px 24px rgba(0, 0, 0, 0.06)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
@@ -2244,8 +2206,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 {/* Left Card: Check In Time */}
                 <div
                   style={{
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #F1F5F9',
+                    backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                    border: '1px solid var(--color-border-default, #E5E7EB)',
                     borderRadius: '14px',
                     padding: '12px 14px',
                     display: 'flex',
@@ -2254,10 +2216,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginBottom: '2px' }}>
-                      {actionType === 'CLOCK_IN' ? 'Check In' : 'Check Out'}
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '3px' }}>
+                      {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Waktu Masuk' : 'Clock In Time') : (language === 'id' ? 'Waktu Pulang' : 'Clock Out Time')}
                     </div>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
                       {checkInSnapshot?.timeShort || '08:14'} WIB
                     </div>
                   </div>
@@ -2266,18 +2228,19 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       width: '36px',
                       height: '36px',
                       borderRadius: '10px',
-                      backgroundColor: '#0A5C67',
+                      backgroundColor: 'var(--color-selected-background, #EAF7FF)',
+                      border: '1px solid #BAE6FD',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#FFFFFF',
+                      color: 'var(--color-primary, #053079)',
                       flexShrink: 0,
                     }}
                   >
                     {actionType === 'CLOCK_IN' ? (
-                      <SignIn size={20} weight="bold" />
+                      <SignIn size={18} weight="bold" color="var(--color-primary, #053079)" />
                     ) : (
-                      <SignOut size={20} weight="bold" />
+                      <SignOut size={18} weight="bold" color="var(--color-primary, #053079)" />
                     )}
                   </div>
                 </div>
@@ -2285,8 +2248,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 {/* Right Card: Photo */}
                 <div
                   style={{
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #F1F5F9',
+                    backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                    border: '1px solid var(--color-border-default, #E5E7EB)',
                     borderRadius: '14px',
                     padding: '12px 14px',
                     display: 'flex',
@@ -2295,8 +2258,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginBottom: '2px' }}>
-                      Photo
+                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '3px' }}>
+                      {language === 'id' ? 'Foto Selfie' : 'Selfie Photo'}
                     </div>
                     <button
                       type="button"
@@ -2307,16 +2270,16 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         padding: 0,
                         fontSize: '0.8125rem',
                         fontWeight: 700,
-                        color: '#09B2FF',
+                        color: 'var(--color-secondary, #09B2FF)',
                         textDecoration: 'underline',
                         cursor: 'pointer',
                         textAlign: 'left',
                       }}
                     >
-                      See Photo
+                      {language === 'id' ? 'Lihat Foto' : 'See Photo'}
                     </button>
                   </div>
-                  {/* Small Square Photo Thumbnail */}
+                  {/* Photo Thumbnail */}
                   <div
                     onClick={() => setIsPreviewPhotoOpen(true)}
                     style={{
@@ -2325,8 +2288,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       borderRadius: '8px',
                       overflow: 'hidden',
                       cursor: 'pointer',
-                      border: '1px solid #CBD5E1',
-                      backgroundColor: '#0F172A',
+                      border: '1.5px solid var(--color-secondary, #09B2FF)',
+                      backgroundColor: 'var(--color-primary, #053079)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2340,7 +2303,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     ) : (
-                      <UserCheck size={20} color="#38BDF8" weight="bold" />
+                      <UserCheck size={18} color="#FFFFFF" weight="bold" />
                     )}
                   </div>
                 </div>
@@ -2349,8 +2312,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               {/* Row 2: Location Card */}
               <div
                 style={{
-                  backgroundColor: '#F8FAFC',
-                  border: '1px solid #F1F5F9',
+                  backgroundColor: 'var(--color-background-surface, #FFFFFF)',
+                  border: '1px solid var(--color-border-default, #E5E7EB)',
                   borderRadius: '14px',
                   padding: '12px 14px',
                   display: 'flex',
@@ -2359,14 +2322,14 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 }}
               >
                 <div style={{ flex: 1, paddingRight: '8px' }}>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B', marginBottom: '2px' }}>
-                    Location
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '3px' }}>
+                    {language === 'id' ? 'Lokasi Presensi' : 'Presence Location'}
                   </div>
-                  <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
+                  <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
                     {checkInSnapshot?.location || baseLocationName}
                   </div>
-                  <div style={{ fontSize: '0.625rem', color: '#94A3B8', fontFamily: 'monospace', marginTop: '2px' }}>
-                    Lat: {checkInSnapshot?.coords?.lat || userCoords.lat}, Long: {checkInSnapshot?.coords?.lng || userCoords.lng}
+                  <div style={{ fontSize: '0.625rem', color: 'var(--color-text-secondary, #64748B)', fontFamily: 'monospace', marginTop: '2px' }}>
+                    GPS: {checkInSnapshot?.coords?.lat || userCoords.lat}, {checkInSnapshot?.coords?.lng || userCoords.lng}
                   </div>
                 </div>
                 <div
@@ -2374,26 +2337,27 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     width: '36px',
                     height: '36px',
                     borderRadius: '10px',
-                    backgroundColor: '#0A5C67',
+                    backgroundColor: 'var(--color-selected-background, #EAF7FF)',
+                    border: '1px solid #BAE6FD',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#FFFFFF',
+                    color: 'var(--color-primary, #053079)',
                     flexShrink: 0,
                   }}
                 >
-                  <MapPin size={20} weight="fill" />
+                  <MapPin size={20} weight="fill" color="var(--color-primary, #053079)" />
                 </div>
               </div>
 
-              {/* Bottom Action Button: Check In */}
+              {/* Bottom Action Button: ProApps Brand Primary Button */}
               <button
                 type="button"
                 onClick={handleFinalCheckIn}
                 style={{
                   width: '100%',
                   height: '50px',
-                  backgroundColor: '#082032',
+                  backgroundColor: 'var(--color-primary, #053079)',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: '12px',
@@ -2404,11 +2368,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginTop: '4px',
-                  boxShadow: '0 4px 14px rgba(8, 32, 50, 0.35)',
+                  boxShadow: '0 4px 14px rgba(5, 48, 121, 0.25)',
                   transition: 'opacity 0.2s ease',
                 }}
               >
-                {actionType === 'CLOCK_IN' ? 'Check In' : 'Check Out'}
+                {actionType === 'CLOCK_IN'
+                  ? (language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In')
+                  : (language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out')}
               </button>
             </div>
           </div>
