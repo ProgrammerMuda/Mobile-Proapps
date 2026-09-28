@@ -612,7 +612,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              boxShadow: isClockedIn ? '0 4px 12px rgba(217, 119, 6, 0.3)' : '0 4px 12px rgba(22, 163, 74, 0.3)',
               transition: 'transform 0.15s ease',
             }}
           >
@@ -1199,7 +1198,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
-                    boxShadow: actionType === 'CLOCK_IN' ? '0 4px 12px rgba(22, 163, 74, 0.3)' : '0 4px 12px rgba(217, 119, 6, 0.3)',
                   }}
                 >
                   {actionType === 'CLOCK_IN' ? (
