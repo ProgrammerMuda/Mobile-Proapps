@@ -597,7 +597,7 @@ export const MonthlyAttendanceDetailView = ({
         gap: '16px',
         boxSizing: 'border-box',
         userSelect: 'none',
-        paddingBottom: '40px',
+        paddingBottom: '24px',
       }}
     >
       {/* 1. Monthly KPI Summary Card */}
@@ -794,7 +794,7 @@ export const MonthlyAttendanceDetailView = ({
       </div>
 
       {/* 2. Daily Attendance Logs List Header & Filter Tabs */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredLogs.length === 0 ? 1 : 'initial' }}>
         <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
           {language === 'id' ? 'Riwayat Absensi Harian' : 'Daily Attendance Records'}
         </h3>
@@ -845,7 +845,7 @@ export const MonthlyAttendanceDetailView = ({
             style={{
               backgroundColor: '#FFFFFF',
               borderRadius: '20px',
-              padding: '32px 16px',
+              padding: '16px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -853,7 +853,7 @@ export const MonthlyAttendanceDetailView = ({
               textAlign: 'center',
               border: '1px solid #E2E8F0',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-              minHeight: '340px',
+              flex: 1,
               width: '100%',
               boxSizing: 'border-box',
             }}
@@ -864,18 +864,18 @@ export const MonthlyAttendanceDetailView = ({
               style={{
                 width: '100%',
                 height: 'auto',
-                maxHeight: '220px',
+                maxHeight: '200px',
                 objectFit: 'contain',
-                marginBottom: '16px',
+                marginBottom: '12px',
                 filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
               }}
             />
             <h4
               style={{
-                fontSize: '1.125rem',
+                fontSize: '1.0625rem',
                 fontWeight: 800,
                 color: '#334155',
-                margin: '0 0 8px 0',
+                margin: '0 0 6px 0',
                 letterSpacing: '-0.2px',
                 textAlign: 'center',
               }}
@@ -887,7 +887,7 @@ export const MonthlyAttendanceDetailView = ({
                 fontSize: '0.8125rem',
                 color: '#64748B',
                 margin: 0,
-                lineHeight: 1.5,
+                lineHeight: 1.45,
                 maxWidth: '300px',
                 fontWeight: 500,
                 textAlign: 'center',

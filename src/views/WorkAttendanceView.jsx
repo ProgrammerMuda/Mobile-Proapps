@@ -764,7 +764,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
         minHeight: '100%',
         backgroundColor: '#F8FAFC',
         fontFamily: 'var(--font-sans)',
-        paddingBottom: '32px',
+        paddingBottom: '24px',
         boxSizing: 'border-box',
       }}
     >
@@ -772,10 +772,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       <div
         style={{
           background: 'linear-gradient(180deg, #02388A 0%, #0348AF 60%, #F8FAFC 100%)',
-          padding: '16px 16px 24px 16px',
+          padding: '16px 16px 0px 16px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
+          flex: 1,
         }}
       >
         {/* =========================================================================
@@ -1398,7 +1399,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
         {/* =========================================================================
             3. HISTORY ABSEN SEMINGGU TERAKHIR (LAST 7 DAYS HISTORY)
             ========================================================================= */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredHistory.length === 0 ? 1 : 'initial' }}>
           {/* Section Title & Range */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
@@ -1478,13 +1479,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           </div>
 
           {/* History Cards List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: filteredHistory.length === 0 ? 1 : 'initial' }}>
             {filteredHistory.length === 0 ? (
               <div
                 style={{
                   backgroundColor: '#FFFFFF',
                   borderRadius: '20px',
-                  padding: '32px 16px',
+                  padding: '16px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -1492,7 +1493,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   textAlign: 'center',
                   border: '1px solid #E2E8F0',
                   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-                  minHeight: '340px',
+                  flex: 1,
                   width: '100%',
                   boxSizing: 'border-box',
                 }}
@@ -1503,18 +1504,18 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   style={{
                     width: '100%',
                     height: 'auto',
-                    maxHeight: '220px',
+                    maxHeight: '200px',
                     objectFit: 'contain',
-                    marginBottom: '16px',
+                    marginBottom: '12px',
                     filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
                   }}
                 />
                 <h4
                   style={{
-                    fontSize: '1.125rem',
+                    fontSize: '1.0625rem',
                     fontWeight: 800,
                     color: '#334155',
-                    margin: '0 0 8px 0',
+                    margin: '0 0 6px 0',
                     letterSpacing: '-0.2px',
                     textAlign: 'center',
                   }}
@@ -1526,7 +1527,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     fontSize: '0.8125rem',
                     color: '#64748B',
                     margin: 0,
-                    lineHeight: 1.5,
+                    lineHeight: 1.45,
                     maxWidth: '300px',
                     fontWeight: 500,
                     textAlign: 'center',
