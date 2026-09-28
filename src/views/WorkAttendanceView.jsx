@@ -49,6 +49,7 @@ import {
 // Import 3D Menu Icons
 import shiftSchedule3d from '../assets/menu-icons/shift-schedule-3d.png';
 import attendance3d from '../assets/menu-icons/attendance-3d.png';
+import employeePermission3d from '../assets/menu-icons/employee-permission-3d.png';
 import workPermit3d from '../assets/menu-icons/work-permit-3d.png';
 import reportAttendance3d from '../assets/menu-icons/report-attendance-3d.png';
 import inspection3d from '../assets/menu-icons/inspection-3d.png';
@@ -991,8 +992,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 }}
               >
                 <img
-                  src={workPermit3d}
-                  alt={language === 'id' ? 'Izin / Cuti' : 'Permission'}
+                  src={employeePermission3d}
+                  alt={language === 'id' ? 'Izin Karyawan' : 'Employee Permission'}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -1010,7 +1011,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   lineHeight: 1.25,
                 }}
               >
-                {language === 'id' ? 'Izin / Cuti' : 'Permission'}
+                {language === 'id' ? 'Izin Karyawan' : 'Employee Permission'}
               </span>
             </button>
 
