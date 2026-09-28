@@ -47,6 +47,7 @@ import {
 } from '../assets/illustrations';
 
 // Import 3D Menu Icons
+import shiftSchedule3d from '../assets/menu-icons/shift-schedule-3d.png';
 import attendance3d from '../assets/menu-icons/attendance-3d.png';
 import workPermit3d from '../assets/menu-icons/work-permit-3d.png';
 import inspection3d from '../assets/menu-icons/inspection-3d.png';
@@ -932,7 +933,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 }}
               >
                 <img
-                  src={attendance3d}
+                  src={shiftSchedule3d}
                   alt={language === 'id' ? 'Jadwal Shift' : 'Shift Schedule'}
                   style={{
                     width: '100%',
