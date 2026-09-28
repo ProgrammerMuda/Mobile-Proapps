@@ -31,6 +31,11 @@ import {
   NavigationArrow,
   Sun,
   MoonStars,
+  QrCode,
+  Scan,
+  Lightning,
+  CornersOut,
+  UserFocus,
 } from '@phosphor-icons/react';
 
 // Import Illustrations
@@ -115,6 +120,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [elapsedDuration, setElapsedDuration] = useState('00j 00m');
 
   // Modals state
+  const [isMethodSheetOpen, setIsMethodSheetOpen] = useState(false);
+  const [attendanceMethod, setAttendanceMethod] = useState('QR'); // 'QR' | 'PHOTO'
+  const [isFlashlightOn, setIsFlashlightOn] = useState(false);
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [actionType, setActionType] = useState('CLOCK_IN'); // 'CLOCK_IN' | 'CLOCK_OUT'
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -596,7 +604,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             type="button"
             onClick={() => {
               setActionType(isClockedIn ? 'CLOCK_OUT' : 'CLOCK_IN');
-              setIsActionModalOpen(true);
+              setIsMethodSheetOpen(true);
             }}
             style={{
               width: '100%',
@@ -1034,7 +1042,246 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       </div>
 
       {/* =========================================================================
-          MODAL 1: CLOCK IN / CLOCK OUT ACTION SHEET (WITH GEOFENCE & CAMERA SIMULATION)
+          MODAL 0: ATTENDANCE METHOD SELECTION BOTTOM SHEET
+          ========================================================================= */}
+      {isMethodSheetOpen && (() => {
+        const modalTarget = getModalTarget();
+        const modalElement = (
+          <div
+            onClick={() => setIsMethodSheetOpen(false)}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.65)',
+              zIndex: 9999,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              backdropFilter: 'blur(3px)',
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '20px 20px 32px 20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                animation: 'slideUp 0.25s ease-out',
+                boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.12)',
+              }}
+            >
+              {/* Drag Handle Bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-4px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '4px',
+                    backgroundColor: '#E2E8F0',
+                    borderRadius: '9999px',
+                  }}
+                />
+              </div>
+
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                    {actionType === 'CLOCK_IN'
+                      ? (language === 'id' ? 'Pilih Metode Clock In' : 'Select Clock In Method')
+                      : (language === 'id' ? 'Pilih Metode Clock Out' : 'Select Clock Out Method')}
+                  </h3>
+                  <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '4px 0 0 0' }}>
+                    {language === 'id'
+                      ? 'Pilih cara validasi presensi kerja Anda'
+                      : 'Choose your attendance verification method'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMethodSheetOpen(false)}
+                  style={{
+                    border: 'none',
+                    background: '#F1F5F9',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                    flexShrink: 0,
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* 2 Method Option Cards */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {/* Option 1: Scan QR Code */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAttendanceMethod('QR');
+                    setIsMethodSheetOpen(false);
+                    setIsActionModalOpen(true);
+                  }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#FFFFFF',
+                    border: '1.5px solid #E2E8F0',
+                    borderRadius: '16px',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      backgroundColor: '#EFF6FF',
+                      border: '1px solid #DBEAFE',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#2563EB',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <QrCode size={24} weight="bold" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                      <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
+                        {language === 'id' ? 'Scan QR Code' : 'Scan QR Code'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.5625rem',
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          backgroundColor: '#EFF6FF',
+                          color: '#2563EB',
+                        }}
+                      >
+                        {language === 'id' ? 'Cepat' : 'Fast'}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
+                      {language === 'id'
+                        ? 'Pindai barcode QR yang terpasang di pos atau lokasi kerja'
+                        : 'Scan the QR barcode located at the workstation or post'}
+                    </div>
+                  </div>
+                  <CaretRight size={18} weight="bold" color="#94A3B8" />
+                </button>
+
+                {/* Option 2: Foto Selfie */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAttendanceMethod('PHOTO');
+                    setIsMethodSheetOpen(false);
+                    setIsActionModalOpen(true);
+                  }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#FFFFFF',
+                    border: '1.5px solid #E2E8F0',
+                    borderRadius: '16px',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      backgroundColor: '#ECFDF5',
+                      border: '1px solid #A7F3D0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#059669',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Camera size={24} weight="bold" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                      <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#0F172A' }}>
+                        {language === 'id' ? 'Foto Selfie' : 'Selfie Photo'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.5625rem',
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          backgroundColor: '#DCFCE7',
+                          color: '#15803D',
+                        }}
+                      >
+                        {language === 'id' ? 'Face Match' : 'Face Match'}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
+                      {language === 'id'
+                        ? 'Ambil foto selfie dengan verifikasi pengenalan wajah otomatis'
+                        : 'Take a selfie photo with instant facial verification'}
+                    </div>
+                  </div>
+                  <CaretRight size={18} weight="bold" color="#94A3B8" />
+                </button>
+              </div>
+
+              {/* Location Tag */}
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '10px',
+                  padding: '8px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.6875rem',
+                  color: '#64748B',
+                }}
+              >
+                <MapPin size={14} color="#2563EB" weight="fill" />
+                <span>{language === 'id' ? 'Lokasi Aktif' : 'Active Location'}: <strong>{activeLocationTitle}</strong></span>
+              </div>
+            </div>
+          </div>
+        );
+
+        return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
+      })()}
+
+      {/* =========================================================================
+          MODAL 1: CLOCK IN / CLOCK OUT ACTION SHEET (QR CODE & SELFIE SIMULATION)
           ========================================================================= */}
       {isActionModalOpen && (() => {
         const modalTarget = getModalTarget();
@@ -1054,6 +1301,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               backdropFilter: 'blur(3px)',
             }}
           >
+            <style>{`
+              @keyframes qrLaserAnim {
+                0% { top: 15%; opacity: 0.8; }
+                50% { top: 80%; opacity: 1; }
+                100% { top: 15%; opacity: 0.8; }
+              }
+            `}</style>
             <div
               style={{
                 backgroundColor: '#FFFFFF',
@@ -1063,7 +1317,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '16px',
-                maxHeight: '90%',
+                maxHeight: '92%',
                 overflowY: 'auto',
                 animation: 'slideUp 0.25s ease-out',
               }}
@@ -1071,11 +1325,25 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
-                    {actionType === 'CLOCK_IN'
-                      ? (language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In')
-                      : (language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out')}
-                  </h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                      {attendanceMethod === 'QR'
+                        ? (actionType === 'CLOCK_IN' ? (language === 'id' ? 'Scan QR Clock In' : 'Scan QR Clock In') : (language === 'id' ? 'Scan QR Clock Out' : 'Scan QR Clock Out'))
+                        : (actionType === 'CLOCK_IN' ? (language === 'id' ? 'Foto Selfie Clock In' : 'Selfie Clock In') : (language === 'id' ? 'Foto Selfie Clock Out' : 'Selfie Clock Out'))}
+                    </h3>
+                    <span
+                      style={{
+                        fontSize: '0.5625rem',
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        backgroundColor: attendanceMethod === 'QR' ? '#EFF6FF' : '#DCFCE7',
+                        color: attendanceMethod === 'QR' ? '#2563EB' : '#15803D',
+                      }}
+                    >
+                      {attendanceMethod === 'QR' ? 'QR Scanner' : 'Face Match'}
+                    </span>
+                  </div>
                   <span style={{ fontSize: '0.6875rem', color: '#64748B' }}>
                     {currentTime} • 28 Sep 2026
                   </span>
@@ -1100,11 +1368,147 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </button>
               </div>
 
+              {/* Viewfinder simulation based on method */}
+              {attendanceMethod === 'QR' ? (
+                /* QR SCANNER VIEWPORT */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {/* Camera Face Simulation */}
                   <div
                     style={{
-                      height: '150px',
+                      height: '180px',
+                      backgroundColor: '#090D16',
+                      borderRadius: '16px',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#FFFFFF',
+                      border: '1.5px solid #1E293B',
+                    }}
+                  >
+                    {/* Scanner Center Box */}
+                    <div
+                      style={{
+                        width: '120px',
+                        height: '120px',
+                        border: '2px solid rgba(56, 189, 248, 0.6)',
+                        borderRadius: '12px',
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(15, 23, 42, 0.4)',
+                      }}
+                    >
+                      {/* Corner Accents */}
+                      <div style={{ position: 'absolute', top: '-2px', left: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderTopLeftRadius: '4px' }} />
+                      <div style={{ position: 'absolute', top: '-2px', right: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderTopRightRadius: '4px' }} />
+                      <div style={{ position: 'absolute', bottom: '-2px', left: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderBottomLeftRadius: '4px' }} />
+                      <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderBottomRightRadius: '4px' }} />
+
+                      {/* QR Icon in center */}
+                      <QrCode size={48} color="#94A3B8" weight="light" style={{ opacity: 0.65 }} />
+
+                      {/* Animated Laser Line */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: '6px',
+                          right: '6px',
+                          height: '2px',
+                          background: 'linear-gradient(90deg, transparent 0%, #38BDF8 50%, transparent 100%)',
+                          boxShadow: '0 0 8px #38BDF8',
+                          animation: 'qrLaserAnim 2s infinite ease-in-out',
+                        }}
+                      />
+                    </div>
+
+                    {/* Top Right Flashlight Button */}
+                    <button
+                      type="button"
+                      onClick={() => setIsFlashlightOn(!isFlashlightOn)}
+                      style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        border: 'none',
+                        backgroundColor: isFlashlightOn ? '#FBBF24' : 'rgba(30, 41, 59, 0.8)',
+                        color: isFlashlightOn ? '#0F172A' : '#FFFFFF',
+                        borderRadius: '9999px',
+                        padding: '4px 10px',
+                        fontSize: '0.625rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <Lightning size={12} weight="fill" />
+                      <span>{isFlashlightOn ? 'Flash ON' : 'Flash'}</span>
+                    </button>
+
+                    {/* Bottom Status Text */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '8px',
+                        fontSize: '0.6875rem',
+                        color: '#94A3B8',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <CheckCircle size={12} weight="fill" color="#22C55E" />
+                      <span>{language === 'id' ? 'QR Code Terdeteksi • Siap Validasi' : 'QR Code Detected • Ready'}</span>
+                    </div>
+                  </div>
+
+                  {/* Verification Info Box */}
+                  <div
+                    style={{
+                      backgroundColor: '#EFF6FF',
+                      border: '1px solid #DBEAFE',
+                      borderRadius: '12px',
+                      padding: '10px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      fontSize: '0.75rem',
+                      color: '#1E40AF',
+                    }}
+                  >
+                    <CheckCircle size={18} weight="fill" color="#2563EB" />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Pos QR Resmi Terverifikasi' : 'Official QR Post Verified'}</div>
+                      <div style={{ fontSize: '0.6875rem', color: '#1E3A8A' }}>{activeLocationTitle}</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceMethod('PHOTO')}
+                      style={{
+                        border: 'none',
+                        background: '#FFFFFF',
+                        color: '#2563EB',
+                        borderRadius: '6px',
+                        padding: '4px 8px',
+                        fontSize: '0.625rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {language === 'id' ? 'Ganti Foto' : 'Switch Photo'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* SELFIE CAMERA VIEWPORT */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div
+                    style={{
+                      height: '180px',
                       backgroundColor: '#0F172A',
                       borderRadius: '16px',
                       position: 'relative',
@@ -1114,9 +1518,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: '#FFFFFF',
+                      border: '1.5px solid #1E293B',
                     }}
                   >
-                    <Camera size={36} color="#38BDF8" weight="bold" />
+                    <Camera size={38} color="#38BDF8" weight="bold" />
                     <span style={{ fontSize: '0.75rem', color: '#94A3B8', marginTop: '6px' }}>
                       {language === 'id' ? 'Wajah Terverifikasi Otomatis' : 'Face Verified Automatically'}
                     </span>
@@ -1155,12 +1560,29 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     }}
                   >
                     <CheckCircle size={18} weight="fill" color="#16A34A" />
-                    <div>
+                    <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Verifikasi Kehadiran Siap' : 'Attendance Verification Ready'}</div>
                       <div style={{ fontSize: '0.6875rem', color: '#166534' }}>{userName} • {activeShiftTitle}</div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceMethod('QR')}
+                      style={{
+                        border: 'none',
+                        background: '#FFFFFF',
+                        color: '#15803D',
+                        borderRadius: '6px',
+                        padding: '4px 8px',
+                        fontSize: '0.625rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {language === 'id' ? 'Ganti QR' : 'Switch QR'}
+                    </button>
                   </div>
                 </div>
+              )}
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
@@ -1203,12 +1625,20 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   {actionType === 'CLOCK_IN' ? (
                     <>
                       <SignIn size={18} weight="bold" />
-                      <span>{language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In'}</span>
+                      <span>
+                        {attendanceMethod === 'QR'
+                          ? (language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock In')
+                          : (language === 'id' ? 'Konfirmasi Presensi Foto' : 'Confirm Photo Clock In')}
+                      </span>
                     </>
                   ) : (
                     <>
                       <SignOut size={18} weight="bold" />
-                      <span>{language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out'}</span>
+                      <span>
+                        {attendanceMethod === 'QR'
+                          ? (language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock Out')
+                          : (language === 'id' ? 'Konfirmasi Presensi Foto' : 'Confirm Photo Clock Out')}
+                      </span>
                     </>
                   )}
                 </button>
@@ -1284,15 +1714,25 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 style={{
                   backgroundColor: '#F8FAFC',
                   borderRadius: '12px',
-                  padding: '10px',
+                  padding: '10px 12px',
                   width: '100%',
                   border: '1px solid #E2E8F0',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  color: '#0F172A',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  boxSizing: 'border-box',
                 }}
               >
-                {currentTime} • Tower A Lobby
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0F172A' }}>
+                  {currentTime} • {userName}
+                </div>
+                <div style={{ fontSize: '0.6875rem', color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <span>{activeShiftName}</span>
+                  <span>•</span>
+                  <span style={{ fontWeight: 600, color: attendanceMethod === 'QR' ? '#2563EB' : '#059669' }}>
+                    {attendanceMethod === 'QR' ? 'Via Scan QR' : 'Via Foto Selfie'}
+                  </span>
+                </div>
               </div>
 
               <button
