@@ -1159,22 +1159,21 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               type="button"
               onClick={() => setIsReportModalOpen(true)}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '2px',
-                backgroundColor: 'transparent',
+                background: 'none',
                 border: 'none',
-                padding: '4px 0',
-                fontSize: '0.75rem',
-                fontWeight: 700,
                 color: '#02388A',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '3px',
                 cursor: 'pointer',
-                transition: 'opacity 0.15s ease',
-                outline: 'none',
+                padding: 0,
+                fontFamily: 'var(--font-sans)',
               }}
             >
-              <span>{language === 'id' ? 'Lihat Detail' : 'View Detail'}</span>
-              <CaretRight size={13} weight="bold" color="#02388A" />
+              <span>{language === 'id' ? 'Lihat Detail' : 'View Details'}</span>
+              <CaretRight size={14} weight="bold" />
             </button>
           </div>
 
