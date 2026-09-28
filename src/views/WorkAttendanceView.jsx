@@ -398,40 +398,28 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           }}
         >
           {/* Live Time & Date Unified Block */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                backgroundColor: isNightTime ? '#EEF2FF' : '#FEF3C7',
-                border: `1px solid ${isNightTime ? '#C7D2FE' : '#FDE68A'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              {isNightTime ? (
-                <MoonStars
-                  size={22}
-                  weight="fill"
-                  color="#6366F1"
-                  style={{
-                    filter: 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.35))',
-                  }}
-                />
-              ) : (
-                <Sun
-                  size={22}
-                  weight="fill"
-                  color="#D97706"
-                  style={{
-                    filter: 'drop-shadow(0 0 4px rgba(217, 119, 6, 0.35))',
-                  }}
-                />
-              )}
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {isNightTime ? (
+              <MoonStars
+                size={26}
+                weight="fill"
+                color="#6366F1"
+                style={{
+                  filter: 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.35))',
+                  flexShrink: 0,
+                }}
+              />
+            ) : (
+              <Sun
+                size={26}
+                weight="fill"
+                color="#F59E0B"
+                style={{
+                  filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.4))',
+                  flexShrink: 0,
+                }}
+              />
+            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
               {/* Tanggal di Atas */}
