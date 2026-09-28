@@ -438,8 +438,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusLabel: language === 'id'
         ? (isClockedIn ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Tepat Waktu') : clockOutTime ? (isClockInLate ? `Terlambat (${clockInLateMinutes}m)` : 'Selesai') : 'Belum Absen')
         : (isClockedIn ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'On Time') : clockOutTime ? (isClockInLate ? `Late (${clockInLateMinutes}m)` : 'Completed') : 'Pending'),
-      statusColor: isClockInLate ? '#D97706' : '#16A34A',
-      statusBg: isClockInLate ? '#FEF3C7' : '#DCFCE7',
+      statusColor: (isClockInLate || (!isClockedIn && !clockOutTime)) ? '#D97706' : '#16A34A',
+      statusBg: (isClockInLate || (!isClockedIn && !clockOutTime)) ? '#FEF3C7' : '#DCFCE7',
       location: activeLocationTitle,
       note: isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola',
     },

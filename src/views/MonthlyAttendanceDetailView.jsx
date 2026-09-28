@@ -386,6 +386,21 @@ export const MonthlyAttendanceDetailView = ({
             Alpha
           </span>
         );
+      case 'pending':
+        return (
+          <span
+            style={{
+              backgroundColor: '#FEF3C7',
+              color: '#D97706',
+              fontSize: '0.6875rem',
+              fontWeight: 700,
+              padding: '2px 8px',
+              borderRadius: '9999px',
+            }}
+          >
+            {language === 'id' ? 'Belum Absen' : 'Pending'}
+          </span>
+        );
       default:
         return null;
     }
