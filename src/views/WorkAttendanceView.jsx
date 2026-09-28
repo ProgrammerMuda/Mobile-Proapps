@@ -2111,7 +2111,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <circle
                     cx="200"
                     cy="100"
-                    r="65"
+                    r="80"
                     fill="rgba(9, 178, 255, 0.16)"
                     stroke="#09B2FF"
                     strokeWidth="2"
@@ -2123,8 +2123,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 <div
                   style={{
                     position: 'absolute',
-                    left: '200px',
-                    top: '100px',
+                    left: '50%',
+                    top: '50%',
                     transform: 'translate(-50%, -50%)',
                     display: 'flex',
                     flexDirection: 'column',
@@ -2437,12 +2437,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <path d="M200,-20 Q210,100 190,220" stroke="#E2E8F0" strokeWidth="28" fill="none" />
                   <path d="M40,140 Q180,130 360,140" stroke="#FFFFFF" strokeWidth="18" fill="none" />
 
-                  {/* Workplace Radius Circle (15m radius centered) */}
+                  {/* Workplace Radius Circle (15m radius widened & centered) */}
                   <circle
                     cx="185"
                     cy="105"
-                    r="52"
-                    fill="rgba(9, 178, 255, 0.15)"
+                    r="76"
+                    fill="rgba(9, 178, 255, 0.16)"
                     stroke="#09B2FF"
                     strokeWidth="2"
                     strokeDasharray="4 2"
@@ -2452,8 +2452,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <line
                     x1="185"
                     y1="105"
-                    x2="335"
-                    y2="45"
+                    x2="340"
+                    y2="38"
                     stroke="#EF4444"
                     strokeWidth="2"
                     strokeDasharray="4 3"
