@@ -75,17 +75,30 @@ const generateMonthlyLogs = (year, monthIndex) => {
     // Skip weekends (Sunday = 0, Saturday = 6)
     if (dayOfWeek === 0 || dayOfWeek === 6) continue;
 
-    if (day === 14) {
-      // 1 Late day
+    if (day === 24 || day === 14) {
+      // Late days
+      const lateMins = day === 24 ? 18 : 14;
       logs.push({
         id: `att-${year}-${monthIndex}-${day}`,
         date: dateObj,
         dayNumber: day,
         status: 'late',
-        clockIn: '08:14 WIB',
+        clockIn: `08:${lateMins} WIB`,
         clockOut: '17:05 WIB',
         workDuration: '8h 51m',
-        notes: 'Terlambat 14 menit',
+        notes: `Terlambat ${lateMins} menit`,
+      });
+    } else if (day === 17 || day === 3) {
+      // Alpha days
+      logs.push({
+        id: `att-${year}-${monthIndex}-${day}`,
+        date: dateObj,
+        dayNumber: day,
+        status: 'alpha',
+        clockIn: '-- : --',
+        clockOut: '-- : --',
+        workDuration: '0h 0m',
+        notes: 'Tanpa Keterangan (Alpha)',
       });
     } else if (day === 8) {
       // 1 Leave day
@@ -98,18 +111,6 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '-- : --',
         workDuration: '0h 0m',
         notes: 'Cuti Tahunan (Disetujui)',
-      });
-    } else if (day === 3) {
-      // 1 Alpha day
-      logs.push({
-        id: `att-${year}-${monthIndex}-${day}`,
-        date: dateObj,
-        dayNumber: day,
-        status: 'alpha',
-        clockIn: '-- : --',
-        clockOut: '-- : --',
-        workDuration: '0h 0m',
-        notes: 'Tanpa Keterangan (Alpha)',
       });
     } else {
       // On time days

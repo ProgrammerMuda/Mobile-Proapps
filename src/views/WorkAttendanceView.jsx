@@ -481,15 +481,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       dateEn: 'Friday, 25 Sep 2026',
       isToday: false,
       shift: activeShiftTitle,
-      clockIn: '07:50',
-      clockOut: '17:00',
-      duration: '09j 10m',
-      status: 'HADIR',
-      statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
-      statusColor: '#16A34A',
-      statusBg: '#DCFCE7',
-      location: isEng ? 'Engineering Room B1 • Radius 8m' : isHk ? 'Area Kolam & Gym • Radius 8m' : isSec ? 'Screening Tamu Basement • Radius 8m' : 'Kantor Pengelola • Radius 8m',
-      note: isEng ? 'Pemeliharaan genset rutin mingguan' : isHk ? 'Sanitasi fasilitas fitness' : isSec ? 'Screening tamu VIP & akses basement' : 'Audit kepuasan tenant mingguan',
+      clockIn: '--:--',
+      clockOut: '--:--',
+      duration: '-',
+      status: 'ALPHA',
+      statusLabel: 'Alpha',
+      statusColor: '#FFFFFF',
+      statusBg: '#DC2626',
+      location: '-',
+      note: language === 'id' ? 'Tanpa Keterangan (Alpha)' : 'Absent without notice (Alpha)',
     },
     {
       id: 'att-5',
@@ -546,6 +546,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     if (historyFilter === 'ALL') return true;
     if (historyFilter === 'HADIR') return item.status === 'HADIR';
     if (historyFilter === 'TERLAMBAT') return item.status === 'TERLAMBAT';
+    if (historyFilter === 'ALPHA') return item.status === 'ALPHA';
     if (historyFilter === 'LIBUR') return item.status === 'LIBUR';
     return true;
   });
@@ -1193,8 +1194,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
             {[
               { id: 'ALL', label: language === 'id' ? 'Semua (7)' : 'All (7)' },
-              { id: 'HADIR', label: language === 'id' ? 'Hadir (5)' : 'Present (5)' },
+              { id: 'HADIR', label: language === 'id' ? 'Hadir (4)' : 'Present (4)' },
               { id: 'TERLAMBAT', label: language === 'id' ? 'Terlambat (1)' : 'Late (1)' },
+              { id: 'ALPHA', label: 'Alpha (1)' },
               { id: 'LIBUR', label: language === 'id' ? 'Libur (1)' : 'Off (1)' },
             ].map((tab) => (
               <button
