@@ -108,15 +108,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const { language } = useLanguage();
 
   // State: Clock In / Out status
-  const [isClockedIn, setIsClockedIn] = useState(true);
-  const [clockInTime, setClockInTime] = useState('08:14 WIB');
+  const [isClockedIn, setIsClockedIn] = useState(false);
+  const [clockInTime, setClockInTime] = useState(null);
   const [clockOutTime, setClockOutTime] = useState(null);
   const [currentTime, setCurrentTime] = useState('');
-  const [elapsedDuration, setElapsedDuration] = useState('03j 45m');
+  const [elapsedDuration, setElapsedDuration] = useState('00j 00m');
 
   // Modals state
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
-  const [actionType, setActionType] = useState('CLOCK_OUT'); // 'CLOCK_IN' | 'CLOCK_OUT'
+  const [actionType, setActionType] = useState('CLOCK_IN'); // 'CLOCK_IN' | 'CLOCK_OUT'
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
@@ -472,24 +472,26 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <SignIn size={14} weight="bold" color="#2563EB" />
                   Clock In
                 </span>
-                <span
-                  style={{
-                    fontSize: '0.5625rem',
-                    fontWeight: 700,
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    backgroundColor: '#DCFCE7',
-                    color: '#15803D',
-                  }}
-                >
-                  {language === 'id' ? 'Tepat Waktu' : 'On Time'}
-                </span>
+                {clockInTime ? (
+                  <span
+                    style={{
+                      fontSize: '0.5625rem',
+                      fontWeight: 700,
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: '#DCFCE7',
+                      color: '#15803D',
+                    }}
+                  >
+                    {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+                  </span>
+                ) : null}
               </div>
-              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.3px' }}>
+              <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockInTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
                 {clockInTime || '--:--'}
               </div>
               <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
-                28 Sep 2026
+                {clockInTime ? '28 Sep 2026' : (language === 'id' ? 'Belum Clock In' : 'Not yet clocked in')}
               </div>
             </div>
 
@@ -510,21 +512,36 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   <SignOut size={14} weight="bold" color="#D97706" />
                   Clock Out
                 </span>
-                <span
-                  style={{
-                    fontSize: '0.5625rem',
-                    fontWeight: 700,
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    backgroundColor: isClockedIn ? '#EFF6FF' : '#DCFCE7',
-                    color: isClockedIn ? '#1D4ED8' : '#15803D',
-                  }}
-                >
-                  {isClockedIn ? (language === 'id' ? 'Aktif' : 'Active') : (language === 'id' ? 'Selesai' : 'Done')}
-                </span>
+                {isClockedIn ? (
+                  <span
+                    style={{
+                      fontSize: '0.5625rem',
+                      fontWeight: 700,
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: '#EFF6FF',
+                      color: '#1D4ED8',
+                    }}
+                  >
+                    {language === 'id' ? 'Aktif' : 'Active'}
+                  </span>
+                ) : clockOutTime ? (
+                  <span
+                    style={{
+                      fontSize: '0.5625rem',
+                      fontWeight: 700,
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      backgroundColor: '#DCFCE7',
+                      color: '#15803D',
+                    }}
+                  >
+                    {language === 'id' ? 'Selesai' : 'Done'}
+                  </span>
+                ) : null}
               </div>
               <div style={{ fontSize: '1.125rem', fontWeight: 800, color: clockOutTime ? '#0F172A' : '#94A3B8', letterSpacing: '-0.3px' }}>
-                {clockOutTime || (isClockedIn ? '--:--' : '--:--')}
+                {clockOutTime || '--:--'}
               </div>
               <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
                 {clockOutTime ? '28 Sep 2026' : (language === 'id' ? 'Belum Clock Out' : 'Not yet clocked out')}
