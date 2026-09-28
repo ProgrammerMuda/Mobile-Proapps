@@ -1969,269 +1969,244 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       })()}
 
       {/* =========================================================================
-          MODAL 1.8: CHECK IN CONFIRMATION SCREEN (PROAPPS DESIGN SYSTEM)
+          MODAL 1.8: CHECK IN CONFIRMATION BOTTOM SHEET (PROAPPS DESIGN SYSTEM)
           ========================================================================= */}
       {isCheckInPageOpen && (() => {
         const modalTarget = getModalTarget();
         const modalElement = (
           <div
+            onClick={() => setIsCheckInPageOpen(false)}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'var(--color-background-page, #F8FAFC)',
+              backgroundColor: 'rgba(15, 23, 42, 0.65)',
               zIndex: 99998,
               display: 'flex',
               flexDirection: 'column',
-              overflow: 'hidden',
+              justifyContent: 'flex-end',
+              backdropFilter: 'blur(4px)',
               fontFamily: 'var(--font-sans)',
             }}
           >
-            {/* Top Bar Header (Clean White Surface) */}
             <div
-              style={{
-                height: '56px',
-                backgroundColor: 'var(--color-background-surface, #FFFFFF)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '0 16px',
-                zIndex: 20,
-                borderBottom: '1px solid var(--color-border-default, #E5E7EB)',
-                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.03)',
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setIsCheckInPageOpen(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  padding: '6px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: 'var(--color-text-primary, #334155)',
-                  borderRadius: '8px',
-                }}
-              >
-                <CaretLeft size={24} weight="bold" />
-              </button>
-
-              <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: 'var(--color-text-primary, #334155)', margin: 0 }}>
-                {actionType === 'CLOCK_IN'
-                  ? (language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In')
-                  : (language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out')}
-              </h2>
-
-              <div style={{ width: '36px' }} />
-            </div>
-
-            {/* Upper Map Area (ProApps Vector Map Theme) */}
-            <div
-              style={{
-                flex: 1,
-                position: 'relative',
-                backgroundColor: '#F1F5F9',
-                overflow: 'hidden',
-              }}
-            >
-              {/* Stylized Vector Map with ProApps Palette */}
-              <svg
-                width="100%"
-                height="100%"
-                viewBox="0 0 400 480"
-                preserveAspectRatio="xMidYMid slice"
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-              >
-                {/* Background base */}
-                <rect width="400" height="480" fill="#F8FAFC" />
-
-                {/* Soft Greenery / Park Areas */}
-                <path d="M0,0 L160,0 L140,110 L50,130 L0,80 Z" fill="#DCFCE7" opacity="0.8" />
-                <path d="M-20,100 Q80,120 70,220 L0,230 Z" fill="#D1FAE5" opacity="0.7" />
-                <path d="M240,120 Q320,80 420,130 L420,240 Q330,220 250,210 Z" fill="#F0FDF4" opacity="0.9" />
-                <path d="M260,250 L420,270 L420,440 L280,420 Z" fill="#E2E8F0" opacity="0.5" />
-
-                {/* Road Networks */}
-                <path d="M-20,140 Q180,180 420,160" stroke="#FFFFFF" strokeWidth="24" fill="none" strokeLinecap="round" />
-                <path d="M-20,140 Q180,180 420,160" stroke="#E2E8F0" strokeWidth="26" fill="none" strokeLinecap="round" style={{ zIndex: -1 }} />
-
-                <path d="M200,-20 Q220,180 180,500" stroke="#FFFFFF" strokeWidth="28" fill="none" />
-                <path d="M200,-20 Q220,180 180,500" stroke="#E2E8F0" strokeWidth="30" fill="none" />
-
-                <path d="M20,320 Q160,300 420,330" stroke="#FFFFFF" strokeWidth="20" fill="none" />
-                <path d="M20,320 Q160,300 420,330" stroke="#E2E8F0" strokeWidth="22" fill="none" />
-
-                {/* Secondary Avenues */}
-                <path d="M120,40 Q180,140 120,260" stroke="#FFFFFF" strokeWidth="12" fill="none" />
-                <path d="M250,80 Q320,180 270,360" stroke="#FFFFFF" strokeWidth="14" fill="none" />
-                <path d="M300,100 Q360,200 350,380" stroke="#FFFFFF" strokeWidth="10" fill="none" />
-                <path d="M40,240 Q140,260 220,360" stroke="#FFFFFF" strokeWidth="10" fill="none" />
-
-                {/* Building Blocks Outline */}
-                <rect x="250" y="220" width="70" height="90" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
-                <rect x="250" y="325" width="70" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
-                <rect x="80" y="270" width="80" height="70" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
-                <rect x="175" y="210" width="50" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" opacity="0.9" />
-
-                {/* ProApps Secondary Blue Geofence Circular Radius Area */}
-                <circle
-                  cx="165"
-                  cy="235"
-                  r="92"
-                  fill="rgba(9, 178, 255, 0.14)"
-                  stroke="#09B2FF"
-                  strokeWidth="2.5"
-                  strokeDasharray="5 3"
-                />
-              </svg>
-
-              {/* ProApps Center Building Pin (Primary Color #053079) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '165px',
-                  top: '235px',
-                  transform: 'translate(-50%, -50%)',
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: '50%',
-                  backgroundColor: 'var(--color-primary, #053079)',
-                  border: '3px solid #FFFFFF',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 14px rgba(5, 48, 121, 0.35)',
-                  zIndex: 8,
-                }}
-              >
-                <Buildings size={22} weight="fill" color="#FFFFFF" />
-              </div>
-
-              {/* User Location Pin (Inside Radius with ProApps Secondary Ring) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '198px',
-                  top: '200px',
-                  transform: 'translate(-50%, -100%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  zIndex: 10,
-                }}
-              >
-                {/* Teardrop Pin */}
-                <div
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '50% 50% 50% 0',
-                    transform: 'rotate(-45deg)',
-                    backgroundColor: 'var(--color-primary, #053079)',
-                    border: '3px solid #09B2FF',
-                    boxShadow: '0 6px 16px rgba(5, 48, 121, 0.4)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ transform: 'rotate(45deg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {checkInSnapshot?.photo && checkInSnapshot.photo !== 'simulated_photo' ? (
-                      <img
-                        src={checkInSnapshot.photo}
-                        alt="Pin User"
-                        style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <UserCheck size={20} weight="bold" color="#FFFFFF" />
-                    )}
-                  </div>
-                </div>
-
-                {/* Radar Ground Shadow */}
-                <div
-                  style={{
-                    width: '14px',
-                    height: '5px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(9, 178, 255, 0.4)',
-                    marginTop: '2px',
-                  }}
-                />
-              </div>
-
-              {/* Floating Status Pill: Didalam Radius (ProApps Token Style) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '16px',
-                  right: '16px',
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #DCFCE7',
-                  padding: '6px 12px',
-                  borderRadius: '9999px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.06)',
-                  fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  color: '#16A34A',
-                }}
-              >
-                <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
-                <span>{language === 'id' ? 'Dalam Radius Presensi' : 'Inside Attendance Radius'}</span>
-              </div>
-            </div>
-
-            {/* Bottom Information Cards (ProApps MaterialCard Standards) */}
-            <div
+              onClick={(e) => e.stopPropagation()}
               style={{
                 backgroundColor: 'var(--color-background-surface, #FFFFFF)',
                 borderTopLeftRadius: '24px',
                 borderTopRightRadius: '24px',
-                borderTop: '1px solid var(--color-border-default, #E5E7EB)',
-                padding: '20px 16px 28px 16px',
-                boxShadow: '0 -6px 24px rgba(0, 0, 0, 0.06)',
+                padding: '16px 20px 32px 20px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '12px',
-                zIndex: 20,
+                gap: '14px',
+                animation: 'slideUp 0.25s ease-out',
+                boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.16)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
               }}
             >
-              {/* Row 1: Check In Time & Photo */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                {/* Left Card: Check In Time */}
+              {/* Drag Handle Bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-4px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '4px',
+                    backgroundColor: '#E2E8F0',
+                    borderRadius: '9999px',
+                  }}
+                />
+              </div>
+
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)', margin: 0 }}>
+                    {actionType === 'CLOCK_IN'
+                      ? (language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In')
+                      : (language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out')}
+                  </h3>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary, #64748B)', margin: '4px 0 0 0' }}>
+                    {language === 'id'
+                      ? 'Verifikasi lokasi radius dan detail presensi Anda'
+                      : 'Verify your radius location and presence details'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsCheckInPageOpen(false)}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    color: 'var(--color-text-secondary, #64748B)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <X size={20} weight="bold" />
+                </button>
+              </div>
+
+              {/* Mini Map Preview Card (Matching Screenshot Reference) */}
+              <div
+                style={{
+                  height: '140px',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid var(--color-border-default, #E5E7EB)',
+                  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.02)',
+                }}
+              >
+                {/* SVG Vector Map */}
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 400 160"
+                  preserveAspectRatio="xMidYMid slice"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                >
+                  <rect width="400" height="160" fill="#F8FAFC" />
+                  <path d="M0,0 L120,0 L100,60 L0,50 Z" fill="#DCFCE7" opacity="0.8" />
+                  <path d="M280,0 L400,0 L400,70 L300,50 Z" fill="#F0FDF4" opacity="0.9" />
+                  <path d="M-20,60 Q180,80 420,70" stroke="#FFFFFF" strokeWidth="22" fill="none" />
+                  <path d="M-20,60 Q180,80 420,70" stroke="#E2E8F0" strokeWidth="24" fill="none" style={{ zIndex: -1 }} />
+                  <path d="M200,-20 Q210,80 190,180" stroke="#FFFFFF" strokeWidth="24" fill="none" />
+                  <path d="M200,-20 Q210,80 190,180" stroke="#E2E8F0" strokeWidth="26" fill="none" />
+                  <path d="M40,110 Q180,100 360,110" stroke="#FFFFFF" strokeWidth="16" fill="none" />
+                  <circle
+                    cx="200"
+                    cy="90"
+                    r="55"
+                    fill="rgba(9, 178, 255, 0.16)"
+                    stroke="#09B2FF"
+                    strokeWidth="2"
+                    strokeDasharray="4 2"
+                  />
+                </svg>
+
+                {/* Top Floating Pill: Current Location (Matching Screenshot) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    right: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderRadius: '12px',
+                    padding: '6px 12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                    backdropFilter: 'blur(4px)',
+                    zIndex: 5,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--color-selected-background, #EAF7FF)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <MapPin size={14} weight="fill" color="var(--color-primary, #053079)" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '0.5625rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      {language === 'id' ? 'Lokasi Terkunci' : 'Current Location'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {checkInSnapshot?.location || baseLocationName}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      backgroundColor: '#DCFCE7',
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                      fontSize: '0.625rem',
+                      fontWeight: 700,
+                      color: '#16A34A',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
+                    <span>Radius OK</span>
+                  </div>
+                </div>
+
+                {/* Center User Pin inside Radius */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '200px',
+                    top: '90px',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    zIndex: 4,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '26px',
+                      height: '26px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--color-primary, #053079)',
+                      border: '2.5px solid #FFFFFF',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(5, 48, 121, 0.4)',
+                    }}
+                  >
+                    <UserCheck size={14} weight="bold" color="#FFFFFF" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid Cards (Waktu Masuk & Foto Selfie) */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {/* Waktu Presensi */}
                 <div
                   style={{
                     backgroundColor: 'var(--color-background-surface, #FFFFFF)',
                     border: '1px solid var(--color-border-default, #E5E7EB)',
                     borderRadius: '14px',
-                    padding: '12px 14px',
+                    padding: '10px 12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '3px' }}>
-                      {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Waktu Masuk' : 'Clock In Time') : (language === 'id' ? 'Waktu Pulang' : 'Clock Out Time')}
+                    <div style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '2px' }}>
+                      {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Waktu Masuk' : 'Clock In') : (language === 'id' ? 'Waktu Pulang' : 'Clock Out')}
                     </div>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
+                    <div style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
                       {checkInSnapshot?.timeShort || '08:14'} WIB
                     </div>
                   </div>
                   <div
                     style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '10px',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
                       backgroundColor: 'var(--color-selected-background, #EAF7FF)',
                       border: '1px solid #BAE6FD',
                       display: 'flex',
@@ -2242,28 +2217,28 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     }}
                   >
                     {actionType === 'CLOCK_IN' ? (
-                      <SignIn size={18} weight="bold" color="var(--color-primary, #053079)" />
+                      <SignIn size={16} weight="bold" color="var(--color-primary, #053079)" />
                     ) : (
-                      <SignOut size={18} weight="bold" color="var(--color-primary, #053079)" />
+                      <SignOut size={16} weight="bold" color="var(--color-primary, #053079)" />
                     )}
                   </div>
                 </div>
 
-                {/* Right Card: Photo */}
+                {/* Foto Selfie */}
                 <div
                   style={{
                     backgroundColor: 'var(--color-background-surface, #FFFFFF)',
                     border: '1px solid var(--color-border-default, #E5E7EB)',
                     borderRadius: '14px',
-                    padding: '12px 14px',
+                    padding: '10px 12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '3px' }}>
-                      {language === 'id' ? 'Foto Selfie' : 'Selfie Photo'}
+                    <div style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '2px' }}>
+                      {language === 'id' ? 'Foto Selfie' : 'Selfie'}
                     </div>
                     <button
                       type="button"
@@ -2272,7 +2247,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         background: 'none',
                         border: 'none',
                         padding: 0,
-                        fontSize: '0.8125rem',
+                        fontSize: '0.75rem',
                         fontWeight: 700,
                         color: 'var(--color-secondary, #09B2FF)',
                         textDecoration: 'underline',
@@ -2283,13 +2258,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       {language === 'id' ? 'Lihat Foto' : 'See Photo'}
                     </button>
                   </div>
-                  {/* Photo Thumbnail */}
                   <div
                     onClick={() => setIsPreviewPhotoOpen(true)}
                     style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '8px',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '6px',
                       overflow: 'hidden',
                       cursor: 'pointer',
                       border: '1.5px solid var(--color-secondary, #09B2FF)',
@@ -2307,40 +2281,40 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                     ) : (
-                      <UserCheck size={18} color="#FFFFFF" weight="bold" />
+                      <UserCheck size={16} color="#FFFFFF" weight="bold" />
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Row 2: Location Card */}
+              {/* Lokasi & Koordinat Lat Long */}
               <div
                 style={{
                   backgroundColor: 'var(--color-background-surface, #FFFFFF)',
                   border: '1px solid var(--color-border-default, #E5E7EB)',
                   borderRadius: '14px',
-                  padding: '12px 14px',
+                  padding: '10px 12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}
               >
                 <div style={{ flex: 1, paddingRight: '8px' }}>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '3px' }}>
-                    {language === 'id' ? 'Lokasi Presensi' : 'Presence Location'}
+                  <div style={{ fontSize: '0.625rem', fontWeight: 700, color: 'var(--color-text-secondary, #64748B)', letterSpacing: '0.03em', textTransform: 'uppercase', marginBottom: '2px' }}>
+                    {language === 'id' ? 'Titik Lokasi & Koordinat' : 'Location & Coordinates'}
                   </div>
-                  <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 800, color: 'var(--color-text-primary, #334155)' }}>
                     {checkInSnapshot?.location || baseLocationName}
                   </div>
                   <div style={{ fontSize: '0.625rem', color: 'var(--color-text-secondary, #64748B)', fontFamily: 'monospace', marginTop: '2px' }}>
-                    GPS: {checkInSnapshot?.coords?.lat || userCoords.lat}, {checkInSnapshot?.coords?.lng || userCoords.lng}
+                    Lat: {checkInSnapshot?.coords?.lat || userCoords.lat}, Long: {checkInSnapshot?.coords?.lng || userCoords.lng}
                   </div>
                 </div>
                 <div
                   style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '10px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
                     backgroundColor: 'var(--color-selected-background, #EAF7FF)',
                     border: '1px solid #BAE6FD',
                     display: 'flex',
@@ -2350,17 +2324,17 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                     flexShrink: 0,
                   }}
                 >
-                  <MapPin size={20} weight="fill" color="var(--color-primary, #053079)" />
+                  <MapPin size={18} weight="fill" color="var(--color-primary, #053079)" />
                 </div>
               </div>
 
-              {/* Bottom Action Button: ProApps Brand Primary Button */}
+              {/* Bottom Confirm Action Button */}
               <button
                 type="button"
                 onClick={handleFinalCheckIn}
                 style={{
                   width: '100%',
-                  height: '50px',
+                  height: '48px',
                   backgroundColor: 'var(--color-primary, #053079)',
                   color: '#FFFFFF',
                   border: 'none',
@@ -2371,9 +2345,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginTop: '4px',
+                  marginTop: '2px',
                   boxShadow: '0 4px 14px rgba(5, 48, 121, 0.25)',
-                  transition: 'opacity 0.2s ease',
                 }}
               >
                 {actionType === 'CLOCK_IN'
