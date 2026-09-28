@@ -1208,7 +1208,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   backgroundColor: '#FFFFFF',
                   borderRadius: '14px',
                   border: item.isToday ? '1.5px solid #2563EB' : '1px solid #E2E8F0',
-                  padding: '14px',
+                  padding: '14px 16px',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '10px',
@@ -1218,7 +1218,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 {/* Header: Date & Status Badge */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0F172A' }}>
+                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1E293B' }}>
                       {language === 'id' ? item.date : item.dateEn}
                     </span>
                     {item.isToday && (
@@ -1245,61 +1245,54 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                       backgroundColor: item.statusBg,
                       color: item.statusColor,
                       padding: '2px 8px',
-                      borderRadius: '6px',
+                      borderRadius: '9999px',
                     }}
                   >
                     {item.statusLabel}
                   </span>
                 </div>
 
-                {/* Body: Shift & Clock Times */}
+                {/* Body: 2-Column Clock In & Clock Out Tiles (Matching Daily Attendance Record) */}
                 {item.status !== 'LIBUR' ? (
                   <>
                     <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '6px',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '10px',
                         backgroundColor: '#F8FAFC',
                         borderRadius: '10px',
-                        padding: '8px 10px',
-                        textAlign: 'center',
+                        padding: '8px 12px',
+                        border: '1px solid #F1F5F9',
                       }}
                     >
-                      <div>
-                        <div style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>
-                          Clock In
-                        </div>
-                        <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0F172A', marginTop: '2px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                          {language === 'id' ? 'Masuk' : 'Clock In'}
+                        </span>
+                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
                           {item.clockIn}
                         </div>
                       </div>
 
-                      <div>
-                        <div style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>
-                          Clock Out
-                        </div>
-                        <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#0F172A', marginTop: '2px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                          {language === 'id' ? 'Keluar' : 'Clock Out'}
+                        </span>
+                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#1E293B' }}>
                           {item.clockOut}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>
-                          {language === 'id' ? 'Total Durasi' : 'Duration'}
-                        </div>
-                        <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#15803D', marginTop: '2px' }}>
-                          {item.duration}
                         </div>
                       </div>
                     </div>
 
+                    {/* Footer: Notes & Duration */}
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <MapPin size={12} color="#64748B" />
-                        {item.location}
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+                        {item.note || item.location}
                       </span>
-                      <span>{item.shift}</span>
+                      <span style={{ fontWeight: 600, color: '#334155' }}>
+                        {language === 'id' ? `Durasi: ${item.duration}` : `Duration: ${item.duration}`}
+                      </span>
                     </div>
                   </>
                 ) : (
