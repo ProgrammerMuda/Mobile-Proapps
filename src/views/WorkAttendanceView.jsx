@@ -2090,63 +2090,29 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   />
                 </svg>
 
-                {/* Top Floating Pill: Current Location (Matching Screenshot) */}
+                {/* Status Badge Top-Right */}
                 <div
                   style={{
                     position: 'absolute',
                     top: '10px',
-                    left: '10px',
                     right: '10px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    borderRadius: '12px',
-                    padding: '6px 12px',
-                    display: 'flex',
+                    backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                    border: '1px solid #DCFCE7',
+                    padding: '4px 10px',
+                    borderRadius: '9999px',
+                    display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+                    gap: '5px',
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
                     backdropFilter: 'blur(4px)',
+                    fontSize: '0.625rem',
+                    fontWeight: 700,
+                    color: '#16A34A',
                     zIndex: 5,
                   }}
                 >
-                  <div
-                    style={{
-                      width: '24px',
-                      height: '24px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--color-selected-background, #EAF7FF)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <MapPin size={14} weight="fill" color="var(--color-primary, #053079)" />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '0.5625rem', color: '#64748B', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      {language === 'id' ? 'Lokasi Terkunci' : 'Current Location'}
-                    </div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {checkInSnapshot?.location || baseLocationName}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      backgroundColor: '#DCFCE7',
-                      padding: '2px 8px',
-                      borderRadius: '9999px',
-                      fontSize: '0.625rem',
-                      fontWeight: 700,
-                      color: '#16A34A',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
-                    <span>Radius OK</span>
-                  </div>
+                  <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#16A34A' }} />
+                  <span>{language === 'id' ? 'Dalam Radius Presensi' : 'Inside Radius'}</span>
                 </div>
 
                 {/* Center User Pin inside Radius */}
