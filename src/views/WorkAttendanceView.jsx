@@ -102,23 +102,6 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
           </div>
         </div>
       </div>
-
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          backgroundColor: 'rgba(255, 255, 255, 0.15)',
-          padding: '4px 8px',
-          borderRadius: '9999px',
-          fontSize: '0.6875rem',
-          fontWeight: 600,
-          color: '#E0F2FE',
-        }}
-      >
-        <ShieldCheck size={14} weight="fill" color="#38BDF8" />
-        <span>Online</span>
-      </div>
     </div>
   );
 };
@@ -397,55 +380,85 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             gap: '16px',
           }}
         >
-          {/* Live Time & Date Unified Block */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {isNightTime ? (
-              <MoonStars
-                size={26}
-                weight="fill"
-                color="#6366F1"
+          {/* Live Time, Date & Live GPS Row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {isNightTime ? (
+                <MoonStars
+                  size={26}
+                  weight="fill"
+                  color="#6366F1"
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.35))',
+                    flexShrink: 0,
+                  }}
+                />
+              ) : (
+                <Sun
+                  size={26}
+                  weight="fill"
+                  color="#F59E0B"
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.4))',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                {/* Tanggal di Atas */}
+                <span
+                  style={{
+                    fontSize: '0.6875rem',
+                    fontWeight: 600,
+                    color: '#64748B',
+                  }}
+                >
+                  {language === 'id' ? 'Senin, 28 Sep 2026' : 'Monday, Sep 28, 2026'}
+                </span>
+
+                {/* Jam di Bawah */}
+                <span
+                  style={{
+                    fontSize: '1.0625rem',
+                    fontWeight: 800,
+                    color: '#0F172A',
+                    letterSpacing: '-0.2px',
+                    fontVariantNumeric: 'tabular-nums',
+                    marginTop: '2px',
+                  }}
+                >
+                  {currentTime || '08:14:00 WIB'}
+                </span>
+              </div>
+            </div>
+
+            {/* Live GPS Badge disamping jam */}
+            <div
+              style={{
+                backgroundColor: '#EFF6FF',
+                border: '1px solid #DBEAFE',
+                borderRadius: '9999px',
+                padding: '4px 10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                fontSize: '0.6875rem',
+                fontWeight: 700,
+                color: '#1D4ED8',
+              }}
+            >
+              <div
                 style={{
-                  filter: 'drop-shadow(0 0 4px rgba(99, 102, 241, 0.35))',
-                  flexShrink: 0,
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: '#16A34A',
+                  boxShadow: '0 0 0 2px rgba(22, 163, 74, 0.25)',
                 }}
               />
-            ) : (
-              <Sun
-                size={26}
-                weight="fill"
-                color="#F59E0B"
-                style={{
-                  filter: 'drop-shadow(0 0 4px rgba(245, 158, 11, 0.4))',
-                  flexShrink: 0,
-                }}
-              />
-            )}
-
-            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-              {/* Tanggal di Atas */}
-              <span
-                style={{
-                  fontSize: '0.6875rem',
-                  fontWeight: 600,
-                  color: '#64748B',
-                }}
-              >
-                {language === 'id' ? 'Senin, 28 Sep 2026' : 'Monday, Sep 28, 2026'}
-              </span>
-
-              {/* Jam di Bawah */}
-              <span
-                style={{
-                  fontSize: '1.0625rem',
-                  fontWeight: 800,
-                  color: '#0F172A',
-                  letterSpacing: '-0.2px',
-                  fontVariantNumeric: 'tabular-nums',
-                  marginTop: '2px',
-                }}
-              >
-                {currentTime || '08:14:00 WIB'}
-              </span>
+              <NavigationArrow size={12} weight="fill" color="#2563EB" />
+              <span>Live GPS</span>
             </div>
           </div>
 
