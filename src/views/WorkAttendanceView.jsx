@@ -1155,36 +1155,28 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
               </span>
             </div>
 
-            <div
+            <button
+              type="button"
+              onClick={() => setIsReportModalOpen(true)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '5px',
-                backgroundColor: '#F0FDF4',
-                border: '1px solid #BBF7D0',
-                padding: '4px 10px',
+                gap: '4px',
+                backgroundColor: '#EFF6FF',
+                border: '1px solid #DBEAFE',
+                padding: '5px 12px',
                 borderRadius: '9999px',
-                boxShadow: '0 1px 3px rgba(22, 163, 74, 0.06)',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                color: '#02388A',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                outline: 'none',
               }}
             >
-              <span
-                style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  backgroundColor: '#16A34A',
-                  display: 'inline-block',
-                  boxShadow: '0 0 0 2.5px rgba(22, 163, 74, 0.2)',
-                }}
-              />
-              <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#15803D', letterSpacing: '-0.1px' }}>
-                {language === 'id' ? '5 Hadir' : '5 Present'}
-              </span>
-              <span style={{ fontSize: '0.625rem', color: '#94A3B8' }}>•</span>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B' }}>
-                {language === 'id' ? '1 Libur' : '1 Off'}
-              </span>
-            </div>
+              <span>{language === 'id' ? 'Lihat Detail' : 'View Detail'}</span>
+              <CaretRight size={13} weight="bold" color="#02388A" />
+            </button>
           </div>
 
           {/* Filter Pills */}
