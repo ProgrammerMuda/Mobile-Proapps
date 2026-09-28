@@ -22,6 +22,8 @@ import {
   WorkOrderDetailHeader,
   HomeServiceDetailView,
   HomeServiceDetailHeader,
+  WorkAttendanceView,
+  WorkAttendanceHeader,
   TenantUnitView,
   TenantUnitHeader,
   UnitTowerView,
@@ -255,6 +257,8 @@ function App() {
             onNextMonth={handleNextHomeServiceMonth}
             onOpenPicker={() => setIsHomeServicePickerOpen(true)}
           />
+        ) : currentScreen === 'work-attendance' ? (
+          <WorkAttendanceHeader onBack={() => setCurrentScreen('home')} />
         ) : null
       }
       bottomNav={
@@ -310,6 +314,8 @@ function App() {
               setCurrentScreen('work-order-detail');
             } else if (menuId === 'home-service') {
               setCurrentScreen('home-service-detail');
+            } else if (menuId === 'attendance' || menuId === 'work-attendance') {
+              setCurrentScreen('work-attendance');
             }
           }}
         />
@@ -460,6 +466,22 @@ function App() {
           }}
           isPickerOpen={isHomeServicePickerOpen}
           setIsPickerOpen={setIsHomeServicePickerOpen}
+        />
+      )}
+
+      {currentScreen === 'work-attendance' && (
+        <WorkAttendanceView
+          user={userSession}
+          onBack={() => setCurrentScreen('home')}
+          onNavigateMenu={(menuId) => {
+            if (menuId === 'tenant-unit') {
+              setCurrentScreen('tenant-unit');
+            } else if (menuId === 'work-order') {
+              setCurrentScreen('work-order-detail');
+            } else if (menuId === 'home-service') {
+              setCurrentScreen('home-service-detail');
+            }
+          }}
         />
       )}
     </AndroidMobileFrame>

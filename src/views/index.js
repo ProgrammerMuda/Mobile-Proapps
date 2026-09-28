@@ -14,3 +14,4 @@ export * from './ProfileView';
 export * from './MonthlyAttendanceDetailView';
 export * from './WorkOrderDetailView';
 export * from './HomeServiceDetailView';
+export * from './WorkAttendanceView';
