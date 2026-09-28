@@ -134,10 +134,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [currentTime, setCurrentTime] = useState('');
   const [elapsedDuration, setElapsedDuration] = useState('03j 45m');
 
-  // Location / Geofence state
-  const [isWithinRadius, setIsWithinRadius] = useState(true);
-  const [currentDistance, setCurrentDistance] = useState(15); // meters
-
   // Modals state
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [actionType, setActionType] = useState('CLOCK_OUT'); // 'CLOCK_IN' | 'CLOCK_OUT'
@@ -335,9 +331,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
   // Handle Clock Action Confirmation
   const handleConfirmClock = () => {
-    if (!isWithinRadius) {
-      return; // Cannot clock if outside radius
-    }
     if (actionType === 'CLOCK_IN') {
       setIsClockedIn(true);
       setClockInTime('08:14 WIB');
@@ -479,55 +472,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </span>
               </div>
             </div>
-          </div>
-
-          {/* Location & Geofence Status Pill */}
-          <div
-            onClick={() => setIsWithinRadius(!isWithinRadius)}
-            style={{
-              backgroundColor: isWithinRadius ? '#F0FDF4' : '#FEF2F2',
-              border: `1px solid ${isWithinRadius ? '#BBF7D0' : '#FECACA'}`,
-              borderRadius: '10px',
-              padding: '8px 12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              cursor: 'pointer',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MapPin
-                size={16}
-                weight="fill"
-                color={isWithinRadius ? '#16A34A' : '#DC2626'}
-              />
-              <div>
-                <div
-                  style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: isWithinRadius ? '#15803D' : '#B91C1C',
-                  }}
-                >
-                  {isWithinRadius
-                    ? (language === 'id' ? 'Dalam Radius Kantor (15m)' : 'Inside Office Radius (15m)')
-                    : (language === 'id' ? 'Di Luar Radius Kantor (450m)' : 'Outside Office Radius (450m)')}
-                </div>
-                <div style={{ fontSize: '0.625rem', color: '#64748B' }}>
-                  Tower A • Main Entrance & Engineering Station
-                </div>
-              </div>
-            </div>
-            <span
-              style={{
-                fontSize: '0.625rem',
-                color: '#02388A',
-                fontWeight: 600,
-                textDecoration: 'underline',
-              }}
-            >
-              {isWithinRadius ? 'Simulasi Luar' : 'Simulasi Masuk'}
-            </span>
           </div>
 
           {/* Clock In vs Clock Out Dual Boxes */}
@@ -1155,60 +1099,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </button>
               </div>
 
-              {/* Geofence Check Condition */}
-              {!isWithinRadius ? (
-                /* Out of Range Warning Screen */
-                <div
-                  style={{
-                    backgroundColor: '#FEF2F2',
-                    border: '1px solid #FECACA',
-                    borderRadius: '16px',
-                    padding: '16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                    gap: '12px',
-                  }}
-                >
-                  <img
-                    src={outOfRangeLocation}
-                    alt="Out of Range"
-                    style={{
-                      width: '140px',
-                      height: 'auto',
-                      objectFit: 'contain',
-                    }}
-                  />
-                  <div>
-                    <h4 style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#991B1B', margin: 0 }}>
-                      {language === 'id' ? 'Di Luar Radius Kantor!' : 'Out of Office Range!'}
-                    </h4>
-                    <p style={{ fontSize: '0.75rem', color: '#7F1D1D', margin: '4px 0 0 0', lineHeight: 1.4 }}>
-                      {language === 'id'
-                        ? 'Jarak Anda 450 meter dari gedung. Harap mendekat ke radius area kantor (maks 50m) untuk presensi.'
-                        : 'You are 450m away from the building. Please move closer to the office radius (max 50m).'}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsWithinRadius(true)}
-                    style={{
-                      padding: '8px 16px',
-                      backgroundColor: '#FFFFFF',
-                      color: '#B91C1C',
-                      border: '1px solid #FECACA',
-                      borderRadius: '8px',
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {language === 'id' ? 'Simulasi Masuk Radius' : 'Simulate In Range'}
-                  </button>
-                </div>
-              ) : (
-                /* Camera & Verification Box */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {/* Camera Face Simulation */}
                   <div
@@ -1265,12 +1155,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                   >
                     <CheckCircle size={18} weight="fill" color="#16A34A" />
                     <div>
-                      <div style={{ fontWeight: 700 }}>Lokasi & Geofence Sesuai</div>
-                      <div style={{ fontSize: '0.6875rem', color: '#166534' }}>Lobby Utama Tower A (Radius 15m)</div>
+                      <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Verifikasi Kehadiran Siap' : 'Attendance Verification Ready'}</div>
+                      <div style={{ fontSize: '0.6875rem', color: '#166534' }}>{userName} • {activeShiftTitle}</div>
                     </div>
                   </div>
                 </div>
-              )}
 
               {/* Action Buttons */}
               <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
@@ -1293,30 +1182,35 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 </button>
                 <button
                   type="button"
-                  disabled={!isWithinRadius}
                   onClick={handleConfirmClock}
                   style={{
                     flex: 2,
                     height: '42px',
-                    backgroundColor: !isWithinRadius ? '#94A3B8' : actionType === 'CLOCK_IN' ? '#16A34A' : '#D97706',
+                    backgroundColor: actionType === 'CLOCK_IN' ? '#16A34A' : '#D97706',
                     color: '#FFFFFF',
                     border: 'none',
                     borderRadius: '12px',
                     fontSize: '0.8125rem',
                     fontWeight: 700,
-                    cursor: !isWithinRadius ? 'not-allowed' : 'pointer',
+                    cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '6px',
+                    boxShadow: actionType === 'CLOCK_IN' ? '0 4px 12px rgba(22, 163, 74, 0.3)' : '0 4px 12px rgba(217, 119, 6, 0.3)',
                   }}
                 >
-                  <Check size={16} weight="bold" />
-                  <span>
-                    {actionType === 'CLOCK_IN'
-                      ? (language === 'id' ? 'Kirim Clock In' : 'Submit Clock In')
-                      : (language === 'id' ? 'Kirim Clock Out' : 'Submit Clock Out')}
-                  </span>
+                  {actionType === 'CLOCK_IN' ? (
+                    <>
+                      <SignIn size={18} weight="bold" />
+                      <span>{language === 'id' ? 'Konfirmasi Clock In' : 'Confirm Clock In'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <SignOut size={18} weight="bold" />
+                      <span>{language === 'id' ? 'Konfirmasi Clock Out' : 'Confirm Clock Out'}</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
