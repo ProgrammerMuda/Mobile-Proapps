@@ -126,6 +126,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '08:18 WIB',
         clockOut: '17:05 WIB',
         workDuration: '8h 47m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Terlambat 18 menit (Macet Tol)',
       });
     } else if (day === 21) {
@@ -140,6 +141,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '07:48 WIB',
         clockOut: '16:45 WIB',
         workDuration: '8h 57m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Pulang 15 menit awal (Izin Urusan Keluarga)',
       });
     } else if (day === 18) {
@@ -154,6 +156,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '07:50 WIB',
         clockOut: '17:02 WIB',
         workDuration: '9h 12m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Shift Pagi (Masuk Awal)',
       });
     } else if (day === 17) {
@@ -168,6 +171,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '-- : --',
         clockOut: '-- : --',
         workDuration: '0h 0m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Tanpa Keterangan (Alpha)',
       });
     } else if (day === 14) {
@@ -183,6 +187,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '08:14 WIB',
         clockOut: '17:05 WIB',
         workDuration: '8h 51m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Terlambat 14 menit',
       });
     } else if (day === 8) {
@@ -197,6 +202,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '-- : --',
         clockOut: '-- : --',
         workDuration: '0h 0m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Cuti Tahunan (Disetujui)',
       });
     } else if (day === 3) {
@@ -211,6 +217,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '-- : --',
         clockOut: '-- : --',
         workDuration: '0h 0m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Tanpa Keterangan (Alpha)',
       });
     } else {
@@ -225,6 +232,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockIn: '08:00 WIB',
         clockOut: '17:00 WIB',
         workDuration: '9h 00m',
+        shift: 'Shift Pagi (08:00 - 17:00)',
         notes: 'Shift Pagi (08:00 - 17:00)',
       });
     }
@@ -1225,12 +1233,12 @@ export const MonthlyAttendanceDetailView = ({
                   </div>
                 </div>
 
-                {/* Footer Notes & Duration */}
+                {/* Footer Shift & Duration */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                  <span style={{ color: isLate ? '#B45309' : isAlpha ? '#DC2626' : '#64748B', fontWeight: (isLate || isAlpha) ? 600 : 400 }}>
-                    {log.notes}
+                  <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                    {log.shift || 'Shift Pagi (08:00 - 17:00)'}
                   </span>
-                  <span style={{ fontWeight: 600, color: '#334155' }}>
+                  <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#334155', flexShrink: 0 }}>
                     {language === 'id' ? `Durasi: ${log.workDuration}` : `Duration: ${log.workDuration}`}
                   </span>
                 </div>
