@@ -1385,9 +1385,16 @@ export const MonthlyAttendanceDetailView = ({
           gap: '14px',
         }}
       >
-        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
-          {language === 'id' ? 'Performa Presensi Per Departemen' : 'Attendance by Department'}
-        </h3>
+        <div>
+          <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+            {language === 'id' ? 'Kehadiran Bulanan Per Departemen' : 'Monthly Attendance by Department'}
+          </h3>
+          <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
+            {language === 'id'
+              ? 'Rata-rata tingkat kehadiran & pemenuhan shift bulanan'
+              : 'Monthly average attendance rate & shift fulfillment'}
+          </p>
+        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {DEPARTMENTS_DATA.map((dept) => {

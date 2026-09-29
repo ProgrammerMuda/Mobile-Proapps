@@ -220,7 +220,7 @@ export const AttendanceDetailHeader = ({
             borderRadius: '9999px',
             fontSize: '0.875rem',
             fontWeight: 700,
-            color: '#1E293B',
+            color: '#334155',
             cursor: 'pointer',
             outline: 'none',
             fontFamily: 'var(--font-sans)',
@@ -573,18 +573,25 @@ export const AttendanceDetailView = ({
       </div>
 
       {/* 2. Section: Attendance by department (Overall progress card) */}
-      <section style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <h2
-          style={{
-            fontSize: '1.0625rem',
-            fontWeight: 700,
-            color: '#1E293B',
-            margin: 0,
-            letterSpacing: '-0.2px',
-          }}
-        >
-          Attendance by department
-        </h2>
+      <section style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {language === 'id' ? 'Kehadiran Departemen Hari Ini' : "Today's Attendance by Department"}
+          </h2>
+          <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
+            {language === 'id'
+              ? 'Presensi personil aktif shift hari ini secara real-time'
+              : 'Real-time active shift personnel presence today'}
+          </p>
+        </div>
 
         <div
           style={{
@@ -692,7 +699,7 @@ export const AttendanceDetailView = ({
                   style={{
                     fontSize: '1.0625rem',
                     fontWeight: 700,
-                    color: '#1E293B',
+                    color: '#334155',
                     margin: 0,
                     letterSpacing: '-0.2px',
                   }}
