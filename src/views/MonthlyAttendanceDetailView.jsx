@@ -1421,16 +1421,42 @@ export const MonthlyAttendanceDetailView = ({
                 const dateObj = log.date;
                 const dayOfWeek = dateObj.getDay();
                 const dayName = language === 'id' ? DAY_NAMES_ID[dayOfWeek] : DAY_NAMES[dayOfWeek];
-                const monthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
-                const dateFormatted = `${dayName}, ${log.dayNumber} ${monthName} ${selectedYear}`;
+                const monthShort = language === 'id' ? MONTH_SHORT_ID[selectedMonth] : MONTH_SHORT[selectedMonth];
+                const dateFormatted = `${dayName}, ${log.dayNumber} ${monthShort} ${selectedYear}`;
+
+                const isLate = log.status === 'late' || log.inStatus === 'LATE' || log.outStatus === 'EARLY_OUT';
+                const isAlpha = log.status === 'alpha';
+                const isOff = log.status === 'leave' || log.status === 'off' || log.status === 'off_day' || log.status === 'LIBUR';
+
+                let cardBg = '#FFFFFF';
+                let cardBorder = '1px solid #E2E8F0';
+                let tileBg = '#F8FAFC';
+                let tileBorder = '1px solid #E2E8F0';
+
+                if (isAlpha) {
+                  cardBg = '#FEF2F2';
+                  cardBorder = '1px solid #FECACA';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #FEE2E2';
+                } else if (isLate) {
+                  cardBg = '#FFFBEB';
+                  cardBorder = '1px solid #FDE68A';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #FEF3C7';
+                } else if (isOff) {
+                  cardBg = '#F8FAFC';
+                  cardBorder = '1px solid #E2E8F0';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #E2E8F0';
+                }
 
                 return (
                   <div
                     key={log.id}
                     style={{
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: cardBg,
                       borderRadius: '14px',
-                      border: '1px solid #E2E8F0',
+                      border: cardBorder,
                       padding: '14px 16px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -1449,10 +1475,10 @@ export const MonthlyAttendanceDetailView = ({
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
                         gap: '10px',
-                        backgroundColor: '#F8FAFC',
+                        backgroundColor: tileBg,
                         borderRadius: '10px',
                         padding: '8px 12px',
-                        border: '1px solid #E2E8F0',
+                        border: tileBorder,
                       }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
@@ -1836,13 +1862,39 @@ export const MonthlyAttendanceDetailView = ({
               displayEmployeesList.map((emp) => {
                 const dateText = language === 'id' ? emp.dateFormattedId : emp.dateFormattedEn;
 
+                const isLate = emp.status === 'LATE' || emp.inStatus === 'LATE' || emp.outStatus === 'EARLY_OUT';
+                const isAlpha = emp.status === 'ALPHA';
+                const isOff = emp.status === 'LEAVE' || emp.status === 'OFF' || emp.status === 'LIBUR';
+
+                let cardBg = '#FFFFFF';
+                let cardBorder = '1px solid #E2E8F0';
+                let tileBg = '#F8FAFC';
+                let tileBorder = '1px solid #E2E8F0';
+
+                if (isAlpha) {
+                  cardBg = '#FEF2F2';
+                  cardBorder = '1px solid #FECACA';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #FEE2E2';
+                } else if (isLate) {
+                  cardBg = '#FFFBEB';
+                  cardBorder = '1px solid #FDE68A';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #FEF3C7';
+                } else if (isOff) {
+                  cardBg = '#F8FAFC';
+                  cardBorder = '1px solid #E2E8F0';
+                  tileBg = '#FFFFFF';
+                  tileBorder = '1px solid #E2E8F0';
+                }
+
                 return (
                   <div
                     key={emp.recordId || emp.id}
                     style={{
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: cardBg,
                       borderRadius: '14px',
-                      border: '1px solid #E2E8F0',
+                      border: cardBorder,
                       padding: '14px 16px',
                       display: 'flex',
                       flexDirection: 'column',
@@ -1873,8 +1925,8 @@ export const MonthlyAttendanceDetailView = ({
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
                         gap: '10px',
-                        backgroundColor: '#F8FAFC',
-                        border: '1px solid #E2E8F0',
+                        backgroundColor: tileBg,
+                        border: tileBorder,
                         borderRadius: '10px',
                         padding: '8px 12px',
                       }}
