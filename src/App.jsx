@@ -72,6 +72,7 @@ function App() {
   const [monthlyAttendanceDay, setMonthlyAttendanceDay] = useState(24); // Day 24
   const [isMonthlyAttendancePickerOpen, setIsMonthlyAttendancePickerOpen] = useState(false);
   const [monthlyAttendancePreviousScreen, setMonthlyAttendancePreviousScreen] = useState('overview');
+  const [monthlyAttendanceMainTab, setMonthlyAttendanceMainTab] = useState('MY_ATTENDANCE'); // 'MY_ATTENDANCE' | 'EMPLOYEES'
   const [workOrderMonth, setWorkOrderMonth] = useState(8); // 8 = September
   const [workOrderYear, setWorkOrderYear] = useState(2026);
   const [isWorkOrderPickerOpen, setIsWorkOrderPickerOpen] = useState(false);
@@ -434,8 +435,13 @@ function App() {
               setCurrentScreen('financial-detail');
             } else if (secLower === 'tenant requests') {
               setCurrentScreen('request-detail');
-            } else if (secLower === 'monthly attendance' || secLower === 'employee attendance') {
+            } else if (secLower === 'employee attendance' || secLower === 'employee attendance list') {
               setMonthlyAttendancePreviousScreen('overview');
+              setMonthlyAttendanceMainTab('EMPLOYEES');
+              setCurrentScreen('monthly-attendance');
+            } else if (secLower === 'monthly attendance') {
+              setMonthlyAttendancePreviousScreen('overview');
+              setMonthlyAttendanceMainTab('MY_ATTENDANCE');
               setCurrentScreen('monthly-attendance');
             } else if (secLower === 'work order' || secLower === 'my work orders') {
               setCurrentScreen('work-order-detail');
@@ -490,6 +496,8 @@ function App() {
       {currentScreen === 'monthly-attendance' && (
         <MonthlyAttendanceDetailView
           user={userSession}
+          activeMainTab={monthlyAttendanceMainTab}
+          onMainTabChange={setMonthlyAttendanceMainTab}
           periodMode={attendancePeriodMode}
           onPeriodModeChange={setAttendancePeriodMode}
           selectedMonth={monthlyAttendanceMonth}

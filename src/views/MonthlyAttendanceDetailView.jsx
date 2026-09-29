@@ -711,6 +711,9 @@ export const MonthlyAttendanceDetailHeader = ({
  */
 export const MonthlyAttendanceDetailView = ({
   user,
+  onBack,
+  activeMainTab: controlledActiveMainTab,
+  onMainTabChange,
   periodMode = 'monthly', // 'monthly' | 'weekly' | 'daily'
   onPeriodModeChange,
   selectedMonth = 8,
@@ -725,7 +728,21 @@ export const MonthlyAttendanceDetailView = ({
   const isBM = user?.roleCode === 'BM';
 
   // For BM: Tab switcher between 'MY_ATTENDANCE' and 'EMPLOYEES'
-  const [activeMainTab, setActiveMainTab] = useState('MY_ATTENDANCE');
+  const [internalActiveMainTab, setInternalActiveMainTab] = useState(
+    controlledActiveMainTab || 'MY_ATTENDANCE'
+  );
+
+  React.useEffect(() => {
+    if (controlledActiveMainTab !== undefined) {
+      setInternalActiveMainTab(controlledActiveMainTab);
+    }
+  }, [controlledActiveMainTab]);
+
+  const activeMainTab = controlledActiveMainTab !== undefined ? controlledActiveMainTab : internalActiveMainTab;
+  const setActiveMainTab = (tab) => {
+    setInternalActiveMainTab(tab);
+    if (onMainTabChange) onMainTabChange(tab);
+  };
 
   // Filter & Search states
   const [activeFilter, setActiveFilter] = useState('ALL');
