@@ -622,7 +622,7 @@ export const MonthlyAttendanceDetailView = ({
   };
 
   const renderLogBadges = (log) => {
-    if (log.status === 'leave') {
+    if (log.status === 'leave' || log.status === 'off' || log.status === 'off_day' || log.status === 'LIBUR') {
       return (
         <span
           style={{
@@ -634,7 +634,9 @@ export const MonthlyAttendanceDetailView = ({
             borderRadius: '9999px',
           }}
         >
-          {language === 'id' ? 'Izin / Cuti' : 'Leave'}
+          {log.status === 'off' || log.status === 'off_day' || log.status === 'LIBUR'
+            ? (language === 'id' ? 'Libur' : 'Day Off')
+            : (language === 'id' ? 'Izin / Cuti' : 'Leave')}
         </span>
       );
     }
@@ -772,7 +774,7 @@ export const MonthlyAttendanceDetailView = ({
   };
 
   const renderEmployeeBadges = (emp) => {
-    if (emp.status === 'LEAVE') {
+    if (emp.status === 'LEAVE' || emp.status === 'OFF' || emp.status === 'LIBUR') {
       return (
         <span
           style={{
@@ -784,7 +786,9 @@ export const MonthlyAttendanceDetailView = ({
             borderRadius: '9999px',
           }}
         >
-          {language === 'id' ? 'Izin / Cuti' : 'Leave'}
+          {emp.status === 'OFF' || emp.status === 'LIBUR'
+            ? (language === 'id' ? 'Libur' : 'Day Off')
+            : (language === 'id' ? 'Izin / Cuti' : 'Leave')}
         </span>
       );
     }

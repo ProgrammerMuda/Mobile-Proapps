@@ -573,7 +573,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
   // Helper to render multiple status badges
   const renderHistoryBadges = (item) => {
-    if (item.status === 'LIBUR') {
+    if (item.status === 'LIBUR' || item.status === 'LEAVE' || item.status === 'IZIN') {
       return (
         <span
           style={{
@@ -585,7 +585,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             borderRadius: '9999px',
           }}
         >
-          {language === 'id' ? 'Libur' : 'Day Off'}
+          {item.status === 'LIBUR'
+            ? (language === 'id' ? 'Libur' : 'Day Off')
+            : (language === 'id' ? 'Izin / Cuti' : 'Leave')}
         </span>
       );
     }
