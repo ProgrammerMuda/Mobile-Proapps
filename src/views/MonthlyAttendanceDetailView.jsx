@@ -812,11 +812,10 @@ export const MonthlyAttendanceDetailView = ({
   );
 
   const totalEmpRecords = allPeriodEmployeeRecords.length;
-  const empKpiOntime = allPeriodEmployeeRecords.filter((e) => e.status === 'ONTIME').length;
-  const empKpiLate = allPeriodEmployeeRecords.filter((e) => e.status === 'LATE').length;
+  const empKpiOntime = allPeriodEmployeeRecords.filter((e) => e.status === 'ONTIME' || (e.inStatus === 'EARLY_IN' && e.outStatus !== 'EARLY_OUT')).length;
+  const empKpiLate = allPeriodEmployeeRecords.filter((e) => e.status === 'LATE' || e.inStatus === 'LATE' || e.outStatus === 'EARLY_OUT' || e.status === 'EARLY_OUT').length;
   const empKpiLeave = allPeriodEmployeeRecords.filter((e) => e.status === 'LEAVE' || e.status === 'OFF' || e.status === 'LIBUR').length;
   const empKpiAlpha = allPeriodEmployeeRecords.filter((e) => e.status === 'ALPHA').length;
-  const empKpiHadir = empKpiOntime + empKpiLate;
 
   // Filtered employees list for display in BM tab
   const displayEmployeesList = useMemo(() => {
@@ -825,8 +824,14 @@ export const MonthlyAttendanceDetailView = ({
         return false;
       }
       if (employeeStatusFilter !== 'ALL') {
-        if (employeeStatusFilter === 'ONTIME' && emp.status !== 'ONTIME') return false;
-        if (employeeStatusFilter === 'LATE' && emp.status !== 'LATE') return false;
+        if (employeeStatusFilter === 'ONTIME') {
+          const isOntime = emp.status === 'ONTIME' || (emp.inStatus === 'EARLY_IN' && emp.outStatus !== 'EARLY_OUT') || (emp.inStatus === 'ON_TIME' && emp.outStatus === 'ON_TIME');
+          if (!isOntime) return false;
+        }
+        if (employeeStatusFilter === 'LATE') {
+          const isLate = emp.status === 'LATE' || emp.inStatus === 'LATE' || emp.outStatus === 'EARLY_OUT' || emp.status === 'EARLY_OUT';
+          if (!isLate) return false;
+        }
         if (employeeStatusFilter === 'LEAVE' && (emp.status !== 'LEAVE' && emp.status !== 'OFF' && emp.status !== 'LIBUR')) return false;
         if (employeeStatusFilter === 'ALPHA' && emp.status !== 'ALPHA') return false;
       }
@@ -1662,8 +1667,8 @@ export const MonthlyAttendanceDetailView = ({
                   gap: '2px',
                 }}
               >
-                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{empKpiHadir}</span>
-                <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Hadir' : 'Present'}</span>
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{empKpiOntime}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Tepat' : 'On Time'}</span>
               </div>
 
               <div
