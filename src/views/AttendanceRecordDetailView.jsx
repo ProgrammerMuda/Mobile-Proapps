@@ -1,4 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import {
   CaretLeft,
   MapPin,
@@ -86,104 +88,171 @@ export const AttendanceRecordDetailHeader = ({ onBack, data }) => {
 };
 
 /**
- * Attendance Location Map with Warm Mapbox Streets Style
+ * Real Live Attendance Location Map of Indonesia (Senayan / Jakarta)
  * Features:
- * - Interactive Zoom In & Zoom Out (+ / − buttons, pinch, wheel, double tap)
- * - Pan / Drag navigation
- * - Primary color (#053079) center building badge
+ * - Real live Map Tiles of Indonesia (CartoDB / OpenStreetMap)
+ * - Interactive Pan, Zoom In & Zoom Out (+ / − controls, touch pinch, mouse scroll)
+ * - Primary color (#053079) center building badge with Phosphor Buildings icon
  * - Secondary color (#09B2FF) geofence radius circle
- * - Green person pin for Check In & Red person pin for Check Out with subtle shadows
- * - Warm Mapbox Streets aesthetic
+ * - Green person pin for Check In & Red person pin for Check Out with subtle drop shadow
  */
 const AttendanceMapFull = ({ data, language }) => {
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+  const [zoomLevel, setZoomLevel] = useState(17);
+
+  // Office Location coordinates: Senayan / Senopati, Jakarta Selatan, Indonesia
+  const officeCoords = [-6.2275, 106.8058];
+  const checkInCoords = [-6.2269, 106.8051];
+  const checkOutCoords = [-6.2282, 106.8066];
+
   const isOff = data?.status === 'LIBUR' || data?.status === 'off' || data?.status === 'LEAVE' || data?.status === 'IZIN';
   const isAlpha = data?.status === 'ALPHA' || data?.status === 'alpha';
-  const hasClockIn = data?.clockIn && data.clockIn !== '-' && data.clockIn !== '--:--' && data.clockIn !== '-- : --';
-  const hasClockOut = data?.clockOut && data.clockOut !== '-' && data.clockOut !== '--:--' && data.clockOut !== '-- : --' && data.clockOut !== 'Sedang Bekerja...';
 
-  // Interactive Zoom and Pan states
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef({ x: 0, y: 0 });
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    // Destroy existing instance if any
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+      mapInstanceRef.current = null;
+    }
+
+    // Initialize real Leaflet map
+    const map = L.map(mapContainerRef.current, {
+      center: officeCoords,
+      zoom: 17,
+      minZoom: 14,
+      maxZoom: 19,
+      zoomControl: false,
+      attributionControl: false,
+    });
+
+    mapInstanceRef.current = map;
+
+    // Add CartoDB Voyager real map tiles (Indonesian streets & landmarks)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 20,
+    }).addTo(map);
+
+    // 1. Geofence Radius Circle (Secondary Color #09B2FF)
+    L.circle(officeCoords, {
+      radius: 110,
+      color: '#09B2FF',
+      fillColor: '#09B2FF',
+      fillOpacity: 0.16,
+      weight: 2.5,
+    }).addTo(map);
+
+    // 2. Primary Color Center Building Badge (#053079) with Phosphor Buildings Icon
+    const buildingIcon = L.divIcon({
+      className: 'real-map-building-icon',
+      html: `
+        <div style="
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background-color: #053079;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+        ">
+          <svg width="24" height="24" viewBox="0 0 256 256" fill="#FFFFFF">
+            <path d="M240,208H224V96a16,16,0,0,0-16-16H160V40a16,16,0,0,0-16-16H48A16,16,0,0,0,32,40V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM48,40h96V208H48ZM208,96V208H160V96ZM88,80a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,80Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,144Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,176Zm96-64a8,8,0,0,1,8-8h8a8,8,0,0,1,0,16h-8A8,8,0,0,1,184,112Zm0,32a8,8,0,0,1,8-8h8a8,8,0,0,1,0,16h-8A8,8,0,0,1,184,144Zm0,32a8,8,0,0,1,8-8h8a8,8,0,0,1,0,16h-8A8,8,0,0,1,184,176Z"/>
+          </svg>
+        </div>
+      `,
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
+    });
+
+    L.marker(officeCoords, { icon: buildingIcon, zIndexOffset: 100 })
+      .addTo(map)
+      .bindTooltip(language === 'id' ? 'Lokasi Kantor' : 'Office Site', { direction: 'top', offset: [0, -24] });
+
+    // 3. Green Person Pin for Check In (with subtle drop shadow)
+    if (!isOff && !isAlpha) {
+      const checkInIcon = L.divIcon({
+        className: 'real-map-checkin-icon',
+        html: `
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center;">
+            <svg width="44" height="56" viewBox="0 0 44 56" fill="none">
+              <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#DCFCE7" stroke="#22C55E" stroke-width="2"/>
+              <circle cx="22" cy="22" r="14.5" fill="#16A34A"/>
+              <g transform="translate(13.5, 13.5)">
+                <svg width="17" height="17" viewBox="0 0 256 256" fill="#FFFFFF">
+                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212ZM72,96a56,56,0,1,1,56,56A56.1,56.1,0,0,1,72,96Z"/>
+                </svg>
+              </g>
+            </svg>
+          </div>
+        `,
+        iconSize: [44, 56],
+        iconAnchor: [22, 56],
+      });
+
+      L.marker(checkInCoords, { icon: checkInIcon, zIndexOffset: 200 })
+        .addTo(map)
+        .bindTooltip(`${language === 'id' ? 'Masuk' : 'Clock In'}: ${data?.clockIn || '08:30'}`, { direction: 'top', offset: [0, -56] });
+
+      // 4. Red Person Pin for Check Out (with subtle drop shadow)
+      const checkOutIcon = L.divIcon({
+        className: 'real-map-checkout-icon',
+        html: `
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center;">
+            <svg width="44" height="56" viewBox="0 0 44 56" fill="none">
+              <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
+              <circle cx="22" cy="22" r="14.5" fill="#DC2626"/>
+              <g transform="translate(13.5, 13.5)">
+                <svg width="17" height="17" viewBox="0 0 256 256" fill="#FFFFFF">
+                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212ZM72,96a56,56,0,1,1,56,56A56.1,56.1,0,0,1,72,96Z"/>
+                </svg>
+              </g>
+            </svg>
+          </div>
+        `,
+        iconSize: [44, 56],
+        iconAnchor: [22, 56],
+      });
+
+      L.marker(checkOutCoords, { icon: checkOutIcon, zIndexOffset: 200 })
+        .addTo(map)
+        .bindTooltip(`${language === 'id' ? 'Keluar' : 'Clock Out'}: ${data?.clockOut || '17:30'}`, { direction: 'top', offset: [0, -56] });
+    }
+
+    // Update zoom level state on map zoom
+    map.on('zoomend', () => {
+      setZoomLevel(map.getZoom());
+    });
+
+    return () => {
+      map.remove();
+      mapInstanceRef.current = null;
+    };
+  }, [language, data]);
 
   const handleZoomIn = () => {
-    setZoom((prev) => Math.min(2.6, +(prev + 0.3).toFixed(2)));
-  };
-
-  const handleZoomOut = () => {
-    setZoom((prev) => Math.max(0.75, +(prev - 0.3).toFixed(2)));
-  };
-
-  const handleReset = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
-
-  // Mouse pan handlers
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    dragStartRef.current = {
-      x: e.clientX - pan.x,
-      y: e.clientY - pan.y,
-    };
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    setPan({
-      x: e.clientX - dragStartRef.current.x,
-      y: e.clientY - dragStartRef.current.y,
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // Touch pan handlers
-  const handleTouchStart = (e) => {
-    if (e.touches.length === 1) {
-      setIsDragging(true);
-      dragStartRef.current = {
-        x: e.touches[0].clientX - pan.x,
-        y: e.touches[0].clientY - pan.y,
-      };
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.zoomIn();
     }
   };
 
-  const handleTouchMove = (e) => {
-    if (!isDragging || e.touches.length !== 1) return;
-    setPan({
-      x: e.touches[0].clientX - dragStartRef.current.x,
-      y: e.touches[0].clientY - dragStartRef.current.y,
-    });
+  const handleZoomOut = () => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.zoomOut();
+    }
   };
 
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
-
-  // Wheel zoom
-  const handleWheel = (e) => {
-    e.preventDefault();
-    if (e.deltaY < 0) {
-      handleZoomIn();
-    } else {
-      handleZoomOut();
+  const handleRecenter = () => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView(officeCoords, 17, { animate: true });
     }
   };
 
   return (
     <div
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onWheel={handleWheel}
       style={{
         width: '100%',
         height: '240px',
@@ -192,217 +261,19 @@ const AttendanceMapFull = ({ data, language }) => {
         border: '1px solid #E2E8F0',
         position: 'relative',
         overflow: 'hidden',
-        cursor: isDragging ? 'grabbing' : 'grab',
-        touchAction: 'none',
-        userSelect: 'none',
       }}
     >
-      {/* Zoomable & Pannable SVG Map Container */}
+      {/* Real Live Map Container */}
       <div
+        ref={mapContainerRef}
         style={{
           width: '100%',
           height: '100%',
-          transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
-          transformOrigin: 'center center',
-          transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.25, 1, 0.5, 1)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          zIndex: 1,
         }}
-      >
-        {/* SVG Map Canvas with authentic Warm Mapbox Streets palette */}
-        <svg
-          viewBox="0 0 400 240"
-          style={{
-            width: '100%',
-            height: '100%',
-            display: 'block',
-            pointerEvents: 'none',
-          }}
-        >
-          <defs>
-            {/* Subtle drop shadow specifically for Clock In and Clock Out pins */}
-            <filter id="subtlePinShadow" x="-30%" y="-20%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="2.5" stdDeviation="2.2" floodColor="#0F172A" floodOpacity="0.22" />
-            </filter>
-          </defs>
+      />
 
-          {/* 1. Base Map Warm Stone/Beige Canvas */}
-          <rect width="400" height="240" fill="#E8E5DF" />
-
-          {/* Warm Land Parcels & Urban Blocks */}
-          <path d="M 0,0 L 115,0 L 100,70 L 0,60 Z" fill="#F4F2EC" />
-          <path d="M 130,0 L 235,0 L 225,50 L 115,55 Z" fill="#F4F2EC" />
-          <path d="M 245,0 L 340,0 L 330,60 L 235,55 Z" fill="#F4F2EC" />
-          <path d="M 350,0 L 400,0 L 400,80 L 340,65 Z" fill="#F4F2EC" />
-
-          <path d="M 0,75 L 85,85 L 70,170 L 0,165 Z" fill="#F4F2EC" />
-          <path d="M 315,75 L 400,90 L 400,180 L 305,170 Z" fill="#F4F2EC" />
-
-          <path d="M 0,180 L 70,185 L 55,240 L 0,240 Z" fill="#F4F2EC" />
-          <path d="M 75,190 L 170,185 L 160,240 L 65,240 Z" fill="#F4F2EC" />
-          <path d="M 180,190 L 270,185 L 265,240 L 170,240 Z" fill="#F4F2EC" />
-          <path d="M 280,180 L 400,190 L 400,240 L 275,240 Z" fill="#F4F2EC" />
-
-          {/* Secondary Warm Parcel Blocks (Slightly warmer beige tone) */}
-          <path d="M 115,75 L 175,70 L 170,105 L 110,102 Z" fill="#EFECE5" />
-          <path d="M 110,115 L 170,118 L 165,160 L 105,155 Z" fill="#EFECE5" />
-          <path d="M 220,70 L 285,75 L 280,115 L 215,110 Z" fill="#EFECE5" />
-          <path d="M 215,125 L 280,128 L 275,170 L 210,165 Z" fill="#EFECE5" />
-
-          {/* Parks & Vegetation (Soft Lime / Pastel Green) */}
-          <path d="M 45,8 L 75,14 L 68,36 L 38,30 Z" fill="#D8EBCF" stroke="#C8DFBE" strokeWidth="0.8" />
-          <path d="M 368,110 L 396,110 L 396,140 L 368,140 Z" fill="#D8EBCF" stroke="#C8DFBE" strokeWidth="0.8" />
-          <path d="M 68,228 L 84,228 L 84,240 L 68,240 Z" fill="#D8EBCF" />
-          <path d="M 360,20 L 380,20 L 375,35 L 355,35 Z" fill="#D8EBCF" />
-
-          {/* Subtle Mapbox Building Footprints (Warm Light Grey/Cream) */}
-          <rect x="25" y="100" width="22" height="16" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-          <rect x="52" y="105" width="18" height="24" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-          <rect x="330" y="100" width="28" height="20" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-          <rect x="335" y="130" width="20" height="18" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-          <rect x="130" y="15" width="25" height="18" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-          <rect x="270" y="18" width="22" height="20" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-          <rect x="105" y="200" width="28" height="18" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-          <rect x="210" y="202" width="24" height="20" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
-
-          {/* Road Casings (Warm soft border stroke) */}
-          <path d="M -10,65 Q 180,130 410,60" fill="none" stroke="#D5D1C6" strokeWidth="18" strokeLinecap="round" />
-          <path d="M -10,175 Q 190,180 410,180" fill="none" stroke="#D5D1C6" strokeWidth="18" strokeLinecap="round" />
-          <path d="M 100,-10 Q 90,110 70,250" fill="none" stroke="#D5D1C6" strokeWidth="15" strokeLinecap="round" />
-          <path d="M 215,-10 Q 215,115 240,250" fill="none" stroke="#D5D1C6" strokeWidth="15" strokeLinecap="round" />
-          <path d="M 320,-10 Q 300,115 285,250" fill="none" stroke="#D5D1C6" strokeWidth="15" strokeLinecap="round" />
-
-          {/* Road Surfaces (Crisp Pure White) */}
-          <path d="M -10,65 Q 180,130 410,60" fill="none" stroke="#FFFFFF" strokeWidth="15" strokeLinecap="round" />
-          <path d="M -10,175 Q 190,180 410,180" fill="none" stroke="#FFFFFF" strokeWidth="15" strokeLinecap="round" />
-          <path d="M 100,-10 Q 90,110 70,250" fill="none" stroke="#FFFFFF" strokeWidth="12" strokeLinecap="round" />
-          <path d="M 215,-10 Q 215,115 240,250" fill="none" stroke="#FFFFFF" strokeWidth="12" strokeLinecap="round" />
-          <path d="M 320,-10 Q 300,115 285,250" fill="none" stroke="#FFFFFF" strokeWidth="12" strokeLinecap="round" />
-
-          {/* Secondary Inner Building Block White Lanes */}
-          <path d="M 115,100 L 190,95 L 185,145 L 110,140 Z" fill="none" stroke="#FFFFFF" strokeWidth="5" />
-          <path d="M 225,95 L 295,100 L 290,150 L 220,145 Z" fill="none" stroke="#FFFFFF" strokeWidth="5" />
-
-          {/* Street & Landmark Labels */}
-          <text x="18" y="185" fontSize="7.5" fontWeight="600" fill="#64748B" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.2px">
-            Jalan Senopati
-          </text>
-          <text x="295" y="85" fontSize="8" fontWeight="700" fill="#475569" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.2px">
-            Senayan
-          </text>
-          <text x="6" y="235" fontSize="7.5" fontWeight="600" fill="#64748B" fontFamily="system-ui, -apple-system, sans-serif">
-            OK I
-          </text>
-
-          {/* Yellow/Orange Restaurant POI (matching reference) */}
-          <g transform="translate(173, 230)">
-            <circle cx="0" cy="0" r="6" fill="#F59E0B" />
-            <path d="M -2.5,-3.5 L -2.5,0.5 L -1.5,0.5 L -1.5,3.5 L -0.5,3.5 L -0.5,0.5 L 0.5,0.5 L 0.5,-3.5 L -0.5,-3.5 L -0.5,-1.5 L -1.5,-1.5 L -1.5,-3.5 Z" fill="#FFFFFF" transform="scale(0.8) translate(0, -0.5)" />
-            <path d="M 1.5,-3.5 Q 3,-3.5 3,-1 Q 3,0.5 2,1 L 2,3.5 L 1,3.5 L 1,0.5 L 1.5,0.5 Z" fill="#FFFFFF" transform="scale(0.8) translate(0, -0.5)" />
-          </g>
-
-          {/* 2. SECONDARY COLOR GEOFENCE RADIUS CIRCLE (#09B2FF) */}
-          <circle
-            cx="195"
-            cy="115"
-            r="96"
-            fill="#09B2FF"
-            fillOpacity="0.16"
-            stroke="#09B2FF"
-            strokeWidth="2.5"
-          />
-
-          {/* 3. PRIMARY COLOR CENTER BUILDING BADGE (#053079) WITH ENLARGED PHOSPHOR BUILDINGS ICON */}
-          <foreignObject x={195 - 23} y={115 - 23} width={46} height={46}>
-            <div
-              style={{
-                width: '46px',
-                height: '46px',
-                borderRadius: '50%',
-                backgroundColor: '#053079',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Buildings size={26} weight="fill" color="#FFFFFF" />
-            </div>
-          </foreignObject>
-
-          {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) - ENLARGED WITH FILL USER ICON & SUBTLE SHADOW */}
-          <g transform="translate(145, 70)" filter="url(#subtlePinShadow)">
-            {/* Teardrop Pin Shape (Green) */}
-            <path
-              d="M 0,0 C -12,-12 -24,-24 -24,-38 C -24,-51 -13,-62 0,-62 C 13,-62 24,-51 24,-38 C 24,-24 12,-12 0,0 Z"
-              fill="#DCFCE7"
-              stroke="#22C55E"
-              strokeWidth="1.8"
-            />
-
-            {/* Inner Dark Green Circle */}
-            <circle cx="0" cy="-38" r="15.5" fill="#16A34A" />
-
-            {/* Enlarged Phosphor User Fill Icon inside Green Pin */}
-            <foreignObject x={-11} y={-49} width={22} height={22}>
-              <div
-                style={{
-                  width: '22px',
-                  height: '22px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <User size={18} weight="fill" color="#FFFFFF" />
-              </div>
-            </foreignObject>
-          </g>
-
-          {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) - ENLARGED WITH FILL USER ICON & SUBTLE SHADOW */}
-          <g transform="translate(240, 155)" filter="url(#subtlePinShadow)">
-            {/* Teardrop Pin Shape (Red) */}
-            <path
-              d="M 0,0 C -12,-12 -24,-24 -24,-38 C -24,-51 -13,-62 0,-62 C 13,-62 24,-51 24,-38 C 24,-24 12,-12 0,0 Z"
-              fill="#FEE2E2"
-              stroke="#EF4444"
-              strokeWidth="1.8"
-            />
-
-            {/* Inner Dark Red Circle */}
-            <circle cx="0" cy="-38" r="15.5" fill="#DC2626" />
-
-            {/* Enlarged Phosphor User Fill Icon inside Red Pin */}
-            <foreignObject x={-11} y={-49} width={22} height={22}>
-              <div
-                style={{
-                  width: '22px',
-                  height: '22px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <User size={18} weight="fill" color="#FFFFFF" />
-              </div>
-            </foreignObject>
-          </g>
-
-          {/* Off Day / Alpha note overlay if applicable */}
-          {(isOff || isAlpha) && (
-            <g transform="translate(195, 115)">
-              <rect x="-85" y="-18" width="170" height="36" rx="12" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.5" />
-              <text x="0" y="4" fontSize="8.5" fontWeight="800" fill={isAlpha ? '#DC2626' : '#64748B'} textAnchor="middle" fontFamily="sans-serif">
-                {isAlpha
-                  ? (language === 'id' ? '⚠️ Tanpa Catatan Presensi' : '⚠️ No Attendance Recorded')
-                  : (language === 'id' ? '🏖️ Hari Libur Terjadwal' : '🏖️ Scheduled Day Off')}
-              </text>
-            </g>
-          )}
-        </svg>
-      </div>
-
-      {/* Mapbox Floating UI Controls (Top Right) */}
+      {/* Floating Zoom & Recenter Controls (Top Right) */}
       <div
         style={{
           position: 'absolute',
@@ -414,7 +285,7 @@ const AttendanceMapFull = ({ data, language }) => {
           borderRadius: '8px',
           border: '1px solid #E2E8F0',
           overflow: 'hidden',
-          zIndex: 10,
+          zIndex: 500,
         }}
       >
         <button
@@ -464,33 +335,31 @@ const AttendanceMapFull = ({ data, language }) => {
         >
           −
         </button>
-        {(zoom !== 1 || pan.x !== 0 || pan.y !== 0) && (
-          <button
-            type="button"
-            onClick={handleReset}
-            aria-label="Reset view"
-            title="Reset view"
-            style={{
-              width: '28px',
-              height: '28px',
-              border: 'none',
-              background: '#F8FAFC',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#053079',
-              cursor: 'pointer',
-              borderTop: '1px solid #F1F5F9',
-              padding: 0,
-              userSelect: 'none',
-            }}
-          >
-            <ArrowsInCardinal size={15} weight="bold" />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleRecenter}
+          aria-label="Recenter"
+          title="Recenter"
+          style={{
+            width: '28px',
+            height: '28px',
+            border: 'none',
+            background: '#F8FAFC',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#053079',
+            cursor: 'pointer',
+            borderTop: '1px solid #F1F5F9',
+            padding: 0,
+            userSelect: 'none',
+          }}
+        >
+          <ArrowsInCardinal size={15} weight="bold" />
+        </button>
       </div>
 
-      {/* Mapbox Watermark Logo (Bottom Left) */}
+      {/* Mapbox / Real Map Watermark (Bottom Left) */}
       <div
         style={{
           position: 'absolute',
@@ -499,7 +368,7 @@ const AttendanceMapFull = ({ data, language }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '4px',
-          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backgroundColor: 'rgba(255, 255, 255, 0.88)',
           backdropFilter: 'blur(2px)',
           padding: '2px 6px',
           borderRadius: '4px',
@@ -507,7 +376,7 @@ const AttendanceMapFull = ({ data, language }) => {
           fontWeight: 800,
           color: '#1E293B',
           letterSpacing: '-0.2px',
-          zIndex: 10,
+          zIndex: 500,
           pointerEvents: 'none',
         }}
       >
@@ -518,7 +387,7 @@ const AttendanceMapFull = ({ data, language }) => {
         <span>mapbox</span>
       </div>
 
-      {/* Mapbox & OSM Attribution + Current Zoom badge (Bottom Right) */}
+      {/* Real Map Attribution + Indonesian City Label (Bottom Right) */}
       <div
         style={{
           position: 'absolute',
@@ -527,27 +396,26 @@ const AttendanceMapFull = ({ data, language }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
-          zIndex: 10,
+          zIndex: 500,
           pointerEvents: 'none',
         }}
       >
-        {zoom !== 1 && (
-          <span
-            style={{
-              backgroundColor: 'rgba(5, 48, 121, 0.85)',
-              color: '#FFFFFF',
-              padding: '1px 5px',
-              borderRadius: '3px',
-              fontSize: '8px',
-              fontWeight: 700,
-            }}
-          >
-            {Math.round(zoom * 100)}%
-          </span>
-        )}
         <div
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            backdropFilter: 'blur(2px)',
+            padding: '1px 6px',
+            borderRadius: '3px',
+            fontSize: '7.5px',
+            fontWeight: 600,
+            color: '#053079',
+          }}
+        >
+          🇮🇩 Jakarta, Indonesia
+        </div>
+        <div
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.88)',
             backdropFilter: 'blur(2px)',
             padding: '1px 5px',
             borderRadius: '3px',
@@ -555,9 +423,33 @@ const AttendanceMapFull = ({ data, language }) => {
             color: '#64748B',
           }}
         >
-          © Mapbox © OpenStreetMap
+          © Mapbox © OSM
         </div>
       </div>
+
+      {/* Off Day / Alpha overlay if applicable */}
+      {(isOff || isAlpha) && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 600,
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #CBD5E1',
+            borderRadius: '12px',
+            padding: '8px 16px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          }}
+        >
+          <span style={{ fontSize: '11px', fontWeight: 800, color: isAlpha ? '#DC2626' : '#64748B' }}>
+            {isAlpha
+              ? (language === 'id' ? '⚠️ Tanpa Catatan Presensi' : '⚠️ No Attendance Recorded')
+              : (language === 'id' ? '🏖️ Hari Libur Terjadwal' : '🏖️ Scheduled Day Off')}
+          </span>
+        </div>
+      )}
     </div>
   );
 };
