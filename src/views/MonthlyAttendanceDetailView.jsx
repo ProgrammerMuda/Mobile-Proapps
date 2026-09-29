@@ -311,106 +311,107 @@ const DEPARTMENTS_DATA = [
 const getEmployeesAttendanceForDay = (year, monthIndex, day) => {
   if (day === 24) {
     return [
-      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:02 WIB', duration: '9h 07m', status: 'ONTIME' },
-      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', status: 'ONTIME' },
-      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:18 WIB', clockOut: '20:05 WIB', duration: '11h 47m', lateMinutes: 18, status: 'LATE' },
-      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE' },
-      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', status: 'ONTIME' },
-      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA' },
-      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:42 WIB', clockOut: '17:32 WIB', duration: '8h 50m', lateMinutes: 12, status: 'LATE' },
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:45 WIB', clockOut: '16:40 WIB', duration: '8h 55m', inStatus: 'EARLY_IN', outStatus: 'EARLY_OUT', status: 'EARLY_OUT' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:18 WIB', clockOut: '19:40 WIB', duration: '11h 22m', lateMinutes: 18, inStatus: 'LATE', outStatus: 'EARLY_OUT', status: 'LATE' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'LEAVE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'ALPHA' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', inStatus: 'ON_TIME', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:42 WIB', clockOut: '17:15 WIB', duration: '8h 33m', lateMinutes: 12, inStatus: 'LATE', outStatus: 'EARLY_OUT', status: 'LATE' },
     ];
   }
 
   if (day === 21) {
     return [
-      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:48 WIB', clockOut: '16:45 WIB', duration: '8h 57m', status: 'ONTIME' },
-      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:48 WIB', clockOut: '16:02 WIB', duration: '9h 14m', status: 'ONTIME' },
-      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', status: 'ONTIME' },
-      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:52 WIB', clockOut: '17:00 WIB', duration: '9h 08m', status: 'ONTIME' },
-      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'OFF' },
-      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:55 WIB', clockOut: '16:00 WIB', duration: '9h 05m', status: 'ONTIME' },
-      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:48 WIB', clockOut: '16:45 WIB', duration: '8h 57m', inStatus: 'EARLY_IN', outStatus: 'EARLY_OUT', status: 'EARLY_OUT' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:48 WIB', clockOut: '16:02 WIB', duration: '9h 14m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:52 WIB', clockOut: '17:00 WIB', duration: '9h 08m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'OFF' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:55 WIB', clockOut: '16:00 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:10 WIB', duration: '8h 50m', inStatus: 'EARLY_IN', outStatus: 'EARLY_OUT', status: 'EARLY_OUT' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
     ];
   }
 
   if (day === 18) {
     return [
-      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:50 WIB', clockOut: '17:02 WIB', duration: '9h 12m', status: 'ONTIME' },
-      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:55 WIB', clockOut: '16:00 WIB', duration: '9h 05m', status: 'ONTIME' },
-      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
-      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '08:15 WIB', clockOut: '17:00 WIB', duration: '8h 45m', lateMinutes: 15, status: 'LATE' },
-      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:10 WIB', duration: '12h 20m', status: 'ONTIME' },
-      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'OFF' },
-      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:22 WIB', clockOut: '17:30 WIB', duration: '9h 08m', status: 'ONTIME' },
-      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:50 WIB', clockOut: '16:45 WIB', duration: '8h 55m', inStatus: 'EARLY_IN', outStatus: 'EARLY_OUT', status: 'EARLY_OUT' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:55 WIB', clockOut: '16:00 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '08:15 WIB', clockOut: '16:50 WIB', duration: '8h 35m', lateMinutes: 15, inStatus: 'LATE', outStatus: 'EARLY_OUT', status: 'LATE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:10 WIB', duration: '12h 20m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'OFF' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:22 WIB', clockOut: '17:30 WIB', duration: '9h 08m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
     ];
   }
 
   if (day === 17) {
     return [
-      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:50 WIB', clockOut: '17:00 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:15 WIB', clockOut: '20:00 WIB', duration: '11h 45m', lateMinutes: 15, status: 'LATE' },
-      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE' },
-      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
-      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA' },
-      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:50 WIB', clockOut: '17:00 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:15 WIB', clockOut: '19:50 WIB', duration: '11h 35m', lateMinutes: 15, inStatus: 'LATE', outStatus: 'EARLY_OUT', status: 'LATE' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'LEAVE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'ALPHA' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', inStatus: 'ON_TIME', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
     ];
   }
 
   if (day === 14) {
     return [
-      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '08:14 WIB', clockOut: '17:05 WIB', duration: '8h 51m', lateMinutes: 14, status: 'LATE' },
-      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:55 WIB', clockOut: '20:00 WIB', duration: '12h 05m', status: 'ONTIME' },
-      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
-      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
-      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:52 WIB', clockOut: '16:00 WIB', duration: '9h 08m', status: 'ONTIME' },
-      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '08:14 WIB', clockOut: '17:05 WIB', duration: '8h 51m', lateMinutes: 14, inStatus: 'LATE', outStatus: 'ON_TIME', status: 'LATE' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:55 WIB', clockOut: '20:00 WIB', duration: '12h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:52 WIB', clockOut: '16:00 WIB', duration: '9h 08m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
     ];
   }
 
   if (day === 8) {
     return [
-      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:58 WIB', clockOut: '17:00 WIB', duration: '9h 02m', status: 'ONTIME' },
-      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'OFF' },
-      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', status: 'ONTIME' },
-      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE' },
-      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
-      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:58 WIB', clockOut: '17:00 WIB', duration: '9h 02m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'OFF' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'LEAVE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
     ];
   }
 
   if (day === 3) {
     return [
-      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
-      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', status: 'ONTIME' },
-      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
-      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
-      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA' },
-      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
-      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', inStatus: null, outStatus: null, status: 'ALPHA' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
     ];
   }
 
   // General weekdays
   const isAltLate = day % 3 === 0;
+  const isAltEarlyOut = day % 4 === 0;
   return [
-    { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:02 WIB', duration: '9h 07m', status: 'ONTIME' },
-    { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', status: 'ONTIME' },
-    { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: isAltLate ? '08:18 WIB' : '07:50 WIB', clockOut: '20:05 WIB', duration: isAltLate ? '11h 47m' : '12h 15m', lateMinutes: isAltLate ? 18 : 0, status: isAltLate ? 'LATE' : 'ONTIME' },
-    { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
-    { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', status: 'ONTIME' },
-    { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
-    { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME' },
-    { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: isAltLate ? '08:42 WIB' : '08:25 WIB', clockOut: '17:32 WIB', duration: isAltLate ? '8h 50m' : '9h 07m', lateMinutes: isAltLate ? 12 : 0, status: isAltLate ? 'LATE' : 'ONTIME' },
+    { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: isAltEarlyOut ? '16:45 WIB' : '17:02 WIB', duration: isAltEarlyOut ? '8h 50m' : '9h 07m', inStatus: 'EARLY_IN', outStatus: isAltEarlyOut ? 'EARLY_OUT' : 'ON_TIME', status: isAltEarlyOut ? 'EARLY_OUT' : 'ONTIME' },
+    { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+    { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: isAltLate ? '08:18 WIB' : '07:50 WIB', clockOut: isAltEarlyOut ? '19:40 WIB' : '20:05 WIB', duration: isAltLate ? '11h 47m' : '12h 15m', lateMinutes: isAltLate ? 18 : 0, inStatus: isAltLate ? 'LATE' : 'EARLY_IN', outStatus: isAltEarlyOut ? 'EARLY_OUT' : 'ON_TIME', status: isAltLate ? 'LATE' : isAltEarlyOut ? 'EARLY_OUT' : 'ONTIME' },
+    { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+    { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+    { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', inStatus: 'EARLY_IN', outStatus: 'ON_TIME', status: 'ONTIME' },
+    { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', inStatus: 'ON_TIME', outStatus: 'ON_TIME', status: 'ONTIME' },
+    { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: isAltLate ? '08:42 WIB' : '08:25 WIB', clockOut: isAltEarlyOut ? '17:15 WIB' : '17:32 WIB', duration: isAltLate ? '8h 50m' : '9h 07m', lateMinutes: isAltLate ? 12 : 0, inStatus: isAltLate ? 'LATE' : 'ON_TIME', outStatus: isAltEarlyOut ? 'EARLY_OUT' : 'ON_TIME', status: isAltLate ? 'LATE' : isAltEarlyOut ? 'EARLY_OUT' : 'ONTIME' },
   ];
 };
 
@@ -1014,9 +1015,37 @@ export const MonthlyAttendanceDetailView = ({
         </span>
       );
     }
-    if (emp.status === 'LATE') {
+
+    const inStatus = emp.inStatus || (emp.status === 'LATE' ? 'LATE' : emp.status === 'EARLY_IN' ? 'EARLY_IN' : 'ON_TIME');
+    const outStatus = emp.outStatus || (emp.status === 'EARLY_OUT' ? 'EARLY_OUT' : 'ON_TIME');
+
+    if (inStatus === 'ON_TIME' && outStatus === 'ON_TIME' && emp.status === 'ONTIME') {
       return (
         <span
+          style={{
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
+          }}
+        >
+          {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+        </span>
+      );
+    }
+
+    const badges = [];
+
+    // In Badge
+    if (inStatus === 'LATE') {
+      badges.push(
+        <span
+          key="in"
           style={{
             backgroundColor: '#D97706',
             color: '#FFFFFF',
@@ -1038,25 +1067,72 @@ export const MonthlyAttendanceDetailView = ({
             : 'Late'}
         </span>
       );
+    } else if (inStatus === 'EARLY_IN') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
+          }}
+        >
+          {language === 'id' ? 'Masuk Awal' : 'Early In'}
+        </span>
+      );
+    } else if (inStatus === 'ON_TIME' && outStatus === 'EARLY_OUT') {
+      badges.push(
+        <span
+          key="in"
+          style={{
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
+          }}
+        >
+          {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+        </span>
+      );
     }
+
+    // Out Badge
+    if (outStatus === 'EARLY_OUT') {
+      badges.push(
+        <span
+          key="out"
+          style={{
+            backgroundColor: '#D97706',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
+          }}
+        >
+          {language === 'id' ? 'Pulang Awal' : 'Early Out'}
+        </span>
+      );
+    }
+
     return (
-      <span
-        style={{
-          backgroundColor: '#16A34A',
-          color: '#FFFFFF',
-          fontSize: '0.6875rem',
-          fontWeight: 700,
-          padding: '2px 8px',
-          borderRadius: '9999px',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-          display: 'inline-block',
-        }}
-      >
-        {emp.inStatus === 'EARLY_IN'
-          ? (language === 'id' ? 'Masuk Awal' : 'Early In')
-          : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
-      </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'nowrap', flexShrink: 0 }}>
+        {badges}
+      </div>
     );
   };
 
