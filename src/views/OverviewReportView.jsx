@@ -230,8 +230,8 @@ const EngineeringOverviewContent = ({ t, onNavigateDetails }) => {
           </h2>
           <span
             style={{
-              backgroundColor: '#DCFCE7',
-              color: '#16A34A',
+              backgroundColor: '#16A34A',
+              color: '#FFFFFF',
               fontSize: '0.6875rem',
               fontWeight: 700,
               padding: '3px 8px',
@@ -3700,8 +3700,8 @@ const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
           </h2>
           <span
             style={{
-              backgroundColor: '#DCFCE7',
-              color: '#16A34A',
+              backgroundColor: '#16A34A',
+              color: '#FFFFFF',
               fontSize: '0.6875rem',
               fontWeight: 700,
               padding: '3px 8px',
