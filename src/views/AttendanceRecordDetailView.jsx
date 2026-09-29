@@ -18,10 +18,14 @@ import {
   SignOut,
   UserFocus,
   ShieldCheck,
-  Compass,
   Check,
   ArrowsInCardinal,
+  ArrowsOut,
+  X,
 } from '@phosphor-icons/react';
+import avatarUser from '../assets/avatar-user.jpg';
+import clockInSelfie from '../assets/attendance-clockin-selfie.jpg';
+import clockOutSelfie from '../assets/attendance-clockout-selfie.jpg';
 import { useLanguage } from '../context/LanguageContext';
 
 /**
@@ -167,8 +171,8 @@ const AttendanceMapFull = ({ data, language }) => {
       weight: 2.5,
     }).addTo(map);
 
-    // 2. Primary Color Center Building Badge (#053079) with BuildingApartment Fill SVG
-    const buildingSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M240,208H224V96a16,16,0,0,0-16-16H160V32a16,16,0,0,0-24.88-13.32l-64,44.02A16,16,0,0,0,64,75.23V208H48a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM104,136a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h16A8,8,0,0,1,104,136Zm0-40a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h16A8,8,0,0,1,104,96Zm64,40a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h16A8,8,0,0,1,168,136Zm0,48a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h16A8,8,0,0,1,168,184Zm40,24H176V96h32Z"/></svg>`;
+    // 2. Primary Color Center Building Badge (#053079) with official Phosphor BuildingApartment Fill SVG
+    const buildingSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M240,208h-8V72a8,8,0,0,0-8-8H184V40a8,8,0,0,0-8-8H80a8,8,0,0,0-8,8V96H32a8,8,0,0,0-8,8V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM80,176H64a8,8,0,0,1,0-16H80a8,8,0,0,1,0,16Zm0-32H64a8,8,0,0,1,0-16H80a8,8,0,0,1,0,16Zm64,64H112V168h32Zm-8-64H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm56,96H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Z"/></svg>`;
 
     const buildingIcon = L.divIcon({
       className: 'real-map-building-icon',
@@ -182,6 +186,7 @@ const AttendanceMapFull = ({ data, language }) => {
           align-items: center;
           justify-content: center;
           box-sizing: border-box;
+          box-shadow: 0 4px 12px rgba(5, 48, 121, 0.4);
           cursor: pointer;
         ">
           ${buildingSvgString}
@@ -227,7 +232,7 @@ const AttendanceMapFull = ({ data, language }) => {
       });
 
     // Phosphor User Fill SVG for Check In and Check Out pins
-    const userFillSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8C55.71,195.58,79.37,176,128,176s72.29,19.58,89.07,44a8,8,0,1,0,13.85-8Z"/></svg>`;
+    const userFillSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"/></svg>`;
 
     // 3. Green Person Pin for Check In (Inside Radius, Solid Phosphor User Fill Icon)
     if (!isOff && !isAlpha) {
@@ -591,6 +596,7 @@ const AttendanceMapFull = ({ data, language }) => {
  */
 export const AttendanceRecordDetailView = ({ data }) => {
   const { language } = useLanguage();
+  const [selectedPhotoModal, setSelectedPhotoModal] = useState(null);
 
   if (!data) {
     return (
@@ -887,14 +893,8 @@ export const AttendanceRecordDetailView = ({ data }) => {
               gap: '14px',
             }}
           >
-            {/* 2-Column Clock In & Clock Out Tiles */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '10px',
-              }}
-            >
+            {/* Clock In & Clock Out - Vertical Stack */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {/* Masuk (Clock In) */}
               <div
                 style={{
@@ -904,13 +904,13 @@ export const AttendanceRecordDetailView = ({ data }) => {
                   padding: '14px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '6px',
+                  gap: '8px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <SignIn size={15} weight="bold" color={isLate ? '#D97706' : '#16A34A'} />
-                    <span style={{ fontSize: '0.6875rem', color: isLate ? '#B45309' : '#15803D', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <SignIn size={16} weight="bold" color={isLate ? '#D97706' : '#16A34A'} />
+                    <span style={{ fontSize: '0.75rem', color: isLate ? '#B45309' : '#15803D', fontWeight: 700 }}>
                       {language === 'id' ? 'JAM MASUK' : 'CLOCK IN'}
                     </span>
                   </div>
@@ -922,7 +922,7 @@ export const AttendanceRecordDetailView = ({ data }) => {
                       fontWeight: 700,
                       backgroundColor: isLate ? '#D97706' : '#16A34A',
                       color: '#FFFFFF',
-                      padding: '2px 7px',
+                      padding: '2px 8px',
                       borderRadius: '9999px',
                     }}
                   >
@@ -934,14 +934,23 @@ export const AttendanceRecordDetailView = ({ data }) => {
                   </span>
                 </div>
 
-                <div style={{ fontSize: '1.375rem', fontWeight: 800, color: '#334155', lineHeight: 1.1 }}>
-                  {cleanTime(data.clockIn) || '--:--'} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>WIB</span>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#334155', lineHeight: 1.1 }}>
+                  {cleanTime(data.clockIn) || '--:--'} <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B' }}>WIB</span>
                 </div>
 
-                <div style={{ fontSize: '0.6875rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                  <MapPin size={11} color="#64748B" weight="fill" />
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {clockInLoc}
+                <div style={{ height: '1px', backgroundColor: isLate ? '#FDE68A' : '#BBF7D0', width: '100%' }} />
+
+                {/* Location info */}
+                <div style={{ fontSize: '0.75rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, flexWrap: 'wrap' }}>
+                  <MapPin size={13} color={isLate ? '#D97706' : '#16A34A'} weight="fill" style={{ flexShrink: 0 }} />
+                  <span>
+                    {data.clockInLat && data.clockInLng
+                      ? `${data.clockInLat}, ${data.clockInLng}`
+                      : '-6.22715, 106.80540'}
+                  </span>
+                  <span style={{ color: '#94A3B8', fontWeight: 400 }}>•</span>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    Radius: {data.clockInRadius || '8m'}
                   </span>
                 </div>
               </div>
@@ -949,19 +958,19 @@ export const AttendanceRecordDetailView = ({ data }) => {
               {/* Keluar (Clock Out) */}
               <div
                 style={{
-                  backgroundColor: isEarlyOut ? '#FFFBEB' : hasClockOut ? '#F0FDF4' : '#EFF6FF',
-                  border: `1px solid ${isEarlyOut ? '#FEF3C7' : hasClockOut ? '#DCFCE7' : '#DBEAFE'}`,
+                  backgroundColor: isEarlyOut ? '#FFFBEB' : hasClockOut ? '#FEF2F2' : '#F8FAFC',
+                  border: `1px solid ${isEarlyOut ? '#FEF3C7' : hasClockOut ? '#FEE2E2' : '#E2E8F0'}`,
                   borderRadius: '14px',
                   padding: '14px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '6px',
+                  gap: '8px',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <SignOut size={15} weight="bold" color={isEarlyOut ? '#D97706' : hasClockOut ? '#16A34A' : '#0284C7'} />
-                    <span style={{ fontSize: '0.6875rem', color: isEarlyOut ? '#B45309' : hasClockOut ? '#15803D' : '#0369A1', fontWeight: 700 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <SignOut size={16} weight="bold" color={isEarlyOut ? '#D97706' : hasClockOut ? '#DC2626' : '#94A3B8'} />
+                    <span style={{ fontSize: '0.75rem', color: isEarlyOut ? '#B45309' : hasClockOut ? '#DC2626' : '#64748B', fontWeight: 700 }}>
                       {language === 'id' ? 'JAM KELUAR' : 'CLOCK OUT'}
                     </span>
                   </div>
@@ -971,9 +980,9 @@ export const AttendanceRecordDetailView = ({ data }) => {
                     style={{
                       fontSize: '0.625rem',
                       fontWeight: 700,
-                      backgroundColor: isEarlyOut ? '#D97706' : hasClockOut ? '#16A34A' : '#0284C7',
+                      backgroundColor: isEarlyOut ? '#D97706' : hasClockOut ? '#DC2626' : '#94A3B8',
                       color: '#FFFFFF',
-                      padding: '2px 7px',
+                      padding: '2px 8px',
                       borderRadius: '9999px',
                     }}
                   >
@@ -985,21 +994,36 @@ export const AttendanceRecordDetailView = ({ data }) => {
                   </span>
                 </div>
 
-                <div style={{ fontSize: '1.375rem', fontWeight: 800, color: '#334155', lineHeight: 1.1 }}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#334155', lineHeight: 1.1 }}>
                   {hasClockOut ? (
-                    <>{cleanTime(data.clockOut)} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>WIB</span></>
+                    <>{cleanTime(data.clockOut)} <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B' }}>WIB</span></>
                   ) : (
-                    <span style={{ fontSize: '1rem', fontWeight: 700, color: '#0284C7' }}>
+                    <span style={{ fontSize: '1rem', fontWeight: 700, color: '#64748B' }}>
                       {language === 'id' ? 'Sedang Bekerja...' : 'Working...'}
                     </span>
                   )}
                 </div>
 
-                <div style={{ fontSize: '0.6875rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                  <MapPin size={11} color="#64748B" weight="fill" />
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {hasClockOut ? clockOutLoc : (language === 'id' ? 'Posisi aktif di Site' : 'Active at Site')}
-                  </span>
+                <div style={{ height: '1px', backgroundColor: isEarlyOut ? '#FDE68A' : hasClockOut ? '#FECACA' : '#E2E8F0', width: '100%' }} />
+
+                {/* Location info */}
+                <div style={{ fontSize: '0.75rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, flexWrap: 'wrap' }}>
+                  <MapPin size={13} color={isEarlyOut ? '#D97706' : hasClockOut ? '#DC2626' : '#94A3B8'} weight="fill" style={{ flexShrink: 0 }} />
+                  {hasClockOut ? (
+                    <>
+                      <span>
+                        {data.clockOutLat && data.clockOutLng
+                          ? `${data.clockOutLat}, ${data.clockOutLng}`
+                          : '-6.22785, 106.80620'}
+                      </span>
+                      <span style={{ color: '#94A3B8', fontWeight: 400 }}>•</span>
+                      <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                        Radius: {data.clockOutRadius || '12m'}
+                      </span>
+                    </>
+                  ) : (
+                    <span>{language === 'id' ? 'Menunggu clock out...' : 'Awaiting clock out...'}</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -1026,106 +1050,384 @@ export const AttendanceRecordDetailView = ({ data }) => {
                 {data.duration || (language === 'id' ? 'Sedang berjalan' : 'In progress')}
               </span>
             </div>
+          </div>
+        )}
 
-            {/* Status Detail & Timing Calculations */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {/* Late Analysis */}
-              <div
+        {/* =========================================================================
+            SECTION 4: BUKTI PRESENSI (ATTENDANCE EVIDENCE / PHOTOS)
+            ========================================================================= */}
+        {!isOff && !isAlpha && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <h2
                 style={{
-                  backgroundColor: isLate ? '#FFFBEB' : '#F0FDF4',
-                  border: `1px solid ${isLate ? '#FEF3C7' : '#DCFCE7'}`,
-                  borderRadius: '12px',
-                  padding: '10px 14px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '10px',
+                  fontSize: '1.0625rem',
+                  fontWeight: 700,
+                  color: '#334155',
+                  margin: 0,
+                  letterSpacing: '-0.2px',
                 }}
               >
-                {isLate ? (
-                  <WarningCircle size={18} weight="fill" color="#D97706" style={{ marginTop: '2px', flexShrink: 0 }} />
-                ) : (
-                  <CheckCircle size={18} weight="fill" color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
-                )}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                  <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: isLate ? '#B45309' : '#15803D' }}>
-                    {isLate
-                      ? (language === 'id' ? `Terlambat ${lateMinutes} Menit` : `Late by ${lateMinutes} Minutes`)
-                      : isEarlyIn
-                      ? (language === 'id' ? `Masuk Lebih Awal (${earlyInMinutes} Menit)` : `Early Clock-In (${earlyInMinutes} Mins)`)
-                      : (language === 'id' ? 'Masuk Tepat Waktu' : 'Clocked In On Time')}
+                {language === 'id' ? 'Bukti Presensi' : 'Attendance Evidence'}
+              </h2>
+              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#64748B' }}>
+                {language === 'id' ? 'Foto Selfie' : 'Selfie Photos'}
+              </span>
+            </div>
+
+            {/* 2 Separate Standalone Cards - Kanan Kiri (Grid 1fr 1fr) */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {/* Card 1: Clock In (Kiri) */}
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '14px',
+                  border: '1px solid #E2E8F0',
+                  padding: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <SignIn size={15} weight="bold" color="#16A34A" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#15803D' }}>
+                    {language === 'id' ? 'CLOCK IN' : 'CLOCK IN'}
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4 }}>
-                    {isLate
-                      ? (language === 'id'
-                          ? `Jadwal masuk shift: 08:00 WIB • Tercatat masuk: ${cleanTime(data.clockIn)} WIB`
-                          : `Shift starts: 08:00 WIB • Clock-in: ${cleanTime(data.clockIn)} WIB`)
-                      : (language === 'id'
-                          ? `Presensi masuk dilakukan sebelum batas toleransi jadwal shift (08:00 WIB)`
-                          : `Clock-in recorded before shift start tolerance (08:00 WIB)`)}
-                  </span>
+                </div>
+
+                {/* Photo Frame - Square / Kotak */}
+                <div
+                  onClick={() => {
+                    const photoSrc = data.clockInPhoto || data.clockInSelfie || clockInSelfie;
+                    setSelectedPhotoModal({
+                      src: photoSrc,
+                      title: language === 'id' ? 'Foto Presensi Masuk' : 'Clock In Attendance Photo',
+                      time: `${cleanTime(data.clockIn) || '07:42'} WIB`,
+                      date: data.date || 'Hari ini',
+                      status: isLate
+                        ? (language === 'id' ? `Telat ${lateMinutes}m` : `Late ${lateMinutes}m`)
+                        : (language === 'id' ? 'Tepat Waktu' : 'On Time'),
+                      statusBg: isLate ? '#D97706' : '#16A34A',
+                      coords: data.clockInLat && data.clockInLng ? `${data.clockInLat}, ${data.clockInLng}` : '-6.22715, 106.80540',
+                    });
+                  }}
+                  style={{
+                    position: 'relative',
+                    width: '100%',
+                    paddingTop: '100%',
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    backgroundColor: '#F1F5F9',
+                    border: '1px solid #CBD5E1',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                  }}
+                >
+                  <img
+                    src={data.clockInPhoto || data.clockInSelfie || clockInSelfie}
+                    alt="Clock In Selfie"
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      right: '4px',
+                      bottom: '4px',
+                      backgroundColor: 'rgba(0,0,0,0.6)',
+                      borderRadius: '3px',
+                      padding: '2px 5px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                      color: '#FFFFFF',
+                      fontSize: '0.5625rem',
+                      fontWeight: 600,
+                      backdropFilter: 'blur(2px)',
+                    }}
+                  >
+                    <ArrowsOut size={10} weight="bold" />
+                    <span>{language === 'id' ? 'Lihat' : 'View'}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Early Out Analysis */}
-              {hasClockOut && (
-                <div
-                  style={{
-                    backgroundColor: isEarlyOut ? '#FFFBEB' : '#F0FDF4',
-                    border: `1px solid ${isEarlyOut ? '#FEF3C7' : '#DCFCE7'}`,
-                    borderRadius: '12px',
-                    padding: '10px 14px',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '10px',
-                  }}
-                >
-                  {isEarlyOut ? (
-                    <WarningCircle size={18} weight="fill" color="#D97706" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  ) : (
-                    <CheckCircle size={18} weight="fill" color="#16A34A" style={{ marginTop: '2px', flexShrink: 0 }} />
-                  )}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                    <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: isEarlyOut ? '#B45309' : '#15803D' }}>
-                      {isEarlyOut
-                        ? (language === 'id' ? `Pulang Awal (${earlyOutMinutes} Menit Lebih Cepat)` : `Early Out (${earlyOutMinutes} Mins Early)`)
-                        : (language === 'id' ? 'Jam Pulang Sesuai Jadwal' : 'Completed Shift On Schedule')}
-                    </span>
-                    <span style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4 }}>
-                      {isEarlyOut
-                        ? (language === 'id'
-                            ? `Keluar pukul ${cleanTime(data.clockOut)} WIB (Jadwal shift selesai: 17:00 WIB)`
-                            : `Left at ${cleanTime(data.clockOut)} WIB (Shift scheduled end: 17:00 WIB)`)
-                        : (language === 'id'
-                            ? `Presensi keluar dilakukan setelah jam operasional shift selesai (17:00 WIB)`
-                            : `Clock-out recorded after shift completed (17:00 WIB)`)}
-                    </span>
-                  </div>
+              {/* Card 2: Clock Out (Kanan) */}
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '14px',
+                  border: '1px solid #E2E8F0',
+                  padding: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <SignOut size={15} weight="bold" color="#DC2626" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#DC2626' }}>
+                    {language === 'id' ? 'CLOCK OUT' : 'CLOCK OUT'}
+                  </span>
                 </div>
-              )}
 
-              {/* Note / Activity Summary */}
-              {data.note && (
-                <div
-                  style={{
-                    backgroundColor: '#F8FAFC',
-                    borderRadius: '12px',
-                    padding: '10px 14px',
-                    border: '1px solid #E2E8F0',
-                    fontSize: '0.75rem',
-                    color: '#475569',
-                    lineHeight: 1.4,
-                  }}
-                >
-                  <strong style={{ color: '#334155' }}>{language === 'id' ? 'Catatan Tugas: ' : 'Task Notes: '}</strong>
-                  {data.note}
-                </div>
-              )}
+                {/* Photo Frame or Placeholder - Square / Kotak */}
+                {hasClockOut ? (
+                  <div
+                    onClick={() => {
+                      const photoSrc = data.clockOutPhoto || data.clockOutSelfie || clockOutSelfie;
+                      setSelectedPhotoModal({
+                        src: photoSrc,
+                        title: language === 'id' ? 'Foto Presensi Keluar' : 'Clock Out Attendance Photo',
+                        time: `${cleanTime(data.clockOut) || '17:05'} WIB`,
+                        date: data.date || 'Hari ini',
+                        status: isEarlyOut
+                          ? (language === 'id' ? `Pulang Awal` : `Early Out`)
+                          : (language === 'id' ? 'Selesai' : 'Completed'),
+                        statusBg: isEarlyOut ? '#D97706' : '#DC2626',
+                        coords: data.clockOutLat && data.clockOutLng ? `${data.clockOutLat}, ${data.clockOutLng}` : '-6.22785, 106.80620',
+                      });
+                    }}
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      paddingTop: '100%',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      backgroundColor: '#F1F5F9',
+                      border: '1px solid #CBD5E1',
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                    }}
+                  >
+                    <img
+                      src={data.clockOutPhoto || data.clockOutSelfie || clockOutSelfie}
+                      alt="Clock Out Selfie"
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        right: '4px',
+                        bottom: '4px',
+                        backgroundColor: 'rgba(0,0,0,0.6)',
+                        borderRadius: '3px',
+                        padding: '2px 5px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        color: '#FFFFFF',
+                        fontSize: '0.5625rem',
+                        fontWeight: 600,
+                        backdropFilter: 'blur(2px)',
+                      }}
+                    >
+                      <ArrowsOut size={10} weight="bold" />
+                      <span>{language === 'id' ? 'Lihat' : 'View'}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      paddingTop: '100%',
+                      borderRadius: '4px',
+                      position: 'relative',
+                      backgroundColor: '#F8FAFC',
+                      border: '1.5px dashed #CBD5E1',
+                      boxSizing: 'border-box',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '4px',
+                        padding: '8px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <Camera size={22} weight="duotone" color="#94A3B8" />
+                      <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600, lineHeight: 1.2 }}>
+                        {language === 'id' ? 'Belum Ada Foto' : 'No Photo Yet'}
+                      </span>
+                      <span style={{ fontSize: '0.5625rem', color: '#94A3B8' }}>
+                        {language === 'id' ? 'Menunggu Checkout' : 'Awaiting Clock Out'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Lightbox / Fullscreen Image Modal */}
+      {selectedPhotoModal && (
+        <div
+          onClick={() => setSelectedPhotoModal(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '20px',
+              maxWidth: '340px',
+              width: '100%',
+              overflow: 'hidden',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                padding: '14px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderBottom: '1px solid #F1F5F9',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Camera size={18} weight="fill" color="#02388A" />
+                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1E293B' }}>
+                  {selectedPhotoModal.title}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedPhotoModal(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  color: '#64748B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                }}
+              >
+                <X size={20} weight="bold" />
+              </button>
+            </div>
+
+            {/* Modal Image */}
+            <div style={{ position: 'relative', width: '100%', backgroundColor: '#000000' }}>
+              <img
+                src={selectedPhotoModal.src}
+                alt={selectedPhotoModal.title}
+                style={{
+                  width: '100%',
+                  maxHeight: '320px',
+                  objectFit: 'contain',
+                  display: 'block',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  left: '10px',
+                  right: '10px',
+                  backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                  backdropFilter: 'blur(6px)',
+                  color: '#FFFFFF',
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  fontSize: '0.75rem',
+                }}
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontWeight: 700 }}>{selectedPhotoModal.time}</span>
+                  <span style={{ fontSize: '0.6875rem', color: '#CBD5E1' }}>{selectedPhotoModal.coords}</span>
+                </div>
+                <span
+                  style={{
+                    backgroundColor: selectedPhotoModal.statusBg || '#16A34A',
+                    color: '#FFFFFF',
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    fontSize: '0.625rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  {selectedPhotoModal.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{ padding: '12px 16px', backgroundColor: '#F8FAFC', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedPhotoModal(null)}
+                style={{
+                  padding: '8px 18px',
+                  backgroundColor: '#02388A',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                {language === 'id' ? 'Tutup' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default AttendanceRecordDetailView;
+
