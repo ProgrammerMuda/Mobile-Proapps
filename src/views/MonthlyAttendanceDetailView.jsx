@@ -1137,446 +1137,350 @@ export const MonthlyAttendanceDetailView = ({
           ========================================================================= */}
       {(!isBM || activeMainTab === 'MY_ATTENDANCE') && (
         <>
-          {/* HARIAN MODE: SINGLE DAY DETAIL CARD */}
-          {periodMode === 'daily' ? (
+          {/* 1. KPI Summary Card */}
+          <div
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+              boxShadow: 'none',
+              border: '1px solid #E2E8F0',
+            }}
+          >
+            <div>
+              <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+                {language === 'id' ? 'Ringkasan Kehadiran' : 'Attendance Summary'}
+              </h2>
+              <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
+                {periodMode === 'daily'
+                  ? (language === 'id' ? `${DAY_NAMES_ID[new Date(selectedYear, selectedMonth, safeDay).getDay()]}, ${safeDay} ${MONTH_NAMES_ID[selectedMonth]} ${selectedYear} • Divisi Engineering` : `${safeDay} ${MONTH_NAMES[selectedMonth]} ${selectedYear} • Engineering Dept`)
+                  : periodMode === 'weekly'
+                  ? (language === 'id' ? `Minggu ${selectedWeek} (${currentWeekObj.startDay}-${currentWeekObj.endDay} ${MONTH_SHORT_ID[selectedMonth]}) • Engineering` : `Week ${selectedWeek} • Engineering`)
+                  : (language === 'id' ? `${MONTH_NAMES_ID[selectedMonth]} ${selectedYear} • Divisi Engineering` : `${MONTH_NAMES[selectedMonth]} ${selectedYear} • Engineering Dept`)}
+              </p>
+            </div>
+
+            {/* Hero Fill Attendance Rate Banner */}
             <div
               style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '16px',
-                padding: '16px',
+                background: 'linear-gradient(135deg, #02388A 0%, #0052CC 60%, #0284C7 100%)',
+                borderRadius: '14px',
+                padding: '13px 14px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '14px',
-                boxShadow: 'none',
-                border: '1px solid #E2E8F0',
+                gap: '10px',
+                position: 'relative',
+                overflow: 'hidden',
               }}
             >
-              {/* Header Title & Date Badge */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                    {language === 'id'
-                      ? `${DAY_NAMES_ID[singleDailyLog.date.getDay()]}, ${singleDailyLog.dayNumber} ${MONTH_NAMES_ID[selectedMonth]} ${selectedYear}`
-                      : `${DAY_NAMES[singleDailyLog.date.getDay()]}, ${singleDailyLog.dayNumber} ${MONTH_NAMES[selectedMonth]} ${selectedYear}`}
-                  </span>
-                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
-                    {singleDailyLog.shift || 'Shift Pagi (08:00 - 17:00)'}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CalendarBlank size={18} weight="fill" color="#38BDF8" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.1px' }}>
+                    {language === 'id' ? 'Tingkat Kehadiran' : 'Attendance Rate'}
                   </span>
                 </div>
 
-                {renderLogBadges(singleDailyLog)}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span
+                    style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      color: '#FFFFFF',
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      padding: '2px 8px',
+                      borderRadius: '9999px',
+                    }}
+                  >
+                    {presentCount}/{totalLogs} {language === 'id' ? 'Hari' : 'Days'}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '1.25rem',
+                      fontWeight: 900,
+                      color: '#FFFFFF',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {attendanceRatePct}%
+                  </span>
+                </div>
               </div>
 
-              {/* Clock In & Out Grid */}
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '10px',
-                  backgroundColor: '#F8FAFC',
-                  borderRadius: '12px',
-                  padding: '12px 14px',
-                  border: '1px solid #E2E8F0',
+                  width: '100%',
+                  height: '8px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                  borderRadius: '9999px',
+                  overflow: 'hidden',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#16A34A', fontSize: '0.75rem', fontWeight: 700 }}>
-                    <SignIn size={16} weight="bold" />
-                    <span>{language === 'id' ? 'Jam Masuk' : 'Clock In'}</span>
-                  </div>
-                  <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#334155' }}>
-                    {singleDailyLog.clockIn}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#0284C7', fontSize: '0.75rem', fontWeight: 700 }}>
-                    <SignOut size={16} weight="bold" />
-                    <span>{language === 'id' ? 'Jam Pulang' : 'Clock Out'}</span>
-                  </div>
-                  <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#334155' }}>
-                    {singleDailyLog.clockOut}
-                  </span>
-                </div>
-              </div>
-
-              {/* Info Details: Work Duration, Location, Notes */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#64748B', fontWeight: 500 }}>
-                    {language === 'id' ? 'Total Durasi Kerja' : 'Total Work Duration'}
-                  </span>
-                  <span style={{ fontWeight: 700, color: '#334155' }}>
-                    {singleDailyLog.workDuration}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                  <span style={{ color: '#64748B', fontWeight: 500 }}>
-                    {language === 'id' ? 'Lokasi Presensi' : 'Attendance Location'}
-                  </span>
-                  <span style={{ fontWeight: 600, color: '#334155', maxWidth: '60%', textAlign: 'right' }}>
-                    {singleDailyLog.location || 'Gedung Menara Jasmine'}
-                  </span>
-                </div>
-
-                {singleDailyLog.notes && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
-                    <span style={{ color: '#64748B', fontWeight: 500 }}>
-                      {language === 'id' ? 'Catatan Presensi' : 'Notes'}
-                    </span>
-                    <span style={{ fontWeight: 600, color: '#02388A', maxWidth: '60%', textAlign: 'right' }}>
-                      {singleDailyLog.notes}
-                    </span>
-                  </div>
-                )}
+                <div
+                  style={{
+                    width: `${attendanceRatePct}%`,
+                    height: '100%',
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '9999px',
+                    transition: 'width 0.4s ease',
+                  }}
+                />
               </div>
             </div>
-          ) : (
-            /* BULANAN & MINGGUAN MODE: KPI SUMMARY + LIST */
-            <>
-              {/* 1. KPI Summary Card */}
+
+            {/* 4 Day Count KPI Metrics Micro-Cards */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '8px',
+              }}
+            >
               <div
                 style={{
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '16px',
-                  padding: '16px',
+                  backgroundColor: '#F0FDF4',
+                  border: '1px solid #DCFCE7',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '14px',
-                  boxShadow: 'none',
-                  border: '1px solid #E2E8F0',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
                 }}
               >
-                <div>
-                  <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
-                    {language === 'id' ? 'Ringkasan Kehadiran' : 'Attendance Summary'}
-                  </h2>
-                  <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
-                    {periodMode === 'weekly'
-                      ? (language === 'id' ? `Minggu ${selectedWeek} (${currentWeekObj.startDay}-${currentWeekObj.endDay} ${MONTH_SHORT_ID[selectedMonth]}) • Engineering` : `Week ${selectedWeek} • Engineering`)
-                      : (language === 'id' ? `${MONTH_NAMES_ID[selectedMonth]} ${selectedYear} • Divisi Engineering` : `${MONTH_NAMES[selectedMonth]} ${selectedYear} • Engineering Dept`)}
-                  </p>
-                </div>
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{onTimeCount}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Tepat' : 'On Time'}</span>
+              </div>
 
-                {/* Hero Fill Attendance Rate Banner */}
-                <div
-                  style={{
-                    background: 'linear-gradient(135deg, #02388A 0%, #0052CC 60%, #0284C7 100%)',
-                    borderRadius: '14px',
-                    padding: '13px 14px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    position: 'relative',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <CalendarBlank size={18} weight="fill" color="#38BDF8" />
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.1px' }}>
-                        {language === 'id' ? 'Tingkat Kehadiran' : 'Attendance Rate'}
-                      </span>
-                    </div>
+              <div
+                style={{
+                  backgroundColor: '#FFFBEB',
+                  border: '1px solid #FEF3C7',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>{lateCount}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
+              </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span
-                        style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                          color: '#FFFFFF',
-                          fontSize: '0.6875rem',
-                          fontWeight: 700,
-                          padding: '2px 8px',
-                          borderRadius: '9999px',
-                        }}
-                      >
-                        {presentCount}/{totalLogs} {language === 'id' ? 'Hari' : 'Days'}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '1.25rem',
-                          fontWeight: 900,
-                          color: '#FFFFFF',
-                          lineHeight: 1,
-                        }}
-                      >
-                        {attendanceRatePct}%
-                      </span>
-                    </div>
-                  </div>
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>{leaveCount}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
+              </div>
 
-                  <div
+              <div
+                style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FEE2E2',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>{alphaCount}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Attendance Logs List Header & Filter Tabs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredPersonalLogs.length === 0 ? 1 : 'initial' }}>
+            <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
+              {periodMode === 'daily'
+                ? (language === 'id' ? 'Riwayat Absensi Harian' : 'Daily Attendance Record')
+                : periodMode === 'weekly'
+                ? (language === 'id' ? 'Riwayat Absensi Mingguan' : 'Weekly Attendance Records')
+                : (language === 'id' ? 'Riwayat Absensi Bulanan' : 'Monthly Attendance Records')}
+            </h3>
+
+            {/* Status Filter Tabs */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                overflowX: 'auto',
+                paddingBottom: '2px',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+            >
+              {[
+                { id: 'ALL', label: language === 'id' ? 'Semua' : 'All', count: totalLogs },
+                { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time', count: onTimeCount },
+                { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late', count: lateCount },
+                { id: 'LEAVE', label: language === 'id' ? 'Izin/Cuti' : 'Leave', count: leaveCount },
+                { id: 'ALPHA', label: 'Alpha', count: alphaCount },
+              ].map((filterTab) => {
+                const isActive = activeFilter === filterTab.id;
+                return (
+                  <button
+                    key={filterTab.id}
+                    type="button"
+                    onClick={() => setActiveFilter(filterTab.id)}
                     style={{
-                      width: '100%',
-                      height: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
                       borderRadius: '9999px',
-                      overflow: 'hidden',
+                      border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
+                      backgroundColor: isActive ? '#02388A' : '#FFFFFF',
+                      color: isActive ? '#FFFFFF' : '#475569',
+                      fontSize: '0.75rem',
+                      fontWeight: isActive ? 700 : 500,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      transition: 'all 0.15s ease',
+                      outline: 'none',
                     }}
                   >
+                    <span>{filterTab.label}</span>
+                    <span
+                      style={{
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : '#F1F5F9',
+                        color: isActive ? '#FFFFFF' : '#64748B',
+                        padding: '1px 6px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      {filterTab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* List of Attendance Cards */}
+            {filteredPersonalLogs.length === 0 ? (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '32px 16px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '16px',
+                  border: '1px solid #E2E8F0',
+                  gap: '12px',
+                  textAlign: 'center',
+                }}
+              >
+                <img
+                  src={attendanceEmptySearch}
+                  alt="No attendance records"
+                  style={{ width: '110px', height: 'auto', objectFit: 'contain' }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                    {language === 'id' ? 'Tidak Ada Catatan Presensi' : 'No Attendance Records'}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                    {language === 'id' ? 'Tidak ada data pada filter yang dipilih.' : 'No data found for the selected filter.'}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              filteredPersonalLogs.map((log) => {
+                const dateObj = log.date;
+                const dayOfWeek = dateObj.getDay();
+                const dayName = language === 'id' ? DAY_NAMES_ID[dayOfWeek] : DAY_NAMES[dayOfWeek];
+                const monthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
+                const dateFormatted = `${dayName}, ${log.dayNumber} ${monthName} ${selectedYear}`;
+
+                return (
+                  <div
+                    key={log.id}
+                    style={{
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '14px',
+                      border: '1px solid #E2E8F0',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#334155' }}>
+                        {dateFormatted}
+                      </span>
+                      {renderLogBadges(log)}
+                    </div>
+
                     <div
                       style={{
-                        width: `${attendanceRatePct}%`,
-                        height: '100%',
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '9999px',
-                        transition: 'width 0.4s ease',
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '10px',
+                        backgroundColor: '#F8FAFC',
+                        borderRadius: '10px',
+                        padding: '8px 12px',
+                        border: '1px solid #E2E8F0',
                       }}
-                    />
-                  </div>
-                </div>
-
-                {/* 4 Day Count KPI Metrics Micro-Cards */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '8px',
-                  }}
-                >
-                  <div
-                    style={{
-                      backgroundColor: '#F0FDF4',
-                      border: '1px solid #DCFCE7',
-                      borderRadius: '12px',
-                      padding: '10px 4px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '2px',
-                    }}
-                  >
-                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{onTimeCount}</span>
-                    <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Tepat' : 'On Time'}</span>
-                  </div>
-
-                  <div
-                    style={{
-                      backgroundColor: '#FFFBEB',
-                      border: '1px solid #FEF3C7',
-                      borderRadius: '12px',
-                      padding: '10px 4px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '2px',
-                    }}
-                  >
-                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>{lateCount}</span>
-                    <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
-                  </div>
-
-                  <div
-                    style={{
-                      backgroundColor: '#F8FAFC',
-                      border: '1px solid #E2E8F0',
-                      borderRadius: '12px',
-                      padding: '10px 4px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '2px',
-                    }}
-                  >
-                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>{leaveCount}</span>
-                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
-                  </div>
-
-                  <div
-                    style={{
-                      backgroundColor: '#FEF2F2',
-                      border: '1px solid #FEE2E2',
-                      borderRadius: '12px',
-                      padding: '10px 4px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '2px',
-                    }}
-                  >
-                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>{alphaCount}</span>
-                    <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. Attendance Logs List Header & Filter Tabs */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredPersonalLogs.length === 0 ? 1 : 'initial' }}>
-                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
-                  {periodMode === 'weekly'
-                    ? (language === 'id' ? 'Riwayat Absensi Mingguan' : 'Weekly Attendance Records')
-                    : (language === 'id' ? 'Riwayat Absensi Bulanan' : 'Monthly Attendance Records')}
-                </h3>
-
-                {/* Status Filter Tabs */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    overflowX: 'auto',
-                    paddingBottom: '2px',
-                    scrollbarWidth: 'none',
-                    msOverflowStyle: 'none',
-                  }}
-                >
-                  {[
-                    { id: 'ALL', label: language === 'id' ? 'Semua' : 'All', count: totalLogs },
-                    { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time', count: onTimeCount },
-                    { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late', count: lateCount },
-                    { id: 'LEAVE', label: language === 'id' ? 'Izin/Cuti' : 'Leave', count: leaveCount },
-                    { id: 'ALPHA', label: 'Alpha', count: alphaCount },
-                  ].map((filterTab) => {
-                    const isActive = activeFilter === filterTab.id;
-                    return (
-                      <button
-                        key={filterTab.id}
-                        type="button"
-                        onClick={() => setActiveFilter(filterTab.id)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '6px 12px',
-                          borderRadius: '9999px',
-                          border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
-                          backgroundColor: isActive ? '#02388A' : '#FFFFFF',
-                          color: isActive ? '#FFFFFF' : '#475569',
-                          fontSize: '0.75rem',
-                          fontWeight: isActive ? 700 : 500,
-                          cursor: 'pointer',
-                          whiteSpace: 'nowrap',
-                          flexShrink: 0,
-                          transition: 'all 0.15s ease',
-                          outline: 'none',
-                        }}
-                      >
-                        <span>{filterTab.label}</span>
-                        <span
-                          style={{
-                            fontSize: '0.6875rem',
-                            fontWeight: 700,
-                            backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : '#F1F5F9',
-                            color: isActive ? '#FFFFFF' : '#64748B',
-                            padding: '1px 6px',
-                            borderRadius: '9999px',
-                          }}
-                        >
-                          {filterTab.count}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                          {language === 'id' ? 'Masuk' : 'Clock In'}
                         </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                          {log.clockIn}
+                        </div>
+                      </div>
 
-                {/* List of Attendance Cards */}
-                {filteredPersonalLogs.length === 0 ? (
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '32px 16px',
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '16px',
-                      border: '1px solid #E2E8F0',
-                      gap: '12px',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <img
-                      src={attendanceEmptySearch}
-                      alt="No attendance records"
-                      style={{ width: '110px', height: 'auto', objectFit: 'contain' }}
-                    />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
-                        {language === 'id' ? 'Tidak Ada Catatan Presensi' : 'No Attendance Records'}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                          {language === 'id' ? 'Keluar' : 'Clock Out'}
+                        </span>
+                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                          {log.clockOut}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
+                      <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                        {log.shift || 'Shift Pagi (08:00 - 17:00)'}
                       </span>
-                      <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
-                        {language === 'id' ? 'Tidak ada data pada filter yang dipilih.' : 'No data found for the selected filter.'}
+                      <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
+                        {language === 'id' ? `Durasi: ${log.workDuration}` : `Duration: ${log.workDuration}`}
                       </span>
                     </div>
                   </div>
-                ) : (
-                  filteredPersonalLogs.map((log) => {
-                    const dateObj = log.date;
-                    const dayOfWeek = dateObj.getDay();
-                    const dayName = language === 'id' ? DAY_NAMES_ID[dayOfWeek] : DAY_NAMES[dayOfWeek];
-                    const monthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
-                    const dateFormatted = `${dayName}, ${log.dayNumber} ${monthName} ${selectedYear}`;
-
-                    return (
-                      <div
-                        key={log.id}
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          borderRadius: '14px',
-                          border: '1px solid #E2E8F0',
-                          padding: '14px 16px',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '10px',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#334155' }}>
-                            {dateFormatted}
-                          </span>
-                          {renderLogBadges(log)}
-                        </div>
-
-                        <div
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            gap: '10px',
-                            backgroundColor: '#F8FAFC',
-                            borderRadius: '10px',
-                            padding: '8px 12px',
-                            border: '1px solid #E2E8F0',
-                          }}
-                        >
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                              {language === 'id' ? 'Masuk' : 'Clock In'}
-                            </span>
-                            <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                              {log.clockIn}
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                              {language === 'id' ? 'Keluar' : 'Clock Out'}
-                            </span>
-                            <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                              {log.clockOut}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                          <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
-                            {log.shift || 'Shift Pagi (08:00 - 17:00)'}
-                          </span>
-                          <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
-                            {language === 'id' ? `Durasi: ${log.workDuration}` : `Duration: ${log.workDuration}`}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </>
-          )}
+                );
+              })
+            )}
+          </div>
         </>
       )}
 
