@@ -118,6 +118,13 @@ const AttendanceMapFull = ({ data, language }) => {
           display: 'block',
         }}
       >
+        <defs>
+          {/* Subtle drop shadow specifically for Clock In and Clock Out pins */}
+          <filter id="subtlePinShadow" x="-30%" y="-20%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="2.5" stdDeviation="2.2" floodColor="#0F172A" floodOpacity="0.22" />
+          </filter>
+        </defs>
+
         {/* 1. Base Map Warm Stone/Beige Canvas */}
         <rect width="400" height="240" fill="#E8E5DF" />
 
@@ -221,8 +228,8 @@ const AttendanceMapFull = ({ data, language }) => {
           </div>
         </foreignObject>
 
-        {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) - ENLARGED WITH FILL USER ICON */}
-        <g transform="translate(145, 70)">
+        {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) - ENLARGED WITH FILL USER ICON & SUBTLE SHADOW */}
+        <g transform="translate(145, 70)" filter="url(#subtlePinShadow)">
           {/* Teardrop Pin Shape (Green) */}
           <path
             d="M 0,0 C -12,-12 -24,-24 -24,-38 C -24,-51 -13,-62 0,-62 C 13,-62 24,-51 24,-38 C 24,-24 12,-12 0,0 Z"
@@ -250,8 +257,8 @@ const AttendanceMapFull = ({ data, language }) => {
           </foreignObject>
         </g>
 
-        {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) - ENLARGED WITH FILL USER ICON */}
-        <g transform="translate(240, 155)">
+        {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) - ENLARGED WITH FILL USER ICON & SUBTLE SHADOW */}
+        <g transform="translate(240, 155)" filter="url(#subtlePinShadow)">
           {/* Teardrop Pin Shape (Red) */}
           <path
             d="M 0,0 C -12,-12 -24,-24 -24,-38 C -24,-51 -13,-62 0,-62 C 13,-62 24,-51 24,-38 C 24,-24 12,-12 0,0 Z"
