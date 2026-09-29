@@ -20,7 +20,6 @@ import {
 } from '@phosphor-icons/react';
 import { useLanguage } from '../context/LanguageContext';
 import attendanceEmptySearch from '../assets/attendance-empty-search.png';
-import { AttendanceDetailModal } from '../components/AttendanceDetailModal';
 
 const MONTH_NAMES = [
   'January',
@@ -724,6 +723,7 @@ export const MonthlyAttendanceDetailView = ({
   onPeriodChange,
   isPickerOpen,
   setIsPickerOpen,
+  onSelectAttendanceRecord,
 }) => {
   const { language } = useLanguage();
   const isBM = user?.roleCode === 'BM';
@@ -746,7 +746,6 @@ export const MonthlyAttendanceDetailView = ({
   };
 
   // Filter & Search states
-  const [selectedAttendanceDetail, setSelectedAttendanceDetail] = useState(null);
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [employeeDeptFilter, setEmployeeDeptFilter] = useState('ALL');
   const [employeeStatusFilter, setEmployeeStatusFilter] = useState('ALL');
@@ -1576,7 +1575,9 @@ export const MonthlyAttendanceDetailView = ({
                         siteName: 'Thamrin Executive Residences',
                         note: log.notes || (log.inStatus === 'LATE' ? 'Kepadatan lalu lintas pagi hari' : 'Presensi harian tercatat dalam geofence radius'),
                       };
-                      setSelectedAttendanceDetail(detailObj);
+                      if (onSelectAttendanceRecord) {
+                        onSelectAttendanceRecord(detailObj);
+                      }
                     }}
                     style={{
                       backgroundColor: cardBg,
@@ -2053,7 +2054,9 @@ export const MonthlyAttendanceDetailView = ({
                         siteName: 'Thamrin Executive Residences',
                         note: `${emp.name} (${emp.dept} - ${emp.role}) • Presensi Geofence Mobile App`,
                       };
-                      setSelectedAttendanceDetail(detailObj);
+                      if (onSelectAttendanceRecord) {
+                        onSelectAttendanceRecord(detailObj);
+                      }
                     }}
                     style={{
                       backgroundColor: cardBg,
@@ -2542,15 +2545,6 @@ export const MonthlyAttendanceDetailView = ({
 
         return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
       })()}
-
-      {/* =========================================================================
-          ATTENDANCE DETAIL MODAL (Map, Dual Pins, Info & Results)
-          ========================================================================= */}
-      <AttendanceDetailModal
-        isOpen={!!selectedAttendanceDetail}
-        onClose={() => setSelectedAttendanceDetail(null)}
-        data={selectedAttendanceDetail}
-      />
     </div>
   );
 };

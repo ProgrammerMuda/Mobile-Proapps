@@ -56,7 +56,6 @@ import payslip3d from '../assets/menu-icons/payslip-3d.png';
 import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
 import dayOffIllustration from '../assets/day-off-illustration.png';
 import attendanceEmptySearch from '../assets/attendance-empty-search.png';
-import { AttendanceDetailModal } from '../components/AttendanceDetailModal';
 
 /**
  * Top Header for Work Attendance
@@ -160,7 +159,7 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
 /**
  * Main Work Attendance View
  */
-export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
+export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAttendanceRecord }) => {
   const { language } = useLanguage();
 
   // State: Clock In / Out status
@@ -171,7 +170,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [elapsedDuration, setElapsedDuration] = useState('00j 00m');
 
   // Modals state
-  const [selectedAttendanceDetail, setSelectedAttendanceDetail] = useState(null);
   const [isMethodSheetOpen, setIsMethodSheetOpen] = useState(false);
   const [attendanceMethod, setAttendanceMethod] = useState('QR'); // 'QR' | 'PHOTO'
   const [isFlashlightOn, setIsFlashlightOn] = useState(false);
@@ -1662,7 +1660,11 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 return (
                   <div
                     key={item.id}
-                    onClick={() => setSelectedAttendanceDetail(item)}
+                    onClick={() => {
+                      if (onSelectAttendanceRecord) {
+                        onSelectAttendanceRecord(item);
+                      }
+                    }}
                     style={{
                       backgroundColor: cardBg,
                       borderRadius: '14px',
@@ -4009,15 +4011,6 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
         return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
       })()}
-
-      {/* =========================================================================
-          ATTENDANCE DETAIL MODAL (Map, Dual Pins, Info & Results)
-          ========================================================================= */}
-      <AttendanceDetailModal
-        isOpen={!!selectedAttendanceDetail}
-        onClose={() => setSelectedAttendanceDetail(null)}
-        data={selectedAttendanceDetail}
-      />
     </div>
   );
 };

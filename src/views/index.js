@@ -15,3 +15,4 @@ export * from './MonthlyAttendanceDetailView';
 export * from './WorkOrderDetailView';
 export * from './HomeServiceDetailView';
 export * from './WorkAttendanceView';
+export * from './AttendanceRecordDetailView';

@@ -32,12 +32,16 @@ import {
   UnitDetailHeader,
   UnitDetailFooter,
   ProfileView,
+  AttendanceRecordDetailView,
+  AttendanceRecordDetailHeader,
 } from './views';
 
 function App() {
   const { t } = useLanguage();
-  const [currentScreen, setCurrentScreen] = useState('splash'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail'
+  const [currentScreen, setCurrentScreen] = useState('splash'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail'
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState(null);
+  const [attendanceRecordPreviousScreen, setAttendanceRecordPreviousScreen] = useState('work-attendance');
   const [userSession, setUserSession] = useState({
     name: 'Ahmad Pratama',
     email: 'bm@proapps.id',
@@ -320,6 +324,11 @@ function App() {
           />
         ) : currentScreen === 'work-attendance' ? (
           <WorkAttendanceHeader onBack={() => setCurrentScreen('home')} />
+        ) : currentScreen === 'attendance-record-detail' ? (
+          <AttendanceRecordDetailHeader
+            data={selectedAttendanceRecord}
+            onBack={() => setCurrentScreen(attendanceRecordPreviousScreen || 'work-attendance')}
+          />
         ) : null
       }
       bottomNav={
@@ -513,6 +522,11 @@ function App() {
           }}
           isPickerOpen={isMonthlyAttendancePickerOpen}
           setIsPickerOpen={setIsMonthlyAttendancePickerOpen}
+          onSelectAttendanceRecord={(item) => {
+            setSelectedAttendanceRecord(item);
+            setAttendanceRecordPreviousScreen('monthly-attendance');
+            setCurrentScreen('attendance-record-detail');
+          }}
         />
       )}
 
@@ -546,6 +560,11 @@ function App() {
         <WorkAttendanceView
           user={userSession}
           onBack={() => setCurrentScreen('home')}
+          onSelectAttendanceRecord={(item) => {
+            setSelectedAttendanceRecord(item);
+            setAttendanceRecordPreviousScreen('work-attendance');
+            setCurrentScreen('attendance-record-detail');
+          }}
           onNavigateMenu={(menuId) => {
             if (menuId === 'tenant-unit') {
               setCurrentScreen('tenant-unit');
@@ -559,6 +578,10 @@ function App() {
             }
           }}
         />
+      )}
+
+      {currentScreen === 'attendance-record-detail' && (
+        <AttendanceRecordDetailView data={selectedAttendanceRecord} />
       )}
     </AndroidMobileFrame>
   );
