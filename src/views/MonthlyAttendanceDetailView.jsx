@@ -287,14 +287,14 @@ const DEPARTMENTS_DATA = [
 
 // Mock Real-time Employees Attendance for BM
 const MOCK_EMPLOYEES_LIST = [
-  { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: '08:00 - 17:00', clockIn: '07:55 WIB', clockOut: '17:02 WIB', status: 'ONTIME', avatarBg: '#2563EB', initials: 'BS' },
-  { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: '07:00 - 16:00', clockIn: '06:50 WIB', clockOut: '16:05 WIB', status: 'ONTIME', avatarBg: '#059669', initials: 'SR' },
-  { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: '08:00 - 20:00', clockIn: '08:18 WIB', clockOut: null, status: 'LATE', avatarBg: '#D97706', initials: 'AS' },
-  { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: '08:00 - 17:00', clockIn: null, clockOut: null, status: 'LEAVE', avatarBg: '#0891B2', initials: 'DL' },
-  { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: '08:00 - 20:00', clockIn: '07:45 WIB', clockOut: '20:10 WIB', status: 'ONTIME', avatarBg: '#4F46E5', initials: 'RH' },
-  { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: '07:00 - 16:00', clockIn: null, clockOut: null, status: 'ALPHA', avatarBg: '#DC2626', initials: 'SW' },
-  { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: '08:30 - 17:30', clockIn: '08:25 WIB', clockOut: '17:35 WIB', status: 'ONTIME', avatarBg: '#0D9488', initials: 'HG' },
-  { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: '08:30 - 17:30', clockIn: '08:42 WIB', clockOut: null, status: 'LATE', avatarBg: '#E11D48', initials: 'FH' },
+  { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:02 WIB', duration: '9h 07m', status: 'ONTIME', avatarBg: '#2563EB', initials: 'BS' },
+  { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', status: 'ONTIME', avatarBg: '#059669', initials: 'SR' },
+  { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:18 WIB', clockOut: '20:05 WIB', duration: '11h 47m', status: 'LATE', avatarBg: '#D97706', initials: 'AS' },
+  { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE', avatarBg: '#0891B2', initials: 'DL' },
+  { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', status: 'ONTIME', avatarBg: '#4F46E5', initials: 'RH' },
+  { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA', avatarBg: '#DC2626', initials: 'SW' },
+  { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME', avatarBg: '#0D9488', initials: 'HG' },
+  { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:42 WIB', clockOut: '17:32 WIB', duration: '8h 50m', status: 'LATE', avatarBg: '#E11D48', initials: 'FH' },
 ];
 
 /**
@@ -1623,13 +1623,35 @@ export const MonthlyAttendanceDetailView = ({
             const isLeave = emp.status === 'LEAVE';
             const isOntime = emp.status === 'ONTIME';
 
+            let cardBg = '#FFFFFF';
+            let cardBorder = '1px solid #E2E8F0';
+            let tileBg = '#F8FAFC';
+            let tileBorder = '1px solid #F1F5F9';
+
+            if (isAlpha) {
+              cardBg = '#FEF2F2';
+              cardBorder = '1px solid #FECACA';
+              tileBg = '#FFFFFF';
+              tileBorder = '1px solid #FEE2E2';
+            } else if (isLate) {
+              cardBg = '#FFFBEB';
+              cardBorder = '1px solid #FDE68A';
+              tileBg = '#FFFFFF';
+              tileBorder = '1px solid #FEF3C7';
+            } else if (isLeave) {
+              cardBg = '#F1F5F9';
+              cardBorder = '1px solid #E2E8F0';
+              tileBg = '#FFFFFF';
+              tileBorder = '1px solid #E2E8F0';
+            }
+
             return (
               <div
                 key={emp.id}
                 style={{
-                  backgroundColor: isAlpha ? '#FEF2F2' : isLate ? '#FFFBEB' : '#FFFFFF',
-                  borderRadius: '16px',
-                  border: isAlpha ? '1px solid #FECACA' : isLate ? '1px solid #FDE68A' : '1px solid #E2E8F0',
+                  backgroundColor: cardBg,
+                  borderRadius: '14px',
+                  border: cardBorder,
                   padding: '14px 16px',
                   display: 'flex',
                   flexDirection: 'column',
@@ -1732,9 +1754,9 @@ export const MonthlyAttendanceDetailView = ({
                   style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: '8px',
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #F1F5F9',
+                    gap: '10px',
+                    backgroundColor: tileBg,
+                    border: tileBorder,
                     borderRadius: '10px',
                     padding: '8px 12px',
                   }}
@@ -1743,7 +1765,7 @@ export const MonthlyAttendanceDetailView = ({
                     <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
                       {language === 'id' ? 'Masuk' : 'Clock In'}
                     </span>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                       {emp.clockIn || '-- : --'}
                     </div>
                   </div>
@@ -1752,15 +1774,20 @@ export const MonthlyAttendanceDetailView = ({
                     <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
                       {language === 'id' ? 'Keluar' : 'Clock Out'}
                     </span>
-                    <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                       {emp.clockOut || '-- : --'}
                     </div>
                   </div>
                 </div>
 
-                {/* Footer Shift Info */}
+                {/* Footer Shift & Duration */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                  <span>Shift: {emp.shift}</span>
+                  <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                    {emp.shift}
+                  </span>
+                  <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#334155', flexShrink: 0 }}>
+                    {language === 'id' ? `Durasi: ${emp.duration || '--'}` : `Duration: ${emp.duration || '--'}`}
+                  </span>
                 </div>
               </div>
             );
