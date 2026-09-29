@@ -56,6 +56,7 @@ import payslip3d from '../assets/menu-icons/payslip-3d.png';
 import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
 import dayOffIllustration from '../assets/day-off-illustration.png';
 import attendanceEmptySearch from '../assets/attendance-empty-search.png';
+import { AttendanceDetailModal } from '../components/AttendanceDetailModal';
 
 /**
  * Top Header for Work Attendance
@@ -170,6 +171,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
   const [elapsedDuration, setElapsedDuration] = useState('00j 00m');
 
   // Modals state
+  const [selectedAttendanceDetail, setSelectedAttendanceDetail] = useState(null);
   const [isMethodSheetOpen, setIsMethodSheetOpen] = useState(false);
   const [attendanceMethod, setAttendanceMethod] = useState('QR'); // 'QR' | 'PHOTO'
   const [isFlashlightOn, setIsFlashlightOn] = useState(false);
@@ -448,6 +450,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       inStatus: isOffDay ? null : (isClockInLate ? 'LATE' : (clockInTime && clockInTime < '08:00' ? 'EARLY_IN' : 'ON_TIME')),
       outStatus: isOffDay ? null : (clockOutTime ? (clockOutTime < '17:00' ? 'EARLY_OUT' : 'ON_TIME') : null),
       lateMinutes: isOffDay ? 0 : (isClockInLate ? clockInLateMinutes : 0),
+      earlyInMinutes: isOffDay ? 0 : (clockInTime && clockInTime < '08:00' ? 8 : 0),
+      earlyOutMinutes: isOffDay ? 0 : (clockOutTime && clockOutTime < '17:00' ? 15 : 0),
       statusLabel: isOffDay
         ? (language === 'id' ? 'Libur' : 'Day Off')
         : (language === 'id'
@@ -456,6 +460,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusColor: isOffDay ? '#64748B' : (isClockInLate ? '#FFFFFF' : (!isClockedIn && !clockOutTime) ? '#1D4ED8' : '#16A34A'),
       statusBg: isOffDay ? '#F1F5F9' : (isClockInLate ? '#D97706' : (!isClockedIn && !clockOutTime) ? '#EFF6FF' : '#DCFCE7'),
       location: isOffDay ? '-' : activeLocationTitle,
+      clockInLocation: isOffDay ? '-' : (isEng ? 'Lobby Tower A (Radius 8m)' : isHk ? 'Lobby Timur (Radius 8m)' : isSec ? 'Pos Masuk Barat (Radius 8m)' : 'Lobby Tower A (Radius 8m)'),
+      clockOutLocation: isOffDay ? '-' : (isEng ? 'Ruang Panel B1 (Radius 12m)' : isHk ? 'Locker HK Lt 1 (Radius 12m)' : isSec ? 'Pos Timur (Radius 12m)' : 'Lobby Tower A (Radius 12m)'),
+      attendanceMethod: 'GPS & Face Biometric Verification',
+      siteName: 'Thamrin Executive Residences',
       note: isOffDay
         ? (language === 'id' ? 'Hari Libur Housekeeping' : 'Housekeeping Day Off')
         : (isEng ? 'Pemeliharaan MEP harian' : isHk ? 'Presensi kebersihan harian' : isSec ? 'Tugas pos keamanan utama' : 'Presensi harian kantor pengelola'),
@@ -476,6 +484,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusColor: '#64748B',
       statusBg: '#F1F5F9',
       location: '-',
+      clockInLocation: '-',
+      clockOutLocation: '-',
+      attendanceMethod: '-',
+      siteName: 'Thamrin Executive Residences',
       note: language === 'id' ? 'Tidak ada jadwal shift yang dibuat' : 'No shift schedule assigned for this day',
     },
     {
@@ -490,10 +502,17 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       status: 'HADIR',
       inStatus: 'EARLY_IN',
       outStatus: 'ON_TIME',
+      earlyInMinutes: 12,
+      earlyOutMinutes: 0,
+      lateMinutes: 0,
       statusLabel: language === 'id' ? 'Masuk Awal' : 'Early In',
       statusColor: '#16A34A',
       statusBg: '#DCFCE7',
       location: isEng ? 'Ruang Panel B1 • Radius 12m' : isHk ? 'Koridor Lantai 5-10 • Radius 12m' : isSec ? 'Pos Timur • Radius 12m' : 'Pintu Masuk Staff • Radius 12m',
+      clockInLocation: isEng ? 'Lobby Tower A (Radius 8m)' : isHk ? 'Lobby Barat (Radius 8m)' : isSec ? 'Pos Timur (Radius 8m)' : 'Lobby Tower A (Radius 8m)',
+      clockOutLocation: isEng ? 'Ruang Panel B1 (Radius 12m)' : isHk ? 'Locker HK (Radius 12m)' : isSec ? 'Pos Timur (Radius 12m)' : 'Lobby Tower A (Radius 12m)',
+      attendanceMethod: 'GPS & Face Biometric Verification',
+      siteName: 'Thamrin Executive Residences',
       note: isEng ? 'Pekerjaan perbaikan lift lantai 10' : isHk ? 'General cleaning koridor' : isSec ? 'Patroli perimeter malam & CCTV' : 'Briefing vendor maintenance',
     },
     {
@@ -512,6 +531,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       statusColor: '#FFFFFF',
       statusBg: '#DC2626',
       location: '-',
+      clockInLocation: '-',
+      clockOutLocation: '-',
+      attendanceMethod: '-',
+      siteName: 'Thamrin Executive Residences',
       note: language === 'id' ? 'Tanpa Keterangan (Alpha)' : 'Absent without notice (Alpha)',
     },
     {
@@ -527,10 +550,16 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       inStatus: 'LATE',
       outStatus: 'ON_TIME',
       lateMinutes: 18,
+      earlyInMinutes: 0,
+      earlyOutMinutes: 0,
       statusLabel: language === 'id' ? 'Terlambat (18m)' : 'Late (18m)',
       statusColor: '#FFFFFF',
       statusBg: '#D97706',
       location: isEng ? 'Ruang Chiller • Radius 18m' : isHk ? 'Lobby Barat • Radius 18m' : isSec ? 'Pos Barat • Radius 18m' : 'Lobby Tower A • Radius 18m',
+      clockInLocation: isEng ? 'Ruang Chiller Lt B2 (Radius 18m)' : isHk ? 'Lobby Barat (Radius 18m)' : isSec ? 'Pos Barat (Radius 18m)' : 'Lobby Tower A (Radius 18m)',
+      clockOutLocation: isEng ? 'Ruang Chiller Lt B2 (Radius 18m)' : isHk ? 'Lobby Barat (Radius 18m)' : isSec ? 'Pos Barat (Radius 18m)' : 'Lobby Tower A (Radius 18m)',
+      attendanceMethod: 'GPS & Face Biometric Verification',
+      siteName: 'Thamrin Executive Residences',
       note: 'Macet jalur tol lingkar luar',
     },
     {
@@ -545,10 +574,17 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       status: 'HADIR',
       inStatus: 'EARLY_IN',
       outStatus: 'EARLY_OUT',
+      earlyInMinutes: 5,
+      earlyOutMinutes: 20,
+      lateMinutes: 0,
       statusLabel: language === 'id' ? 'Pulang Awal' : 'Early Out',
       statusColor: '#FFFFFF',
       statusBg: '#D97706',
       location: isEng ? 'Ruang STP • Radius 10m' : isHk ? 'Void Lobby • Radius 10m' : isSec ? 'Pintu Darurat • Radius 10m' : 'Lobby Tower A • Radius 10m',
+      clockInLocation: isEng ? 'Ruang STP (Radius 10m)' : isHk ? 'Void Lobby (Radius 10m)' : isSec ? 'Pintu Darurat (Radius 10m)' : 'Lobby Tower A (Radius 10m)',
+      clockOutLocation: isEng ? 'Gerbang Utama (Radius 12m)' : isHk ? 'Lobby Barat (Radius 12m)' : isSec ? 'Pos Barat (Radius 12m)' : 'Gerbang Barat (Radius 12m)',
+      attendanceMethod: 'GPS & Face Biometric Verification',
+      siteName: 'Thamrin Executive Residences',
       note: isEng ? 'Izin pulang awal keperluan keluarga' : isHk ? 'Izin pulang awal keperluan keluarga' : isSec ? 'Izin pulang awal keperluan keluarga' : 'Izin pulang awal keperluan keluarga',
     },
     {
@@ -563,10 +599,17 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
       status: 'HADIR',
       inStatus: 'ON_TIME',
       outStatus: 'ON_TIME',
+      earlyInMinutes: 0,
+      earlyOutMinutes: 0,
+      lateMinutes: 0,
       statusLabel: language === 'id' ? 'Tepat Waktu' : 'On Time',
       statusColor: '#16A34A',
       statusBg: '#DCFCE7',
       location: isEng ? 'Unit 14B • Radius 14m' : isHk ? 'Linen Room • Radius 14m' : isSec ? 'Gerbang Logistik • Radius 14m' : 'Lobby Tower A • Radius 14m',
+      clockInLocation: isEng ? 'Unit 14B (Radius 14m)' : isHk ? 'Linen Room (Radius 14m)' : isSec ? 'Gerbang Logistik (Radius 14m)' : 'Lobby Tower A (Radius 14m)',
+      clockOutLocation: isEng ? 'Workshop Maintenance (Radius 10m)' : isHk ? 'Locker HK (Radius 10m)' : isSec ? 'Pos Timur (Radius 10m)' : 'Lobby Tower A (Radius 10m)',
+      attendanceMethod: 'GPS & Face Biometric Verification',
+      siteName: 'Thamrin Executive Residences',
       note: isEng ? 'Perbaikan instalasi listrik unit 14B' : isHk ? 'Restock chemical & inventory' : isSec ? 'Pengawalan bongkar muatan logistik' : 'Review laporan keuangan IPL',
     },
   ];
@@ -1619,17 +1662,28 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                 return (
                   <div
                     key={item.id}
+                    onClick={() => setSelectedAttendanceDetail(item)}
                     style={{
                       backgroundColor: cardBg,
                       borderRadius: '14px',
                       border: cardBorder,
-                    padding: '14px 16px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    boxShadow: item.isToday ? (isLate ? '0 2px 8px rgba(217, 119, 6, 0.1)' : isAlpha ? '0 2px 8px rgba(220, 38, 38, 0.1)' : '0 2px 8px rgba(37, 99, 235, 0.08)') : 'none',
-                  }}
-                >
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
+                      boxShadow: item.isToday ? (isLate ? '0 2px 8px rgba(217, 119, 6, 0.1)' : isAlpha ? '0 2px 8px rgba(220, 38, 38, 0.1)' : '0 2px 8px rgba(37, 99, 235, 0.08)') : 'none',
+                      cursor: 'pointer',
+                      transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.boxShadow = item.isToday ? (isLate ? '0 2px 8px rgba(217, 119, 6, 0.1)' : isAlpha ? '0 2px 8px rgba(220, 38, 38, 0.1)' : '0 2px 8px rgba(37, 99, 235, 0.08)') : 'none';
+                    }}
+                  >
                   {/* Header: Date & Status Badge */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -3955,6 +4009,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
 
         return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
       })()}
+
+      {/* =========================================================================
+          ATTENDANCE DETAIL MODAL (Map, Dual Pins, Info & Results)
+          ========================================================================= */}
+      <AttendanceDetailModal
+        isOpen={!!selectedAttendanceDetail}
+        onClose={() => setSelectedAttendanceDetail(null)}
+        data={selectedAttendanceDetail}
+      />
     </div>
   );
 };

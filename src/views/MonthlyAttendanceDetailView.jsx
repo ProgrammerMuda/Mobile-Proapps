@@ -20,6 +20,7 @@ import {
 } from '@phosphor-icons/react';
 import { useLanguage } from '../context/LanguageContext';
 import attendanceEmptySearch from '../assets/attendance-empty-search.png';
+import { AttendanceDetailModal } from '../components/AttendanceDetailModal';
 
 const MONTH_NAMES = [
   'January',
@@ -745,6 +746,7 @@ export const MonthlyAttendanceDetailView = ({
   };
 
   // Filter & Search states
+  const [selectedAttendanceDetail, setSelectedAttendanceDetail] = useState(null);
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [employeeDeptFilter, setEmployeeDeptFilter] = useState('ALL');
   const [employeeStatusFilter, setEmployeeStatusFilter] = useState('ALL');
@@ -1551,6 +1553,31 @@ export const MonthlyAttendanceDetailView = ({
                 return (
                   <div
                     key={log.id}
+                    onClick={() => {
+                      const dayNameEn = DAY_NAMES[dayOfWeek];
+                      const dayNameId = DAY_NAMES_ID[dayOfWeek];
+                      const detailObj = {
+                        date: dateFormatted,
+                        dateEn: `${dayNameEn}, ${log.dayNumber} ${MONTH_SHORT[selectedMonth]} ${selectedYear}`,
+                        shift: log.shift || 'Shift Pagi (08:00 - 17:00 WIB)',
+                        clockIn: log.clockIn,
+                        clockOut: log.clockOut,
+                        duration: log.workDuration || '8h 50m',
+                        status: log.status?.toUpperCase(),
+                        inStatus: log.inStatus,
+                        outStatus: log.outStatus,
+                        lateMinutes: log.lateMinutes || (log.inStatus === 'LATE' ? 14 : 0),
+                        earlyInMinutes: log.inStatus === 'EARLY_IN' ? 10 : 0,
+                        earlyOutMinutes: log.outStatus === 'EARLY_OUT' ? 15 : 0,
+                        location: 'Thamrin Executive Residences • Tower A',
+                        clockInLocation: 'Lobby Tower A (Radius 8m)',
+                        clockOutLocation: 'West Security Gate (Radius 12m)',
+                        attendanceMethod: 'GPS & Face Biometric Verification',
+                        siteName: 'Thamrin Executive Residences',
+                        note: log.notes || (log.inStatus === 'LATE' ? 'Kepadatan lalu lintas pagi hari' : 'Presensi harian tercatat dalam geofence radius'),
+                      };
+                      setSelectedAttendanceDetail(detailObj);
+                    }}
                     style={{
                       backgroundColor: cardBg,
                       borderRadius: '14px',
@@ -1559,6 +1586,16 @@ export const MonthlyAttendanceDetailView = ({
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '10px',
+                      cursor: 'pointer',
+                      transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1995,6 +2032,29 @@ export const MonthlyAttendanceDetailView = ({
                 return (
                   <div
                     key={emp.recordId || emp.id}
+                    onClick={() => {
+                      const detailObj = {
+                        date: dateText,
+                        dateEn: dateText,
+                        shift: emp.shift || 'Shift Pagi (08:00 - 17:00 WIB)',
+                        clockIn: emp.clockIn,
+                        clockOut: emp.clockOut,
+                        duration: emp.duration || '8h 50m',
+                        status: emp.status?.toUpperCase(),
+                        inStatus: emp.inStatus,
+                        outStatus: emp.outStatus,
+                        lateMinutes: emp.lateMinutes || (emp.inStatus === 'LATE' ? 14 : 0),
+                        earlyInMinutes: emp.inStatus === 'EARLY_IN' ? 10 : 0,
+                        earlyOutMinutes: emp.outStatus === 'EARLY_OUT' ? 15 : 0,
+                        location: `${emp.dept || 'Engineering'} • ${emp.role || 'Staff'}`,
+                        clockInLocation: 'Lobby Tower A (Radius 8m)',
+                        clockOutLocation: 'West Security Gate (Radius 12m)',
+                        attendanceMethod: 'GPS & Face Biometric Verification',
+                        siteName: 'Thamrin Executive Residences',
+                        note: `${emp.name} (${emp.dept} - ${emp.role}) • Presensi Geofence Mobile App`,
+                      };
+                      setSelectedAttendanceDetail(detailObj);
+                    }}
                     style={{
                       backgroundColor: cardBg,
                       borderRadius: '14px',
@@ -2003,6 +2063,16 @@ export const MonthlyAttendanceDetailView = ({
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '10px',
+                      cursor: 'pointer',
+                      transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'none';
+                      e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
                     {/* Top Row: Date on Left, Status Badge on Right (Consistent with My Attendance, never drops down) */}
@@ -2472,6 +2542,15 @@ export const MonthlyAttendanceDetailView = ({
 
         return modalTarget ? createPortal(modalElement, modalTarget) : modalElement;
       })()}
+
+      {/* =========================================================================
+          ATTENDANCE DETAIL MODAL (Map, Dual Pins, Info & Results)
+          ========================================================================= */}
+      <AttendanceDetailModal
+        isOpen={!!selectedAttendanceDetail}
+        onClose={() => setSelectedAttendanceDetail(null)}
+        data={selectedAttendanceDetail}
+      />
     </div>
   );
 };
