@@ -84,7 +84,7 @@ export const AttendanceRecordDetailHeader = ({ onBack, data }) => {
 };
 
 /**
- * Visual GPS Map with Dual Pins (Clock In & Clock Out)
+ * Visual GPS Map with Radius Circle, Central Building Icon, Green Check-In Pin, and Red Check-Out Pin
  */
 const AttendanceMapFull = ({ data, language }) => {
   const isOff = data?.status === 'LIBUR' || data?.status === 'off' || data?.status === 'LEAVE' || data?.status === 'IZIN';
@@ -92,22 +92,24 @@ const AttendanceMapFull = ({ data, language }) => {
   const hasClockIn = data?.clockIn && data.clockIn !== '-' && data.clockIn !== '--:--' && data.clockIn !== '-- : --';
   const hasClockOut = data?.clockOut && data.clockOut !== '-' && data.clockOut !== '--:--' && data.clockOut !== '-- : --' && data.clockOut !== 'Sedang Bekerja...';
 
+  const siteName = data?.siteName || 'Thamrin Executive Residences';
+
   return (
     <div
       style={{
         width: '100%',
-        height: '220px',
+        height: '230px',
         borderRadius: '16px',
-        backgroundColor: '#E2E8F0',
+        backgroundColor: '#F1F5F9',
         border: '1px solid #CBD5E1',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.06)',
+        boxShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.04)',
       }}
     >
       {/* SVG Map Canvas */}
       <svg
-        viewBox="0 0 400 220"
+        viewBox="0 0 400 230"
         style={{
           width: '100%',
           height: '100%',
@@ -115,193 +117,264 @@ const AttendanceMapFull = ({ data, language }) => {
         }}
       >
         <defs>
-          <radialGradient id="geofenceGlowFull" cx="50%" cy="50%" r="50%">
+          {/* Radial gradient for geofence radius area */}
+          <radialGradient id="geofenceRadiusFill" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#0284C7" stopOpacity="0.22" />
-            <stop offset="80%" stopColor="#0284C7" stopOpacity="0.08" />
-            <stop offset="100%" stopColor="#0284C7" stopOpacity="0" />
+            <stop offset="75%" stopColor="#0284C7" stopOpacity="0.10" />
+            <stop offset="100%" stopColor="#0284C7" stopOpacity="0.04" />
           </radialGradient>
 
+          {/* Keyframe animations for pins */}
           <style>
             {`
-              @keyframes pinPulseFull {
+              @keyframes pulsePin {
                 0% { transform: scale(0.9); opacity: 0.8; }
-                50% { transform: scale(1.25); opacity: 0.2; }
+                50% { transform: scale(1.3); opacity: 0.2; }
                 100% { transform: scale(0.9); opacity: 0.8; }
               }
-              .pulse-ring-full {
+              .pulse-green {
                 transform-origin: center;
-                animation: pinPulseFull 2s ease-in-out infinite;
+                animation: pulsePin 2.2s ease-in-out infinite;
+              }
+              .pulse-red {
+                transform-origin: center;
+                animation: pulsePin 2.2s ease-in-out infinite 0.5s;
               }
             `}
           </style>
         </defs>
 
-        {/* Ground */}
-        <rect width="400" height="220" fill="#F1F5F9" />
+        {/* 1. Base Map Background Grid & Roads */}
+        <rect width="400" height="230" fill="#F8FAFC" />
 
-        {/* Green Landscape Areas */}
+        {/* Subtle Map Blocks & Landscape */}
         <path
-          d="M 10,15 Q 80,10 110,60 T 40,110 Z"
-          fill="#DCFCE7"
-          stroke="#BBF7D0"
+          d="M 0,40 Q 90,20 120,80 T 30,140 Z"
+          fill="#F1F5F9"
+          stroke="#E2E8F0"
           strokeWidth="1"
         />
         <path
-          d="M 280,135 Q 360,115 390,165 T 310,210 Z"
-          fill="#DCFCE7"
-          stroke="#BBF7D0"
+          d="M 270,20 Q 360,10 390,70 T 310,130 Z"
+          fill="#F1F5F9"
+          stroke="#E2E8F0"
+          strokeWidth="1"
+        />
+        <path
+          d="M 280,145 Q 360,125 400,180 T 300,230 Z"
+          fill="#F1F5F9"
+          stroke="#E2E8F0"
           strokeWidth="1"
         />
 
-        {/* Roads & Walkways */}
+        {/* Street Lines */}
         <path
-          d="M 0,110 Q 180,90 400,105"
+          d="M 0,115 Q 200,100 400,115"
           fill="none"
           stroke="#FFFFFF"
-          strokeWidth="18"
+          strokeWidth="20"
           strokeLinecap="round"
         />
         <path
-          d="M 140,0 Q 155,100 165,220"
+          d="M 0,115 Q 200,100 400,115"
+          fill="none"
+          stroke="#E2E8F0"
+          strokeWidth="1"
+          strokeDasharray="4 4"
+        />
+        <path
+          d="M 130,0 Q 145,115 155,230"
           fill="none"
           stroke="#FFFFFF"
           strokeWidth="16"
           strokeLinecap="round"
         />
         <path
-          d="M 250,0 Q 240,100 230,220"
+          d="M 270,0 Q 255,115 245,230"
           fill="none"
           stroke="#FFFFFF"
-          strokeWidth="14"
+          strokeWidth="16"
           strokeLinecap="round"
         />
 
-        {/* Road Centerlines */}
-        <path
-          d="M 0,110 Q 180,90 400,105"
-          fill="none"
-          stroke="#CBD5E1"
-          strokeWidth="1"
-          strokeDasharray="4 4"
-        />
-
-        {/* Building 3D Footprints */}
-        {/* Tower A */}
-        <rect x="55" y="45" width="70" height="50" rx="6" fill="#CBD5E1" />
-        <rect x="52" y="42" width="70" height="50" rx="6" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1" />
-        <text x="87" y="68" fontSize="8" fontWeight="700" fill="#475569" textAnchor="middle" fontFamily="sans-serif">
-          Tower A
-        </text>
-        <text x="87" y="78" fontSize="6.5" fontWeight="500" fill="#94A3B8" textAnchor="middle" fontFamily="sans-serif">
-          Residential
-        </text>
-
-        {/* Management Office / Main Lobby */}
-        <rect x="180" y="55" width="85" height="42" rx="6" fill="#CBD5E1" />
-        <rect x="177" y="52" width="85" height="42" rx="6" fill="#FFFFFF" stroke="#0284C7" strokeWidth="1.2" />
-        <text x="219" y="73" fontSize="8" fontWeight="700" fill="#02388A" textAnchor="middle" fontFamily="sans-serif">
-          Main Lobby
-        </text>
-        <text x="219" y="83" fontSize="6.5" fontWeight="500" fill="#64748B" textAnchor="middle" fontFamily="sans-serif">
-          Management Office
-        </text>
-
-        {/* Tower B */}
-        <rect x="290" y="45" width="70" height="50" rx="6" fill="#CBD5E1" />
-        <rect x="287" y="42" width="70" height="50" rx="6" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1" />
-        <text x="322" y="68" fontSize="8" fontWeight="700" fill="#475569" textAnchor="middle" fontFamily="sans-serif">
-          Tower B
-        </text>
-
-        {/* Security West Gate */}
-        <rect x="90" y="150" width="55" height="32" rx="4" fill="#CBD5E1" />
-        <rect x="88" y="148" width="55" height="32" rx="4" fill="#FFFFFF" stroke="#94A3B8" strokeWidth="1" />
-        <text x="115" y="165" fontSize="7.5" fontWeight="700" fill="#475569" textAnchor="middle" fontFamily="sans-serif">
-          West Gate
-        </text>
-        <text x="115" y="174" fontSize="6" fontWeight="500" fill="#94A3B8" textAnchor="middle" fontFamily="sans-serif">
-          Pos Keamanan
-        </text>
-
-        {/* Street Labels */}
-        <text x="20" y="125" fontSize="7" fontWeight="600" fill="#94A3B8" fontFamily="sans-serif">
+        {/* Street Name Labels */}
+        <text x="16" y="130" fontSize="7" fontWeight="600" fill="#94A3B8" fontFamily="sans-serif">
           Jl. Thamrin Boulevard
         </text>
-        <text x="280" y="25" fontSize="7" fontWeight="600" fill="#94A3B8" fontFamily="sans-serif">
+        <text x="280" y="24" fontSize="7" fontWeight="600" fill="#94A3B8" fontFamily="sans-serif">
           Jl. Kebon Kacang Raya
         </text>
 
-        {/* Geofence Zone Circle (Radius 100m) */}
-        <circle cx="200" cy="110" r="95" fill="url(#geofenceGlowFull)" stroke="#0284C7" strokeWidth="1.5" strokeDasharray="4 4" />
+        {/* 2. LINGKARAN RADIUS (Geofence Radius Circle - Center at 200, 115, Radius: 85) */}
+        <circle
+          cx="200"
+          cy="115"
+          r="88"
+          fill="url(#geofenceRadiusFill)"
+          stroke="#0284C7"
+          strokeWidth="2"
+          strokeDasharray="5 4"
+        />
+        <circle
+          cx="200"
+          cy="115"
+          r="92"
+          fill="none"
+          stroke="#38BDF8"
+          strokeWidth="1"
+          strokeOpacity="0.4"
+        />
 
-        {/* Connecting Trajectory Line between Clock In (195,85) and Clock Out (115,155) */}
-        {hasClockIn && hasClockOut && (
+        {/* Trajectory dashed line between PIN Hijau (145, 80) and PIN Merah (255, 150) */}
+        {hasClockIn && (
           <g>
             <path
-              d="M 195,85 Q 160,115 115,155"
+              d="M 145,80 Q 195,115 255,150"
               fill="none"
               stroke="#0284C7"
               strokeWidth="2.5"
               strokeDasharray="5 4"
+              strokeOpacity="0.8"
             />
-            <rect x="135" y="110" width="46" height="15" rx="7" fill="#02388A" />
-            <text x="158" y="121" fontSize="6.5" fontWeight="700" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
+            {/* Trajectory Distance Label Bubble */}
+            <rect x="180" y="106" width="40" height="16" rx="8" fill="#02388A" />
+            <text x="200" y="117" fontSize="7" fontWeight="800" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
               85 m
             </text>
           </g>
         )}
 
-        {/* PIN 1: Clock In Pin (195, 85) */}
+        {/* 3. ICON LOKASI BUILDING (Di tengah lingkaran radius: 200, 115) */}
+        <g transform="translate(200, 115)">
+          {/* Outer glow ring */}
+          <circle cx="0" cy="0" r="24" fill="#FFFFFF" filter="drop-shadow(0 2px 8px rgba(2, 56, 138, 0.2))" />
+          <circle cx="0" cy="0" r="20" fill="#02388A" stroke="#FFFFFF" strokeWidth="2" />
+
+          {/* Building Icon inside Center */}
+          <g transform="translate(-10, -10)">
+            {/* Main Center Tower */}
+            <rect x="5" y="2" width="10" height="15" rx="1" fill="#FFFFFF" />
+            {/* Tower Roof */}
+            <polygon points="10,-1 4,3 16,3" fill="#38BDF8" />
+            {/* Windows */}
+            <rect x="7" y="5" width="2" height="2" rx="0.5" fill="#02388A" />
+            <rect x="11" y="5" width="2" height="2" rx="0.5" fill="#02388A" />
+            <rect x="7" y="9" width="2" height="2" rx="0.5" fill="#02388A" />
+            <rect x="11" y="9" width="2" height="2" rx="0.5" fill="#02388A" />
+            {/* Main Door */}
+            <rect x="8.5" y="13" width="3" height="4" rx="0.5" fill="#02388A" />
+            {/* Left Side Wing */}
+            <rect x="1" y="7" width="4" height="10" rx="0.5" fill="#E2E8F0" />
+            {/* Right Side Wing */}
+            <rect x="15" y="7" width="4" height="10" rx="0.5" fill="#E2E8F0" />
+          </g>
+
+          {/* Building Location Label under icon */}
+          <g transform="translate(0, 30)">
+            <rect
+              x="-68"
+              y="-8"
+              width="136"
+              height="18"
+              rx="9"
+              fill="#FFFFFF"
+              stroke="#02388A"
+              strokeWidth="1.2"
+              filter="drop-shadow(0 2px 4px rgba(0,0,0,0.08))"
+            />
+            <text x="0" y="4" fontSize="7.5" fontWeight="800" fill="#02388A" textAnchor="middle" fontFamily="sans-serif">
+              🏢 {siteName}
+            </text>
+          </g>
+        </g>
+
+        {/* 4. PIN HIJAU UNTUK CHECK IN (Clock In - Posisi: 145, 80) */}
         {hasClockIn && (
-          <g transform="translate(195, 85)">
-            <circle cx="0" cy="0" r="14" fill="#16A34A" className="pulse-ring-full" />
+          <g transform="translate(145, 80)">
+            {/* Pulsing ring */}
+            <circle cx="0" cy="0" r="15" fill="#16A34A" className="pulse-green" />
             <circle cx="0" cy="0" r="8" fill="#16A34A" stroke="#FFFFFF" strokeWidth="2.5" />
             <circle cx="0" cy="0" r="3" fill="#FFFFFF" />
 
+            {/* Check In Tooltip Pill (Green) */}
             <g transform="translate(0, -22)">
-              <rect x="-42" y="-14" width="84" height="16" rx="8" fill="#16A34A" stroke="#FFFFFF" strokeWidth="1.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.15))" />
-              <text x="0" y="-3" fontSize="7.5" fontWeight="800" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
-                🟢 Masuk: {data.clockIn}
+              <rect
+                x="-48"
+                y="-14"
+                width="96"
+                height="18"
+                rx="9"
+                fill="#16A34A"
+                stroke="#FFFFFF"
+                strokeWidth="1.5"
+                filter="drop-shadow(0 2px 5px rgba(22, 163, 74, 0.35))"
+              />
+              <text x="0" y="-2" fontSize="7.5" fontWeight="800" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
+                🟢 Check In: {data.clockIn}
               </text>
-              <polygon points="-4,2 4,2 0,6" fill="#16A34A" />
+              {/* Pointer triangle */}
+              <polygon points="-4,4 4,4 0,8" fill="#16A34A" />
             </g>
           </g>
         )}
 
-        {/* PIN 2: Clock Out Pin (115, 155) */}
-        {hasClockOut && (
-          <g transform="translate(115, 155)">
-            <circle cx="0" cy="0" r="14" fill="#02388A" className="pulse-ring-full" />
-            <circle cx="0" cy="0" r="8" fill="#02388A" stroke="#FFFFFF" strokeWidth="2.5" />
+        {/* 5. PIN MERAH UNTUK CHECKOUT (Clock Out - Posisi: 255, 150) */}
+        {hasClockOut ? (
+          <g transform="translate(255, 150)">
+            {/* Pulsing ring */}
+            <circle cx="0" cy="0" r="15" fill="#DC2626" className="pulse-red" />
+            <circle cx="0" cy="0" r="8" fill="#DC2626" stroke="#FFFFFF" strokeWidth="2.5" />
             <circle cx="0" cy="0" r="3" fill="#FFFFFF" />
 
+            {/* Check Out Tooltip Pill (Red) */}
             <g transform="translate(0, -22)">
-              <rect x="-42" y="-14" width="84" height="16" rx="8" fill="#02388A" stroke="#FFFFFF" strokeWidth="1.5" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.15))" />
-              <text x="0" y="-3" fontSize="7.5" fontWeight="800" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
-                🔵 Keluar: {data.clockOut}
+              <rect
+                x="-50"
+                y="-14"
+                width="100"
+                height="18"
+                rx="9"
+                fill="#DC2626"
+                stroke="#FFFFFF"
+                strokeWidth="1.5"
+                filter="drop-shadow(0 2px 5px rgba(220, 38, 38, 0.35))"
+              />
+              <text x="0" y="-2" fontSize="7.5" fontWeight="800" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
+                🔴 Check Out: {data.clockOut}
               </text>
-              <polygon points="-4,2 4,2 0,6" fill="#02388A" />
+              {/* Pointer triangle */}
+              <polygon points="-4,4 4,4 0,8" fill="#DC2626" />
             </g>
           </g>
-        )}
-
-        {/* Pending Clock Out status */}
-        {hasClockIn && !hasClockOut && (
-          <g transform="translate(195, 85)">
-            <g transform="translate(0, 18)">
-              <rect x="-50" y="0" width="100" height="14" rx="7" fill="#02388A" fillOpacity="0.9" />
-              <text x="0" y="10" fontSize="6.5" fontWeight="700" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
-                ⏱️ Sedang Bekerja di Site
+        ) : hasClockIn ? (
+          /* When clocked in but not yet checked out -> Show pending Checkout indicator */
+          <g transform="translate(255, 150)">
+            <circle cx="0" cy="0" r="7" fill="#DC2626" fillOpacity="0.4" stroke="#DC2626" strokeWidth="1.5" strokeDasharray="3 2" />
+            <g transform="translate(0, -20)">
+              <rect
+                x="-46"
+                y="-13"
+                width="92"
+                height="16"
+                rx="8"
+                fill="#DC2626"
+                fillOpacity="0.9"
+                stroke="#FFFFFF"
+                strokeWidth="1"
+              />
+              <text x="0" y="-2" fontSize="7" fontWeight="700" fill="#FFFFFF" textAnchor="middle" fontFamily="sans-serif">
+                🔴 Belum Check Out
               </text>
+              <polygon points="-4,3 4,3 0,6" fill="#DC2626" fillOpacity="0.9" />
             </g>
           </g>
-        )}
+        ) : null}
 
-        {/* Off Day / Alpha note */}
+        {/* Off Day / Alpha note overlay if applicable */}
         {(isOff || isAlpha) && (
-          <g transform="translate(200, 110)">
-            <rect x="-80" y="-16" width="160" height="32" rx="10" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.5" filter="drop-shadow(0 2px 6px rgba(0,0,0,0.1))" />
-            <text x="0" y="3" fontSize="8.5" fontWeight="700" fill={isAlpha ? '#DC2626' : '#64748B'} textAnchor="middle" fontFamily="sans-serif">
+          <g transform="translate(200, 115)">
+            <rect x="-85" y="-18" width="170" height="36" rx="12" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.5" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.12))" />
+            <text x="0" y="4" fontSize="8.5" fontWeight="800" fill={isAlpha ? '#DC2626' : '#64748B'} textAnchor="middle" fontFamily="sans-serif">
               {isAlpha
                 ? (language === 'id' ? '⚠️ Tanpa Catatan Presensi' : '⚠️ No Attendance Recorded')
                 : (language === 'id' ? '🏖️ Hari Libur Terjadwal' : '🏖️ Scheduled Day Off')}
@@ -319,7 +392,7 @@ const AttendanceMapFull = ({ data, language }) => {
           backgroundColor: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(4px)',
           borderRadius: '9999px',
-          padding: '3px 10px',
+          padding: '4px 10px',
           display: 'flex',
           alignItems: 'center',
           gap: '5px',
@@ -330,11 +403,11 @@ const AttendanceMapFull = ({ data, language }) => {
       >
         <ShieldCheck size={13} weight="fill" color="#16A34A" />
         <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#16A34A' }}>
-          {language === 'id' ? 'Radius Geofence Valid (±8m)' : 'Valid Geofence Radius (±8m)'}
+          {language === 'id' ? 'Radius Presensi 100m (Valid)' : '100m Attendance Radius (Valid)'}
         </span>
       </div>
 
-      {/* Coordinates & Compass Badge (Bottom-Left) */}
+      {/* GPS Coordinates Badge (Bottom-Left) */}
       <div
         style={{
           position: 'absolute',
@@ -357,7 +430,7 @@ const AttendanceMapFull = ({ data, language }) => {
         <span>Lat: -6.1954 • Long: 106.8211</span>
       </div>
 
-      {/* Site Name Pill (Bottom-Right) */}
+      {/* Radius Indicator Pill (Bottom-Right) */}
       <div
         style={{
           position: 'absolute',
@@ -373,12 +446,12 @@ const AttendanceMapFull = ({ data, language }) => {
           border: '1px solid #E2E8F0',
           fontSize: '0.625rem',
           fontWeight: 700,
-          color: '#02388A',
+          color: '#0284C7',
           zIndex: 2,
         }}
       >
-        <Buildings size={11} weight="fill" color="#02388A" />
-        <span>Thamrin Exec. Residences</span>
+        <MapPin size={11} weight="fill" color="#0284C7" />
+        <span>Radius Geofence: 100m</span>
       </div>
     </div>
   );
