@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -168,10 +167,8 @@ const AttendanceMapFull = ({ data, language }) => {
       weight: 2.5,
     }).addTo(map);
 
-    // 2. Primary Color Center Building Badge (#053079) with exact Phosphor BuildingApartment Fill Icon
-    const buildingSvgString = renderToStaticMarkup(
-      <BuildingApartment size={26} weight="fill" color="#FFFFFF" />
-    );
+    // 2. Primary Color Center Building Badge (#053079) with BuildingApartment Fill SVG
+    const buildingSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M240,208H224V96a16,16,0,0,0-16-16H160V32a16,16,0,0,0-24.88-13.32l-64,44.02A16,16,0,0,0,64,75.23V208H48a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM104,136a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h16A8,8,0,0,1,104,136Zm0-40a8,8,0,0,1-8,8H80a8,8,0,0,1,0-16h16A8,8,0,0,1,104,96Zm64,40a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h16A8,8,0,0,1,168,136Zm0,48a8,8,0,0,1-8,8H144a8,8,0,0,1,0-16h16A8,8,0,0,1,168,184Zm40,24H176V96h32Z"/></svg>`;
 
     const buildingIcon = L.divIcon({
       className: 'real-map-building-icon',
@@ -229,10 +226,8 @@ const AttendanceMapFull = ({ data, language }) => {
         className: 'custom-map-popup',
       });
 
-    // Render exact Phosphor User Fill Icon for Check In and Check Out pins
-    const userFillSvgString = renderToStaticMarkup(
-      <User size={20} weight="fill" color="#FFFFFF" />
-    );
+    // Phosphor User Fill SVG for Check In and Check Out pins
+    const userFillSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8C55.71,195.58,79.37,176,128,176s72.29,19.58,89.07,44a8,8,0,1,0,13.85-8Z"/></svg>`;
 
     // 3. Green Person Pin for Check In (Inside Radius, Solid Phosphor User Fill Icon)
     if (!isOff && !isAlpha) {
