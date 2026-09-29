@@ -204,12 +204,12 @@ const AttendanceMapFull = ({ data, language }) => {
           strokeWidth="2.5"
         />
 
-        {/* 3. PRIMARY COLOR CENTER BUILDING BADGE (#053079) WITH PHOSPHOR BUILDINGS ICON */}
-        <foreignObject x={195 - 19} y={115 - 19} width={38} height={38}>
+        {/* 3. PRIMARY COLOR CENTER BUILDING BADGE (#053079) WITH ENLARGED PHOSPHOR BUILDINGS ICON */}
+        <foreignObject x={195 - 23} y={115 - 23} width={46} height={46}>
           <div
             style={{
-              width: '38px',
-              height: '38px',
+              width: '46px',
+              height: '46px',
               borderRadius: '50%',
               backgroundColor: '#053079',
               display: 'flex',
@@ -217,64 +217,64 @@ const AttendanceMapFull = ({ data, language }) => {
               justifyContent: 'center',
             }}
           >
-            <Buildings size={20} weight="fill" color="#FFFFFF" />
+            <Buildings size={26} weight="fill" color="#FFFFFF" />
           </div>
         </foreignObject>
 
-        {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) WITH PHOSPHOR USER ICON */}
+        {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) - ENLARGED WITH FILL USER ICON */}
         <g transform="translate(145, 70)">
           {/* Teardrop Pin Shape (Green) */}
           <path
-            d="M 0,0 C -9,-9 -18,-18 -18,-29 C -18,-39 -10,-47 0,-47 C 10,-47 18,-39 18,-29 C 18,-18 9,-9 0,0 Z"
+            d="M 0,0 C -12,-12 -24,-24 -24,-38 C -24,-51 -13,-62 0,-62 C 13,-62 24,-51 24,-38 C 24,-24 12,-12 0,0 Z"
             fill="#DCFCE7"
             stroke="#22C55E"
-            strokeWidth="1.5"
+            strokeWidth="1.8"
           />
 
           {/* Inner Dark Green Circle */}
-          <circle cx="0" cy="-28" r="12" fill="#16A34A" />
+          <circle cx="0" cy="-38" r="15.5" fill="#16A34A" />
 
-          {/* Phosphor User Icon inside Green Pin */}
-          <foreignObject x={-8} y={-36} width={16} height={16}>
+          {/* Enlarged Phosphor User Fill Icon inside Green Pin */}
+          <foreignObject x={-11} y={-49} width={22} height={22}>
             <div
               style={{
-                width: '16px',
-                height: '16px',
+                width: '22px',
+                height: '22px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <User size={13} weight="bold" color="#FFFFFF" />
+              <User size={18} weight="fill" color="#FFFFFF" />
             </div>
           </foreignObject>
         </g>
 
-        {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) WITH PHOSPHOR USER ICON */}
+        {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) - ENLARGED WITH FILL USER ICON */}
         <g transform="translate(240, 155)">
           {/* Teardrop Pin Shape (Red) */}
           <path
-            d="M 0,0 C -9,-9 -18,-18 -18,-29 C -18,-39 -10,-47 0,-47 C 10,-47 18,-39 18,-29 C 18,-18 9,-9 0,0 Z"
+            d="M 0,0 C -12,-12 -24,-24 -24,-38 C -24,-51 -13,-62 0,-62 C 13,-62 24,-51 24,-38 C 24,-24 12,-12 0,0 Z"
             fill="#FEE2E2"
             stroke="#EF4444"
-            strokeWidth="1.5"
+            strokeWidth="1.8"
           />
 
           {/* Inner Dark Red Circle */}
-          <circle cx="0" cy="-28" r="12" fill="#DC2626" />
+          <circle cx="0" cy="-38" r="15.5" fill="#DC2626" />
 
-          {/* Phosphor User Icon inside Red Pin */}
-          <foreignObject x={-8} y={-36} width={16} height={16}>
+          {/* Enlarged Phosphor User Fill Icon inside Red Pin */}
+          <foreignObject x={-11} y={-49} width={22} height={22}>
             <div
               style={{
-                width: '16px',
-                height: '16px',
+                width: '22px',
+                height: '22px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <User size={13} weight="bold" color="#FFFFFF" />
+              <User size={18} weight="fill" color="#FFFFFF" />
             </div>
           </foreignObject>
         </g>
