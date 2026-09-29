@@ -289,12 +289,12 @@ const DEPARTMENTS_DATA = [
 const MOCK_EMPLOYEES_LIST = [
   { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:02 WIB', duration: '9h 07m', status: 'ONTIME', avatarBg: '#2563EB', initials: 'BS' },
   { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', status: 'ONTIME', avatarBg: '#059669', initials: 'SR' },
-  { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:18 WIB', clockOut: '20:05 WIB', duration: '11h 47m', status: 'LATE', avatarBg: '#D97706', initials: 'AS' },
+  { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:18 WIB', clockOut: '20:05 WIB', duration: '11h 47m', lateMinutes: 18, status: 'LATE', avatarBg: '#D97706', initials: 'AS' },
   { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE', avatarBg: '#0891B2', initials: 'DL' },
   { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', status: 'ONTIME', avatarBg: '#4F46E5', initials: 'RH' },
   { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA', avatarBg: '#DC2626', initials: 'SW' },
   { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME', avatarBg: '#0D9488', initials: 'HG' },
-  { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:42 WIB', clockOut: '17:32 WIB', duration: '8h 50m', status: 'LATE', avatarBg: '#E11D48', initials: 'FH' },
+  { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:42 WIB', clockOut: '17:32 WIB', duration: '8h 50m', lateMinutes: 12, status: 'LATE', avatarBg: '#E11D48', initials: 'FH' },
 ];
 
 /**
@@ -768,6 +768,78 @@ export const MonthlyAttendanceDetailView = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
         {badges}
       </div>
+    );
+  };
+
+  const renderEmployeeBadges = (emp) => {
+    if (emp.status === 'LEAVE') {
+      return (
+        <span
+          style={{
+            backgroundColor: '#F1F5F9',
+            color: '#64748B',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {language === 'id' ? 'Izin / Cuti' : 'Leave'}
+        </span>
+      );
+    }
+    if (emp.status === 'ALPHA') {
+      return (
+        <span
+          style={{
+            backgroundColor: '#DC2626',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          Alpha
+        </span>
+      );
+    }
+    if (emp.status === 'LATE') {
+      return (
+        <span
+          style={{
+            backgroundColor: '#D97706',
+            color: '#FFFFFF',
+            fontSize: '0.6875rem',
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: '9999px',
+          }}
+        >
+          {emp.lateMinutes
+            ? language === 'id'
+              ? `Terlambat (${emp.lateMinutes}m)`
+              : `Late (${emp.lateMinutes}m)`
+            : language === 'id'
+            ? 'Terlambat'
+            : 'Late'}
+        </span>
+      );
+    }
+    // ONTIME / Default
+    return (
+      <span
+        style={{
+          backgroundColor: '#DCFCE7',
+          color: '#16A34A',
+          fontSize: '0.6875rem',
+          fontWeight: 700,
+          padding: '2px 8px',
+          borderRadius: '9999px',
+        }}
+      >
+        {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+      </span>
     );
   };
 
@@ -1686,62 +1758,7 @@ export const MonthlyAttendanceDetailView = ({
                   </div>
 
                   {/* Status Badge */}
-                  {isOntime && (
-                    <span
-                      style={{
-                        backgroundColor: '#DCFCE7',
-                        color: '#16A34A',
-                        fontSize: '0.6875rem',
-                        fontWeight: 700,
-                        padding: '3px 8px',
-                        borderRadius: '9999px',
-                      }}
-                    >
-                      {language === 'id' ? 'Tepat Waktu' : 'On Time'}
-                    </span>
-                  )}
-                  {isLate && (
-                    <span
-                      style={{
-                        backgroundColor: '#FEF3C7',
-                        color: '#D97706',
-                        fontSize: '0.6875rem',
-                        fontWeight: 700,
-                        padding: '3px 8px',
-                        borderRadius: '9999px',
-                      }}
-                    >
-                      {language === 'id' ? 'Terlambat' : 'Late'}
-                    </span>
-                  )}
-                  {isLeave && (
-                    <span
-                      style={{
-                        backgroundColor: '#F1F5F9',
-                        color: '#64748B',
-                        fontSize: '0.6875rem',
-                        fontWeight: 700,
-                        padding: '3px 8px',
-                        borderRadius: '9999px',
-                      }}
-                    >
-                      {language === 'id' ? 'Izin / Cuti' : 'Leave'}
-                    </span>
-                  )}
-                  {isAlpha && (
-                    <span
-                      style={{
-                        backgroundColor: '#DC2626',
-                        color: '#FFFFFF',
-                        fontSize: '0.6875rem',
-                        fontWeight: 700,
-                        padding: '3px 8px',
-                        borderRadius: '9999px',
-                      }}
-                    >
-                      Alpha
-                    </span>
-                  )}
+                  {renderEmployeeBadges(emp)}
                 </div>
 
                 {/* Clock In & Out Grid */}
