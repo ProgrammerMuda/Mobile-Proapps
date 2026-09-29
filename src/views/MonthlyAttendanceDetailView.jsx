@@ -1268,27 +1268,22 @@ export const MonthlyAttendanceDetailView = ({
           border: '1px solid #E2E8F0',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div>
-            <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
-              {language === 'id' ? 'Presensi Seluruh Karyawan' : 'All Employee Attendance'}
-            </h2>
-            <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
-              {language === 'id'
-                ? `${MONTH_NAMES_ID[selectedMonth]} ${selectedYear} • 4 Departemen Aktif`
-                : `${MONTH_NAMES[selectedMonth]} ${selectedYear} • 4 Active Departments`}
-            </p>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+          <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+            {language === 'id' ? 'Presensi Seluruh Karyawan' : 'All Employee Attendance'}
+          </h2>
 
           <div
             style={{
               backgroundColor: '#EFF6FF',
               color: '#1D4ED8',
-              fontSize: '0.75rem',
+              fontSize: '0.6875rem',
               fontWeight: 700,
-              padding: '4px 10px',
+              padding: '3px 8px',
               borderRadius: '9999px',
               border: '1px solid #DBEAFE',
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
             }}
           >
             218 {language === 'id' ? 'Karyawan' : 'Employees'}
