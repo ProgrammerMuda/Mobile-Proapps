@@ -176,22 +176,29 @@ const AttendanceMapFull = ({ data, language }) => {
     });
 
     const officePopupHtml = `
-      <div style="
-        background-color: #053079;
-        color: #FFFFFF;
-        padding: 5px 10px;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        box-shadow: 0 4px 12px rgba(5, 48, 121, 0.35);
-        white-space: nowrap;
-        font-family: system-ui, -apple-system, sans-serif;
-      ">
-        <svg width="12" height="12" viewBox="0 0 256 256" fill="#FFFFFF"><path d="M240,208H224V96a16,16,0,0,0-16-16H160V40a16,16,0,0,0-16-16H48A16,16,0,0,0,32,40V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM48,40h96V208H48ZM208,96V208H160V96Z"/></svg>
-        <span>${language === 'id' ? 'Lokasi Kantor' : 'Office Site'}</span>
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+        <div style="
+          background-color: #053079;
+          color: #FFFFFF;
+          padding: 6px 12px;
+          border-radius: 8px;
+          font-size: 11px;
+          font-weight: 700;
+          box-shadow: 0 4px 12px rgba(5, 48, 121, 0.35);
+          white-space: nowrap;
+          font-family: system-ui, -apple-system, sans-serif;
+          letter-spacing: -0.2px;
+        ">
+          ${language === 'id' ? 'Lokasi Kantor' : 'Office Site'}
+        </div>
+        <div style="
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 5px solid #053079;
+          margin-top: -1px;
+        "></div>
       </div>
     `;
 
@@ -228,22 +235,29 @@ const AttendanceMapFull = ({ data, language }) => {
       });
 
       const checkInPopupHtml = `
-        <div style="
-          background-color: #16A34A;
-          color: #FFFFFF;
-          padding: 5px 10px;
-          border-radius: 8px;
-          font-size: 11px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
-          white-space: nowrap;
-          font-family: system-ui, -apple-system, sans-serif;
-        ">
-          <svg width="12" height="12" viewBox="0 0 256 256" fill="#FFFFFF"><circle cx="128" cy="96" r="56"/><path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z"/></svg>
-          <span>${language === 'id' ? 'Clock In' : 'Clock In'}: ${data?.clockIn || '08:30'} WIB</span>
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+          <div style="
+            background-color: #16A34A;
+            color: #FFFFFF;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+            white-space: nowrap;
+            font-family: system-ui, -apple-system, sans-serif;
+            letter-spacing: -0.2px;
+          ">
+            Clock In: ${data?.clockIn || '08:30'} WIB
+          </div>
+          <div style="
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #16A34A;
+            margin-top: -1px;
+          "></div>
         </div>
       `;
 
@@ -274,22 +288,29 @@ const AttendanceMapFull = ({ data, language }) => {
       });
 
       const checkOutPopupHtml = `
-        <div style="
-          background-color: #DC2626;
-          color: #FFFFFF;
-          padding: 5px 10px;
-          border-radius: 8px;
-          font-size: 11px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
-          white-space: nowrap;
-          font-family: system-ui, -apple-system, sans-serif;
-        ">
-          <svg width="12" height="12" viewBox="0 0 256 256" fill="#FFFFFF"><circle cx="128" cy="96" r="56"/><path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z"/></svg>
-          <span>${language === 'id' ? 'Clock Out' : 'Clock Out'}: ${data?.clockOut || '17:30'} WIB</span>
+        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+          <div style="
+            background-color: #DC2626;
+            color: #FFFFFF;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+            white-space: nowrap;
+            font-family: system-ui, -apple-system, sans-serif;
+            letter-spacing: -0.2px;
+          ">
+            Clock Out: ${data?.clockOut || '17:30'} WIB
+          </div>
+          <div style="
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid #DC2626;
+            margin-top: -1px;
+          "></div>
         </div>
       `;
 
