@@ -65,8 +65,11 @@ function App() {
   const [isRequestPickerOpen, setIsRequestPickerOpen] = useState(false);
   const [attendanceDate, setAttendanceDate] = useState(new Date(2026, 8, 24));
   const [isAttendancePickerOpen, setIsAttendancePickerOpen] = useState(false);
+  const [attendancePeriodMode, setAttendancePeriodMode] = useState('monthly'); // 'monthly' | 'weekly' | 'daily'
   const [monthlyAttendanceMonth, setMonthlyAttendanceMonth] = useState(8); // 0-indexed (8 = September)
   const [monthlyAttendanceYear, setMonthlyAttendanceYear] = useState(2026);
+  const [monthlyAttendanceWeek, setMonthlyAttendanceWeek] = useState(4); // Week 4
+  const [monthlyAttendanceDay, setMonthlyAttendanceDay] = useState(24); // Day 24
   const [isMonthlyAttendancePickerOpen, setIsMonthlyAttendancePickerOpen] = useState(false);
   const [monthlyAttendancePreviousScreen, setMonthlyAttendancePreviousScreen] = useState('overview');
   const [workOrderMonth, setWorkOrderMonth] = useState(8); // 8 = September
@@ -120,21 +123,73 @@ function App() {
     setAttendanceDate(next);
   };
 
-  const handlePrevAttendanceMonth = () => {
-    if (monthlyAttendanceMonth === 0) {
-      setMonthlyAttendanceMonth(11);
-      setMonthlyAttendanceYear((y) => y - 1);
-    } else {
-      setMonthlyAttendanceMonth((m) => m - 1);
+  const handlePrevAttendancePeriod = () => {
+    if (attendancePeriodMode === 'monthly') {
+      if (monthlyAttendanceMonth === 0) {
+        setMonthlyAttendanceMonth(11);
+        setMonthlyAttendanceYear((y) => y - 1);
+      } else {
+        setMonthlyAttendanceMonth((m) => m - 1);
+      }
+    } else if (attendancePeriodMode === 'weekly') {
+      if (monthlyAttendanceWeek <= 1) {
+        if (monthlyAttendanceMonth === 0) {
+          setMonthlyAttendanceMonth(11);
+          setMonthlyAttendanceYear((y) => y - 1);
+        } else {
+          setMonthlyAttendanceMonth((m) => m - 1);
+        }
+        setMonthlyAttendanceWeek(4);
+      } else {
+        setMonthlyAttendanceWeek((w) => w - 1);
+      }
+    } else if (attendancePeriodMode === 'daily') {
+      if (monthlyAttendanceDay <= 1) {
+        const prevMonth = monthlyAttendanceMonth === 0 ? 11 : monthlyAttendanceMonth - 1;
+        const prevYear = monthlyAttendanceMonth === 0 ? monthlyAttendanceYear - 1 : monthlyAttendanceYear;
+        const daysInPrevMonth = new Date(prevYear, prevMonth + 1, 0).getDate();
+        setMonthlyAttendanceMonth(prevMonth);
+        setMonthlyAttendanceYear(prevYear);
+        setMonthlyAttendanceDay(daysInPrevMonth);
+      } else {
+        setMonthlyAttendanceDay((d) => d - 1);
+      }
     }
   };
 
-  const handleNextAttendanceMonth = () => {
-    if (monthlyAttendanceMonth === 11) {
-      setMonthlyAttendanceMonth(0);
-      setMonthlyAttendanceYear((y) => y + 1);
-    } else {
-      setMonthlyAttendanceMonth((m) => m + 1);
+  const handleNextAttendancePeriod = () => {
+    const daysInCurrentMonth = new Date(monthlyAttendanceYear, monthlyAttendanceMonth + 1, 0).getDate();
+    if (attendancePeriodMode === 'monthly') {
+      if (monthlyAttendanceMonth === 11) {
+        setMonthlyAttendanceMonth(0);
+        setMonthlyAttendanceYear((y) => y + 1);
+      } else {
+        setMonthlyAttendanceMonth((m) => m + 1);
+      }
+    } else if (attendancePeriodMode === 'weekly') {
+      if (monthlyAttendanceWeek >= 5) {
+        if (monthlyAttendanceMonth === 11) {
+          setMonthlyAttendanceMonth(0);
+          setMonthlyAttendanceYear((y) => y + 1);
+        } else {
+          setMonthlyAttendanceMonth((m) => m + 1);
+        }
+        setMonthlyAttendanceWeek(1);
+      } else {
+        setMonthlyAttendanceWeek((w) => w + 1);
+      }
+    } else if (attendancePeriodMode === 'daily') {
+      if (monthlyAttendanceDay >= daysInCurrentMonth) {
+        if (monthlyAttendanceMonth === 11) {
+          setMonthlyAttendanceMonth(0);
+          setMonthlyAttendanceYear((y) => y + 1);
+        } else {
+          setMonthlyAttendanceMonth((m) => m + 1);
+        }
+        setMonthlyAttendanceDay(1);
+      } else {
+        setMonthlyAttendanceDay((d) => d + 1);
+      }
     }
   };
 
@@ -234,10 +289,14 @@ function App() {
         ) : currentScreen === 'monthly-attendance' ? (
           <MonthlyAttendanceDetailHeader
             onBack={() => setCurrentScreen(monthlyAttendancePreviousScreen || 'overview')}
+            periodMode={attendancePeriodMode}
+            onPeriodModeChange={setAttendancePeriodMode}
             selectedMonth={monthlyAttendanceMonth}
             selectedYear={monthlyAttendanceYear}
-            onPrevMonth={handlePrevAttendanceMonth}
-            onNextMonth={handleNextAttendanceMonth}
+            selectedWeek={monthlyAttendanceWeek}
+            selectedDay={monthlyAttendanceDay}
+            onPrevPeriod={handlePrevAttendancePeriod}
+            onNextPeriod={handleNextAttendancePeriod}
             onOpenPicker={() => setIsMonthlyAttendancePickerOpen(true)}
           />
         ) : currentScreen === 'work-order-detail' ? (
@@ -431,11 +490,18 @@ function App() {
       {currentScreen === 'monthly-attendance' && (
         <MonthlyAttendanceDetailView
           user={userSession}
+          periodMode={attendancePeriodMode}
+          onPeriodModeChange={setAttendancePeriodMode}
           selectedMonth={monthlyAttendanceMonth}
           selectedYear={monthlyAttendanceYear}
-          onMonthChange={(m, y) => {
-            setMonthlyAttendanceMonth(m);
-            setMonthlyAttendanceYear(y);
+          selectedWeek={monthlyAttendanceWeek}
+          selectedDay={monthlyAttendanceDay}
+          onPeriodChange={({ mode, month, year, week, day }) => {
+            if (mode !== undefined) setAttendancePeriodMode(mode);
+            if (month !== undefined) setMonthlyAttendanceMonth(month);
+            if (year !== undefined) setMonthlyAttendanceYear(year);
+            if (week !== undefined) setMonthlyAttendanceWeek(week);
+            if (day !== undefined) setMonthlyAttendanceDay(day);
           }}
           isPickerOpen={isMonthlyAttendancePickerOpen}
           setIsPickerOpen={setIsMonthlyAttendancePickerOpen}

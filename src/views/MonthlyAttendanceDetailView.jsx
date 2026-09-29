@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import {
   CaretLeft,
   CaretRight,
   CalendarBlank,
   X,
-  SealCheck,
-  Warning,
   Clock,
   CheckCircle,
   XCircle,
@@ -17,6 +15,8 @@ import {
   Briefcase,
   SignIn,
   SignOut,
+  MapPin,
+  FileText,
 } from '@phosphor-icons/react';
 import { useLanguage } from '../context/LanguageContext';
 import attendanceEmptySearch from '../assets/attendance-empty-search.png';
@@ -104,9 +104,20 @@ const DAY_NAMES_ID = [
 const DAY_SHORT_ID = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 const DAY_SHORT_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Mock monthly attendance log generator
+// Helper to get week ranges for a given year & month (1-indexed weeks: 1 to 5)
+const getMonthWeeks = (year, monthIndex) => {
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  return [
+    { weekNumber: 1, startDay: 1, endDay: Math.min(7, daysInMonth) },
+    { weekNumber: 2, startDay: 8, endDay: Math.min(14, daysInMonth) },
+    { weekNumber: 3, startDay: 15, endDay: Math.min(21, daysInMonth) },
+    { weekNumber: 4, startDay: 22, endDay: Math.min(28, daysInMonth) },
+    { weekNumber: 5, startDay: 29, endDay: daysInMonth },
+  ].filter((w) => w.startDay <= daysInMonth);
+};
+
+// Mock monthly attendance log generator for personal attendance
 const generateMonthlyLogs = (year, monthIndex) => {
-  // Generate mock logs for 24 work days
   const logs = [];
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
 
@@ -130,6 +141,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '17:05 WIB',
         workDuration: '8h 47m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: 'Gedung Menara Jasmine, Lobby Utama',
         notes: 'Terlambat 18 menit (Macet Tol)',
       });
     } else if (day === 21) {
@@ -145,6 +157,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '16:45 WIB',
         workDuration: '8h 57m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: 'Gedung Menara Jasmine, Lantai B1',
         notes: 'Pulang 15 menit awal (Izin Urusan Keluarga)',
       });
     } else if (day === 18) {
@@ -160,6 +173,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '17:02 WIB',
         workDuration: '9h 12m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: 'Gedung Menara Jasmine, Lobby Utama',
         notes: 'Shift Pagi (Masuk Awal)',
       });
     } else if (day === 17) {
@@ -175,6 +189,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '-- : --',
         workDuration: '0h 0m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: '--',
         notes: 'Tanpa Keterangan (Alpha)',
       });
     } else if (day === 14) {
@@ -191,6 +206,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '17:05 WIB',
         workDuration: '8h 51m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: 'Gedung Menara Jasmine, Lobby Utama',
         notes: 'Terlambat 14 menit',
       });
     } else if (day === 8) {
@@ -206,6 +222,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '-- : --',
         workDuration: '0h 0m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: '--',
         notes: 'Cuti Tahunan (Disetujui)',
       });
     } else if (day === 3) {
@@ -221,6 +238,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '-- : --',
         workDuration: '0h 0m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: '--',
         notes: 'Tanpa Keterangan (Alpha)',
       });
     } else {
@@ -236,6 +254,7 @@ const generateMonthlyLogs = (year, monthIndex) => {
         clockOut: '17:00 WIB',
         workDuration: '9h 00m',
         shift: 'Shift Pagi (08:00 - 17:00)',
+        location: 'Gedung Menara Jasmine, Lobby Utama',
         notes: 'Shift Pagi (08:00 - 17:00)',
       });
     }
@@ -395,104 +414,72 @@ const getEmployeesAttendanceForDay = (year, monthIndex, day) => {
   ];
 };
 
-/**
- * Mini Department Donut Chart Component
- */
-const DepartmentDonutChart = ({ present, late, leave, absent, percentage }) => {
-  const total = present + late + leave + absent || 1;
-  const radius = 30;
-  const circumference = 2 * Math.PI * radius;
-  const strokeWidth = 10;
+// Helper to generate monthly employee recap list
+const getEmployeesAttendanceForMonth = (year, monthIndex) => {
+  return [
+    { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', present: 22, total: 24, rate: 92, ontime: 20, late: 2, leave: 1, alpha: 1 },
+    { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', present: 23, total: 24, rate: 96, ontime: 23, late: 0, leave: 1, alpha: 0 },
+    { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', present: 20, total: 24, rate: 83, ontime: 17, late: 3, leave: 2, alpha: 2 },
+    { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', present: 21, total: 24, rate: 88, ontime: 20, late: 1, leave: 3, alpha: 0 },
+    { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', present: 24, total: 24, rate: 100, ontime: 24, late: 0, leave: 0, alpha: 0 },
+    { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', present: 19, total: 24, rate: 79, ontime: 19, late: 0, leave: 2, alpha: 3 },
+    { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', present: 24, total: 24, rate: 100, ontime: 24, late: 0, leave: 0, alpha: 0 },
+    { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', present: 22, total: 24, rate: 92, ontime: 20, late: 2, leave: 2, alpha: 0 },
+  ];
+};
 
-  const presentDash = (present / total) * circumference;
-  const lateDash = (late / total) * circumference;
-  const leaveDash = (leave / total) * circumference;
-  const absentDash = (absent / total) * circumference;
-
-  return (
-    <div style={{ position: 'relative', width: '76px', height: '76px', flexShrink: 0 }}>
-      <svg
-        width="76"
-        height="76"
-        viewBox="0 0 80 80"
-        style={{
-          transform: 'rotate(-90deg)',
-          overflow: 'visible',
-        }}
-      >
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          stroke="#10B981"
-          strokeWidth={strokeWidth}
-          strokeDasharray={`${presentDash} ${circumference}`}
-          strokeDashoffset={0}
-        />
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          stroke="#F59E0B"
-          strokeWidth={strokeWidth}
-          strokeDasharray={`${lateDash} ${circumference}`}
-          strokeDashoffset={-presentDash}
-        />
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          stroke="#09B2FF"
-          strokeWidth={strokeWidth}
-          strokeDasharray={`${leaveDash} ${circumference}`}
-          strokeDashoffset={-(presentDash + lateDash)}
-        />
-        <circle
-          cx="40"
-          cy="40"
-          r={radius}
-          fill="none"
-          stroke="#EF4444"
-          strokeWidth={strokeWidth}
-          strokeDasharray={`${absentDash} ${circumference}`}
-          strokeDashoffset={-(presentDash + lateDash + leaveDash)}
-        />
-      </svg>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-        }}
-      >
-        <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
-          {percentage}%
-        </span>
-      </div>
-    </div>
-  );
+// Helper to generate weekly employee recap list
+const getEmployeesAttendanceForWeek = (year, monthIndex, weekNumber) => {
+  return [
+    { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', present: 5, total: 5, rate: 100, ontime: 4, late: 1, leave: 0, alpha: 0 },
+    { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', present: 5, total: 5, rate: 100, ontime: 5, late: 0, leave: 0, alpha: 0 },
+    { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', present: 4, total: 5, rate: 80, ontime: 3, late: 1, leave: 1, alpha: 0 },
+    { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', present: 4, total: 5, rate: 80, ontime: 4, late: 0, leave: 1, alpha: 0 },
+    { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', present: 5, total: 5, rate: 100, ontime: 5, late: 0, leave: 0, alpha: 0 },
+    { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', present: 3, total: 5, rate: 60, ontime: 3, late: 0, leave: 1, alpha: 1 },
+    { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', present: 5, total: 5, rate: 100, ontime: 5, late: 0, leave: 0, alpha: 0 },
+    { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', present: 4, total: 5, rate: 80, ontime: 3, late: 1, leave: 0, alpha: 1 },
+  ];
 };
 
 /**
- * Monthly Attendance Detail Header Bar
+ * Monthly Attendance Detail Header Bar (With Bulanan | Mingguan | Harian Switcher)
  */
 export const MonthlyAttendanceDetailHeader = ({
   onBack,
-  selectedMonth = 6, // 0-indexed (6 = July)
+  periodMode = 'monthly', // 'monthly' | 'weekly' | 'daily'
+  onPeriodModeChange,
+  selectedMonth = 8, // 0-indexed (8 = September)
   selectedYear = 2026,
-  onPrevMonth,
-  onNextMonth,
+  selectedWeek = 4,
+  selectedDay = 24,
+  onPrevPeriod,
+  onNextPeriod,
   onOpenPicker,
 }) => {
   const { language } = useLanguage();
-  const monthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
   const headerTitle = language === 'id' ? 'Laporan Presensi' : 'Report Attendance';
+
+  // Format Navigator Label depending on active period mode
+  let periodNavigatorLabel = '';
+  if (periodMode === 'monthly') {
+    const monthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
+    periodNavigatorLabel = `${monthName} ${selectedYear}`;
+  } else if (periodMode === 'weekly') {
+    const weeks = getMonthWeeks(selectedYear, selectedMonth);
+    const currWeekObj = weeks.find((w) => w.weekNumber === selectedWeek) || weeks[weeks.length - 1] || { startDay: 22, endDay: 28 };
+    const monthShort = language === 'id' ? MONTH_SHORT_ID[selectedMonth] : MONTH_SHORT[selectedMonth];
+    const prefix = language === 'id' ? `Minggu ${selectedWeek}` : `Week ${selectedWeek}`;
+    periodNavigatorLabel = `${prefix} (${currWeekObj.startDay} - ${currWeekObj.endDay} ${monthShort} ${selectedYear})`;
+  } else {
+    // Daily mode
+    const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+    const safeDay = Math.min(Math.max(1, selectedDay), daysInMonth);
+    const dateObj = new Date(selectedYear, selectedMonth, safeDay);
+    const dayName = language === 'id' ? DAY_NAMES_ID[dateObj.getDay()] : DAY_NAMES[dateObj.getDay()];
+    const monthShort = language === 'id' ? MONTH_SHORT_ID[selectedMonth] : MONTH_SHORT[selectedMonth];
+    periodNavigatorLabel = `${dayName}, ${safeDay} ${monthShort} ${selectedYear}`;
+  }
 
   return (
     <header
@@ -516,7 +503,6 @@ export const MonthlyAttendanceDetailHeader = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           height: '52px',
-          borderBottom: '1px solid #F1F5F9',
         }}
       >
         <button
@@ -558,21 +544,65 @@ export const MonthlyAttendanceDetailHeader = ({
         <div style={{ width: '32px' }} />
       </div>
 
-      {/* 2. Date/Month Navigator Filter Row (Identical to BM Attendance Detail) */}
+      {/* 2. Clean Segmented Period Tabs Switcher (Bulanan | Mingguan | Harian) */}
+      <div style={{ padding: '0 16px 8px 16px' }}>
+        <div
+          style={{
+            display: 'flex',
+            backgroundColor: '#F1F5F9',
+            borderRadius: '10px',
+            padding: '3px',
+            gap: '3px',
+          }}
+        >
+          {[
+            { id: 'monthly', label: language === 'id' ? 'Bulanan' : 'Monthly' },
+            { id: 'weekly', label: language === 'id' ? 'Mingguan' : 'Weekly' },
+            { id: 'daily', label: language === 'id' ? 'Harian' : 'Daily' },
+          ].map((tab) => {
+            const isActive = periodMode === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => onPeriodModeChange && onPeriodModeChange(tab.id)}
+                style={{
+                  flex: 1,
+                  padding: '7px 0',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: isActive ? '#02388A' : 'transparent',
+                  color: isActive ? '#FFFFFF' : '#64748B',
+                  fontSize: '0.8125rem',
+                  fontWeight: isActive ? 700 : 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  boxShadow: isActive ? '0 1px 3px rgba(2, 56, 138, 0.25)' : 'none',
+                  outline: 'none',
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. Date/Period Navigator Row */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '8px',
-          padding: '10px 16px 14px 16px',
+          padding: '4px 16px 14px 16px',
           backgroundColor: '#FFFFFF',
         }}
       >
         <button
           type="button"
-          onClick={onPrevMonth}
-          aria-label="Previous month"
+          onClick={onPrevPeriod}
+          aria-label="Previous period"
           style={{
             width: '38px',
             height: '38px',
@@ -603,9 +633,9 @@ export const MonthlyAttendanceDetailHeader = ({
             gap: '8px',
             backgroundColor: '#FFFFFF',
             border: '1px solid #E2E8F0',
-            padding: '8px 18px',
+            padding: '8px 14px',
             borderRadius: '9999px',
-            fontSize: '0.875rem',
+            fontSize: '0.8125rem',
             fontWeight: 700,
             color: '#334155',
             cursor: 'pointer',
@@ -613,16 +643,19 @@ export const MonthlyAttendanceDetailHeader = ({
             fontFamily: 'var(--font-sans)',
             flex: 1,
             boxShadow: 'none',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
-          <CalendarBlank size={18} weight="fill" color="#053079" />
-          <span>{`${monthName} ${selectedYear}`}</span>
+          <CalendarBlank size={18} weight="fill" color="#053079" style={{ flexShrink: 0 }} />
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{periodNavigatorLabel}</span>
         </button>
 
         <button
           type="button"
-          onClick={onNextMonth}
-          aria-label="Next month"
+          onClick={onNextPeriod}
+          aria-label="Next period"
           style={{
             width: '38px',
             height: '38px',
@@ -652,57 +685,76 @@ export const MonthlyAttendanceDetailHeader = ({
  */
 export const MonthlyAttendanceDetailView = ({
   user,
+  periodMode = 'monthly', // 'monthly' | 'weekly' | 'daily'
+  onPeriodModeChange,
   selectedMonth = 8,
   selectedYear = 2026,
-  onMonthChange,
+  selectedWeek = 4,
+  selectedDay = 24,
+  onPeriodChange,
   isPickerOpen,
   setIsPickerOpen,
 }) => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const isBM = user?.roleCode === 'BM';
 
   // For BM: Tab switcher between 'MY_ATTENDANCE' and 'EMPLOYEES'
   const [activeMainTab, setActiveMainTab] = useState('MY_ATTENDANCE');
 
-  // Employee tab date & filters (BM)
-  const [employeeSelectedDay, setEmployeeSelectedDay] = useState(24);
+  // Filter & Search states
+  const [activeFilter, setActiveFilter] = useState('ALL');
   const [employeeDeptFilter, setEmployeeDeptFilter] = useState('ALL');
   const [employeeStatusFilter, setEmployeeStatusFilter] = useState('ALL');
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
 
-  // Days in month calculation for BM All Employee view
-  const daysInSelectedMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
-  const safeDay = Math.min(Math.max(1, employeeSelectedDay), daysInSelectedMonth);
-  const currentEmployeeDayObj = new Date(selectedYear, selectedMonth, safeDay);
-  const selectedDayName = language === 'id' ? DAY_NAMES_ID[currentEmployeeDayObj.getDay()] : DAY_NAMES[currentEmployeeDayObj.getDay()];
-  const selectedDayMonthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
-  const selectedDayFullText = `${selectedDayName}, ${safeDay} ${selectedDayMonthName} ${selectedYear}`;
-
-  // Daily employee attendance dataset for the chosen day
-  const dailyEmployeesList = getEmployeesAttendanceForDay(selectedYear, selectedMonth, safeDay);
-
-  const dailyOntimeCount = dailyEmployeesList.filter((e) => e.status === 'ONTIME').length;
-  const dailyLateCount = dailyEmployeesList.filter((e) => e.status === 'LATE').length;
-  const dailyLeaveCount = dailyEmployeesList.filter((e) => e.status === 'LEAVE' || e.status === 'OFF').length;
-  const dailyAlphaCount = dailyEmployeesList.filter((e) => e.status === 'ALPHA').length;
-  const dailyPresentCount = dailyOntimeCount + dailyLateCount;
-
-  // Personal Attendance filters
-  const [activeFilter, setActiveFilter] = useState('ALL');
+  // Picker temp state for modals
   const [pickerTempMonth, setPickerTempMonth] = useState(selectedMonth);
   const [pickerTempYear, setPickerTempYear] = useState(selectedYear);
+  const [pickerTempWeek, setPickerTempWeek] = useState(selectedWeek);
+  const [pickerTempDay, setPickerTempDay] = useState(selectedDay);
 
-  const logs = generateMonthlyLogs(selectedYear, selectedMonth);
+  // Sync temp state whenever picker opens
+  React.useEffect(() => {
+    if (isPickerOpen) {
+      setPickerTempMonth(selectedMonth);
+      setPickerTempYear(selectedYear);
+      setPickerTempWeek(selectedWeek);
+      setPickerTempDay(selectedDay);
+    }
+  }, [isPickerOpen, selectedMonth, selectedYear, selectedWeek, selectedDay]);
 
-  const totalLogs = logs.length;
-  const onTimeCount = logs.filter((l) => l.status === 'ontime').length;
-  const lateCount = logs.filter((l) => l.status === 'late').length;
-  const leaveCount = logs.filter((l) => l.status === 'leave').length;
-  const alphaCount = logs.filter((l) => l.status === 'alpha').length;
+  // Days in month calculation
+  const daysInSelectedMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+  const safeDay = Math.min(Math.max(1, selectedDay), daysInSelectedMonth);
+  const weeksList = useMemo(() => getMonthWeeks(selectedYear, selectedMonth), [selectedYear, selectedMonth]);
+  const currentWeekObj = weeksList.find((w) => w.weekNumber === selectedWeek) || weeksList[weeksList.length - 1] || { startDay: 22, endDay: 28 };
+
+  // 1. DATASETS FOR PERSONAL ATTENDANCE (MY ATTENDANCE)
+  const fullMonthlyLogs = useMemo(() => generateMonthlyLogs(selectedYear, selectedMonth), [selectedYear, selectedMonth]);
+
+  // Filtered logs depending on periodMode
+  const activePeriodLogs = useMemo(() => {
+    if (periodMode === 'monthly') {
+      return fullMonthlyLogs;
+    }
+    if (periodMode === 'weekly') {
+      return fullMonthlyLogs.filter((l) => l.dayNumber >= currentWeekObj.startDay && l.dayNumber <= currentWeekObj.endDay);
+    }
+    // Daily mode
+    return fullMonthlyLogs.filter((l) => l.dayNumber === safeDay);
+  }, [periodMode, fullMonthlyLogs, currentWeekObj, safeDay]);
+
+  // Personal metrics for active period
+  const totalLogs = activePeriodLogs.length;
+  const onTimeCount = activePeriodLogs.filter((l) => l.status === 'ontime').length;
+  const lateCount = activePeriodLogs.filter((l) => l.status === 'late').length;
+  const leaveCount = activePeriodLogs.filter((l) => l.status === 'leave').length;
+  const alphaCount = activePeriodLogs.filter((l) => l.status === 'alpha').length;
   const presentCount = onTimeCount + lateCount;
   const attendanceRatePct = totalLogs > 0 ? Math.round((presentCount / totalLogs) * 100) : 0;
 
-  const filteredLogs = logs.filter((log) => {
+  // Filtered personal logs by status pill
+  const filteredPersonalLogs = activePeriodLogs.filter((log) => {
     if (activeFilter === 'ALL') return true;
     if (activeFilter === 'ONTIME') return log.status === 'ontime';
     if (activeFilter === 'LATE') return log.status === 'late';
@@ -711,31 +763,104 @@ export const MonthlyAttendanceDetailView = ({
     return true;
   });
 
-  // Filtered employees for BM tab on that day
-  const filteredEmployees = dailyEmployeesList.filter((emp) => {
-    if (employeeDeptFilter !== 'ALL' && emp.dept.toLowerCase() !== employeeDeptFilter.toLowerCase()) {
-      return false;
-    }
-    if (employeeStatusFilter !== 'ALL') {
-      if (employeeStatusFilter === 'ONTIME' && emp.status !== 'ONTIME') return false;
-      if (employeeStatusFilter === 'LATE' && emp.status !== 'LATE') return false;
-      if (employeeStatusFilter === 'LEAVE' && (emp.status !== 'LEAVE' && emp.status !== 'OFF')) return false;
-      if (employeeStatusFilter === 'ALPHA' && emp.status !== 'ALPHA') return false;
-    }
-    if (employeeSearchQuery.trim()) {
-      const q = employeeSearchQuery.toLowerCase();
-      return (
-        emp.name.toLowerCase().includes(q) ||
-        emp.dept.toLowerCase().includes(q) ||
-        emp.role.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
+  // Daily single log for personal daily mode
+  const singleDailyLog = fullMonthlyLogs.find((l) => l.dayNumber === safeDay) || {
+    id: `att-${selectedYear}-${selectedMonth}-${safeDay}`,
+    date: new Date(selectedYear, selectedMonth, safeDay),
+    dayNumber: safeDay,
+    status: 'ontime',
+    inStatus: 'ON_TIME',
+    outStatus: 'ON_TIME',
+    clockIn: '08:00 WIB',
+    clockOut: '17:00 WIB',
+    workDuration: '9h 00m',
+    shift: 'Shift Pagi (08:00 - 17:00)',
+    location: 'Gedung Menara Jasmine, Lobby Utama',
+    notes: 'Presensi Shift Pagi',
+  };
 
-  const handleApplyMonthPicker = () => {
-    if (onMonthChange) {
-      onMonthChange(pickerTempMonth, pickerTempYear);
+  // 2. DATASETS FOR EMPLOYEES ATTENDANCE (BM TAB)
+  const dailyEmployeesList = useMemo(() => getEmployeesAttendanceForDay(selectedYear, selectedMonth, safeDay), [selectedYear, selectedMonth, safeDay]);
+  const weeklyEmployeesList = useMemo(() => getEmployeesAttendanceForWeek(selectedYear, selectedMonth, selectedWeek), [selectedYear, selectedMonth, selectedWeek]);
+  const monthlyEmployeesList = useMemo(() => getEmployeesAttendanceForMonth(selectedYear, selectedMonth), [selectedYear, selectedMonth]);
+
+  // Employee KPI metrics depending on periodMode
+  let empKpiHadir = 0;
+  let empKpiLate = 0;
+  let empKpiLeave = 0;
+  let empKpiAlpha = 0;
+  let totalEmpCount = 0;
+
+  if (periodMode === 'daily') {
+    empKpiHadir = dailyEmployeesList.filter((e) => e.status === 'ONTIME').length;
+    empKpiLate = dailyEmployeesList.filter((e) => e.status === 'LATE').length;
+    empKpiLeave = dailyEmployeesList.filter((e) => e.status === 'LEAVE' || e.status === 'OFF').length;
+    empKpiAlpha = dailyEmployeesList.filter((e) => e.status === 'ALPHA').length;
+    totalEmpCount = dailyEmployeesList.length;
+  } else if (periodMode === 'weekly') {
+    empKpiHadir = weeklyEmployeesList.reduce((acc, curr) => acc + curr.ontime, 0);
+    empKpiLate = weeklyEmployeesList.reduce((acc, curr) => acc + curr.late, 0);
+    empKpiLeave = weeklyEmployeesList.reduce((acc, curr) => acc + curr.leave, 0);
+    empKpiAlpha = weeklyEmployeesList.reduce((acc, curr) => acc + curr.alpha, 0);
+    totalEmpCount = weeklyEmployeesList.length;
+  } else {
+    // monthly
+    empKpiHadir = monthlyEmployeesList.reduce((acc, curr) => acc + curr.ontime, 0);
+    empKpiLate = monthlyEmployeesList.reduce((acc, curr) => acc + curr.late, 0);
+    empKpiLeave = monthlyEmployeesList.reduce((acc, curr) => acc + curr.leave, 0);
+    empKpiAlpha = monthlyEmployeesList.reduce((acc, curr) => acc + curr.alpha, 0);
+    totalEmpCount = monthlyEmployeesList.length;
+  }
+
+  // Filtered employees list for display in BM tab
+  const displayEmployeesList = useMemo(() => {
+    let sourceList = [];
+    if (periodMode === 'daily') {
+      sourceList = dailyEmployeesList;
+    } else if (periodMode === 'weekly') {
+      sourceList = weeklyEmployeesList;
+    } else {
+      sourceList = monthlyEmployeesList;
+    }
+
+    return sourceList.filter((emp) => {
+      if (employeeDeptFilter !== 'ALL' && emp.dept.toLowerCase() !== employeeDeptFilter.toLowerCase()) {
+        return false;
+      }
+      if (employeeStatusFilter !== 'ALL') {
+        if (periodMode === 'daily') {
+          if (employeeStatusFilter === 'ONTIME' && emp.status !== 'ONTIME') return false;
+          if (employeeStatusFilter === 'LATE' && emp.status !== 'LATE') return false;
+          if (employeeStatusFilter === 'LEAVE' && (emp.status !== 'LEAVE' && emp.status !== 'OFF')) return false;
+          if (employeeStatusFilter === 'ALPHA' && emp.status !== 'ALPHA') return false;
+        } else {
+          // In weekly/monthly recap
+          if (employeeStatusFilter === 'ONTIME' && emp.rate < 90) return false;
+          if (employeeStatusFilter === 'LATE' && emp.late === 0) return false;
+          if (employeeStatusFilter === 'LEAVE' && emp.leave === 0) return false;
+          if (employeeStatusFilter === 'ALPHA' && emp.alpha === 0) return false;
+        }
+      }
+      if (employeeSearchQuery.trim()) {
+        const q = employeeSearchQuery.toLowerCase();
+        return (
+          emp.name.toLowerCase().includes(q) ||
+          emp.dept.toLowerCase().includes(q) ||
+          emp.role.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [periodMode, dailyEmployeesList, weeklyEmployeesList, monthlyEmployeesList, employeeDeptFilter, employeeStatusFilter, employeeSearchQuery]);
+
+  const handleApplyPicker = () => {
+    if (onPeriodChange) {
+      onPeriodChange({
+        month: pickerTempMonth,
+        year: pickerTempYear,
+        week: pickerTempWeek,
+        day: pickerTempDay,
+      });
     }
     setIsPickerOpen(false);
   };
@@ -775,27 +900,10 @@ export const MonthlyAttendanceDetailView = ({
         </span>
       );
     }
-    if (log.status === 'today' || log.status === 'pending') {
-      return (
-        <span
-          style={{
-            backgroundColor: '#EFF6FF',
-            color: '#1D4ED8',
-            fontSize: '0.6875rem',
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: '9999px',
-          }}
-        >
-          {language === 'id' ? 'Hari Ini' : 'Today'}
-        </span>
-      );
-    }
 
     const inStatus = log.inStatus || (log.status === 'late' ? 'LATE' : 'ON_TIME');
     const outStatus = log.outStatus || 'ON_TIME';
 
-    // Rule: Jika clock in dan clock out keduanya on time, hanya tampilkan 1 badge On Time
     if (inStatus === 'ON_TIME' && outStatus === 'ON_TIME') {
       return (
         <span
@@ -814,25 +922,7 @@ export const MonthlyAttendanceDetailView = ({
     }
 
     const badges = [];
-
-    // 1. Clock In Badge (Early In / Late / On Time)
-    if (inStatus === 'EARLY_IN') {
-      badges.push(
-        <span
-          key="in"
-          style={{
-            backgroundColor: '#DCFCE7',
-            color: '#16A34A',
-            fontSize: '0.6875rem',
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: '9999px',
-          }}
-        >
-          {language === 'id' ? 'Masuk Awal' : 'Early In'}
-        </span>
-      );
-    } else if (inStatus === 'LATE') {
+    if (inStatus === 'LATE') {
       badges.push(
         <span
           key="in"
@@ -848,7 +938,7 @@ export const MonthlyAttendanceDetailView = ({
           {log.lateMinutes ? (language === 'id' ? `Terlambat (${log.lateMinutes}m)` : `Late (${log.lateMinutes}m)`) : (language === 'id' ? 'Terlambat' : 'Late')}
         </span>
       );
-    } else if (inStatus === 'ON_TIME') {
+    } else if (inStatus === 'EARLY_IN' || inStatus === 'ON_TIME') {
       badges.push(
         <span
           key="in"
@@ -861,12 +951,11 @@ export const MonthlyAttendanceDetailView = ({
             borderRadius: '9999px',
           }}
         >
-          {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+          {language === 'id' ? 'Masuk Awal' : 'Early In'}
         </span>
       );
     }
 
-    // 2. Clock Out Badge (Early Out / On Time)
     if (outStatus === 'EARLY_OUT') {
       badges.push(
         <span
@@ -892,7 +981,7 @@ export const MonthlyAttendanceDetailView = ({
     );
   };
 
-  const renderEmployeeBadges = (emp) => {
+  const renderDailyEmployeeBadges = (emp) => {
     if (emp.status === 'LEAVE' || emp.status === 'OFF' || emp.status === 'LIBUR') {
       return (
         <span
@@ -949,7 +1038,6 @@ export const MonthlyAttendanceDetailView = ({
         </span>
       );
     }
-    // ONTIME / Default
     return (
       <span
         style={{
@@ -978,7 +1066,7 @@ export const MonthlyAttendanceDetailView = ({
         gap: '16px',
         boxSizing: 'border-box',
         userSelect: 'none',
-        paddingBottom: '24px',
+        paddingBottom: '28px',
       }}
     >
       {/* BM Role: Segmented Tab Switcher (Absensi Saya vs Karyawan Lain) */}
@@ -1049,981 +1137,945 @@ export const MonthlyAttendanceDetailView = ({
           ========================================================================= */}
       {(!isBM || activeMainTab === 'MY_ATTENDANCE') && (
         <>
-          {/* 1. Monthly KPI Summary Card */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-          boxShadow: 'none',
-          border: '1px solid #E2E8F0',
-        }}
-      >
-        <div>
-          <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
-            {language === 'id' ? 'Ringkasan Kehadiran' : 'Attendance Summary'}
-          </h2>
-          <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
-            {language === 'id'
-              ? `${MONTH_NAMES_ID[selectedMonth]} ${selectedYear} • Divisi Engineering`
-              : `${MONTH_NAMES[selectedMonth]} ${selectedYear} • Engineering Dept`}
-          </p>
-        </div>
-
-        {/* Hero Fill Attendance Rate Banner (Placed ABOVE micro-cards) */}
-        <div
-          style={{
-            background: 'linear-gradient(135deg, #02388A 0%, #0052CC 60%, #0284C7 100%)',
-            borderRadius: '14px',
-            padding: '13px 14px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Subtle background glow effect */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '-20px',
-              right: '-20px',
-              width: '90px',
-              height: '90px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(2, 56, 138, 0) 70%)',
-              pointerEvents: 'none',
-            }}
-          />
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <CalendarBlank size={18} weight="fill" color="#38BDF8" />
-              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.1px' }}>
-                {language === 'id' ? 'Tingkat Kehadiran' : 'Attendance Rate'}
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  color: '#FFFFFF',
-                  fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  padding: '2px 8px',
-                  borderRadius: '9999px',
-                  backdropFilter: 'blur(4px)',
-                }}
-              >
-                {presentCount}/{totalLogs} {language === 'id' ? 'Hari' : 'Days'}
-              </span>
-              <span
-                style={{
-                  fontSize: '1.25rem',
-                  fontWeight: 900,
-                  color: '#FFFFFF',
-                  lineHeight: 1,
-                  letterSpacing: '-0.5px',
-                }}
-              >
-                {attendanceRatePct}%
-              </span>
-            </div>
-          </div>
-
-          {/* Glowing White Progress Bar on Semi-transparent Track */}
-          <div
-            style={{
-              width: '100%',
-              height: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.22)',
-              borderRadius: '9999px',
-              overflow: 'hidden',
-              position: 'relative',
-              zIndex: 1,
-            }}
-          >
+          {/* HARIAN MODE: SINGLE DAY DETAIL CARD */}
+          {periodMode === 'daily' ? (
             <div
               style={{
-                width: `${attendanceRatePct}%`,
-                height: '100%',
                 backgroundColor: '#FFFFFF',
-                borderRadius: '9999px',
-                transition: 'width 0.4s ease',
-              }}
-            />
-          </div>
-        </div>
-
-        {/* 4 Day Count KPI Metrics Micro-Cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '8px',
-          }}
-        >
-          {/* On Time */}
-          <div
-            style={{
-              backgroundColor: '#F0FDF4',
-              border: '1px solid #DCFCE7',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{onTimeCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Tepat' : 'On Time'}</span>
-          </div>
-
-          {/* Late */}
-          <div
-            style={{
-              backgroundColor: '#FFFBEB',
-              border: '1px solid #FEF3C7',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>{lateCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
-          </div>
-
-          {/* Leave */}
-          <div
-            style={{
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>{leaveCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
-          </div>
-
-          {/* Alpha */}
-          <div
-            style={{
-              backgroundColor: '#FEF2F2',
-              border: '1px solid #FEE2E2',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>{alphaCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Daily Attendance Logs List Header & Filter Tabs */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredLogs.length === 0 ? 1 : 'initial' }}>
-        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
-          {language === 'id' ? 'Riwayat Absensi Harian' : 'Daily Attendance Records'}
-        </h3>
-
-        {/* Filter Tabs */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            paddingBottom: '2px',
-          }}
-        >
-          {[
-            { key: 'ALL', label: language === 'id' ? `Semua (${totalLogs})` : `All (${totalLogs})` },
-            { key: 'ONTIME', label: language === 'id' ? `Tepat (${onTimeCount})` : `On Time (${onTimeCount})` },
-            { key: 'LATE', label: language === 'id' ? `Terlambat (${lateCount})` : `Late (${lateCount})` },
-            { key: 'LEAVE', label: language === 'id' ? `Izin (${leaveCount})` : `Leave (${leaveCount})` },
-            { key: 'ALPHA', label: `Alpha (${alphaCount})` },
-          ].map((tab) => {
-            const isActive = activeFilter === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveFilter(tab.key)}
-                style={{
-                  backgroundColor: isActive ? '#02388A' : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : '#64748B',
-                  border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
-                  borderRadius: '20px',
-                  padding: '6px 12px',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {filteredLogs.length === 0 ? (
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
-              padding: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              border: '1px solid #E2E8F0',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-              flex: 1,
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
-            <img
-              src={attendanceEmptySearch}
-              alt="No Attendance Records Found"
-              style={{
-                width: '100%',
-                height: 'auto',
-                maxHeight: '200px',
-                objectFit: 'contain',
-                marginBottom: '12px',
-                filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
-              }}
-            />
-            <h4
-              style={{
-                fontSize: '1.0625rem',
-                fontWeight: 800,
-                color: '#334155',
-                margin: '0 0 6px 0',
-                letterSpacing: '-0.2px',
-                textAlign: 'center',
+                borderRadius: '16px',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+                boxShadow: 'none',
+                border: '1px solid #E2E8F0',
               }}
             >
-              No Attendance Records Found
-            </h4>
-            <p
-              style={{
-                fontSize: '0.8125rem',
-                color: '#64748B',
-                margin: 0,
-                lineHeight: 1.45,
-                maxWidth: '300px',
-                fontWeight: 500,
-                textAlign: 'center',
-              }}
-            >
-              There are no attendance records matching your selected status filter.
-            </p>
-          </div>
-        ) : (
-          filteredLogs.map((log) => {
-            const dayName = language === 'id' ? DAY_NAMES_ID[log.date.getDay()] : DAY_NAMES[log.date.getDay()];
-            const monthStr = language === 'id' ? MONTH_SHORT_ID[selectedMonth] : MONTH_SHORT[selectedMonth];
-            const dateDisplay = `${dayName}, ${log.dayNumber} ${monthStr} ${selectedYear}`;
-            const isLate = log.status === 'late' || log.inStatus === 'LATE' || log.outStatus === 'EARLY_OUT';
-            const isAlpha = log.status === 'alpha';
-            const isOff = log.status === 'leave' || log.status === 'off' || log.status === 'LIBUR';
+              {/* Header Title & Date Badge */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                    {language === 'id'
+                      ? `${DAY_NAMES_ID[singleDailyLog.date.getDay()]}, ${singleDailyLog.dayNumber} ${MONTH_NAMES_ID[selectedMonth]} ${selectedYear}`
+                      : `${DAY_NAMES[singleDailyLog.date.getDay()]}, ${singleDailyLog.dayNumber} ${MONTH_NAMES[selectedMonth]} ${selectedYear}`}
+                  </span>
+                  <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                    {singleDailyLog.shift || 'Shift Pagi (08:00 - 17:00)'}
+                  </span>
+                </div>
 
-            let cardBg = '#FFFFFF';
-            let cardBorder = '1px solid #E2E8F0';
-            let tileBg = '#F8FAFC';
-            let tileBorder = '1px solid #F1F5F9';
+                {renderLogBadges(singleDailyLog)}
+              </div>
 
-            if (isAlpha) {
-              cardBg = '#FEF2F2';
-              cardBorder = '1px solid #FECACA';
-              tileBg = '#FFFFFF';
-              tileBorder = '1px solid #FEE2E2';
-            } else if (isLate) {
-              cardBg = '#FFFBEB';
-              cardBorder = '1px solid #FDE68A';
-              tileBg = '#FFFFFF';
-              tileBorder = '1px solid #FEF3C7';
-            } else if (isOff) {
-              cardBg = '#F1F5F9';
-              cardBorder = '1px solid #E2E8F0';
-              tileBg = '#FFFFFF';
-              tileBorder = '1px solid #E2E8F0';
-            }
-
-            return (
+              {/* Clock In & Out Grid */}
               <div
-                key={log.id}
                 style={{
-                  backgroundColor: cardBg,
-                  borderRadius: '14px',
-                  padding: '14px 16px',
-                  display: 'flex',
-                  flexDirection: 'column',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
                   gap: '10px',
-                  border: cardBorder,
+                  backgroundColor: '#F8FAFC',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  border: '1px solid #E2E8F0',
                 }}
               >
-                {/* Date & Status Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#334155' }}>
-                    {dateDisplay}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#16A34A', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <SignIn size={16} weight="bold" />
+                    <span>{language === 'id' ? 'Jam Masuk' : 'Clock In'}</span>
+                  </div>
+                  <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#334155' }}>
+                    {singleDailyLog.clockIn}
                   </span>
-                  {renderLogBadges(log)}
                 </div>
 
-                {/* Clock In & Clock Out Tiles */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '10px',
-                    backgroundColor: tileBg,
-                    borderRadius: '10px',
-                    padding: '8px 12px',
-                    border: tileBorder,
-                  }}
-                >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                      {language === 'id' ? 'Masuk' : 'Clock In'}
-                    </span>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                      {log.clockIn}
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#0284C7', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <SignOut size={16} weight="bold" />
+                    <span>{language === 'id' ? 'Jam Pulang' : 'Clock Out'}</span>
                   </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                      {language === 'id' ? 'Keluar' : 'Clock Out'}
-                    </span>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                      {log.clockOut}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Shift & Duration */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                  <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
-                    {log.shift || 'Shift Pagi (08:00 - 17:00)'}
-                  </span>
-                  <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#334155', flexShrink: 0 }}>
-                    {language === 'id' ? `Durasi: ${log.workDuration}` : `Duration: ${log.workDuration}`}
+                  <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#334155' }}>
+                    {singleDailyLog.clockOut}
                   </span>
                 </div>
               </div>
-            );
-          })
-        )}
-      </div>
-    </>
-  )}
 
-  {/* =========================================================================
-      VIEW 2: ALL EMPLOYEES ATTENDANCE (BM ONLY)
-      ========================================================================= */}
-  {isBM && activeMainTab === 'EMPLOYEES' && (
-    <>
-      {/* 0. Day Selector Strip / Navigator for Daily Roster Filter */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          padding: '12px 14px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-        }}
-      >
-        {/* Day Header with Prev / Next Day Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <button
-            type="button"
-            onClick={() => setEmployeeSelectedDay((prev) => Math.max(1, prev - 1))}
-            disabled={safeDay <= 1}
+              {/* Info Details: Work Duration, Location, Notes */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Total Durasi Kerja' : 'Total Work Duration'}
+                  </span>
+                  <span style={{ fontWeight: 700, color: '#334155' }}>
+                    {singleDailyLog.workDuration}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                  <span style={{ color: '#64748B', fontWeight: 500 }}>
+                    {language === 'id' ? 'Lokasi Presensi' : 'Attendance Location'}
+                  </span>
+                  <span style={{ fontWeight: 600, color: '#334155', maxWidth: '60%', textAlign: 'right' }}>
+                    {singleDailyLog.location || 'Gedung Menara Jasmine'}
+                  </span>
+                </div>
+
+                {singleDailyLog.notes && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                    <span style={{ color: '#64748B', fontWeight: 500 }}>
+                      {language === 'id' ? 'Catatan Presensi' : 'Notes'}
+                    </span>
+                    <span style={{ fontWeight: 600, color: '#02388A', maxWidth: '60%', textAlign: 'right' }}>
+                      {singleDailyLog.notes}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* BULANAN & MINGGUAN MODE: KPI SUMMARY + LIST */
+            <>
+              {/* 1. KPI Summary Card */}
+              <div
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '14px',
+                  boxShadow: 'none',
+                  border: '1px solid #E2E8F0',
+                }}
+              >
+                <div>
+                  <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+                    {language === 'id' ? 'Ringkasan Kehadiran' : 'Attendance Summary'}
+                  </h2>
+                  <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
+                    {periodMode === 'weekly'
+                      ? (language === 'id' ? `Minggu ${selectedWeek} (${currentWeekObj.startDay}-${currentWeekObj.endDay} ${MONTH_SHORT_ID[selectedMonth]}) • Engineering` : `Week ${selectedWeek} • Engineering`)
+                      : (language === 'id' ? `${MONTH_NAMES_ID[selectedMonth]} ${selectedYear} • Divisi Engineering` : `${MONTH_NAMES[selectedMonth]} ${selectedYear} • Engineering Dept`)}
+                  </p>
+                </div>
+
+                {/* Hero Fill Attendance Rate Banner */}
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, #02388A 0%, #0052CC 60%, #0284C7 100%)',
+                    borderRadius: '14px',
+                    padding: '13px 14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <CalendarBlank size={18} weight="fill" color="#38BDF8" />
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.1px' }}>
+                        {language === 'id' ? 'Tingkat Kehadiran' : 'Attendance Rate'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span
+                        style={{
+                          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                          color: '#FFFFFF',
+                          fontSize: '0.6875rem',
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                        }}
+                      >
+                        {presentCount}/{totalLogs} {language === 'id' ? 'Hari' : 'Days'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '1.25rem',
+                          fontWeight: 900,
+                          color: '#FFFFFF',
+                          lineHeight: 1,
+                        }}
+                      >
+                        {attendanceRatePct}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '8px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                      borderRadius: '9999px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${attendanceRatePct}%`,
+                        height: '100%',
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '9999px',
+                        transition: 'width 0.4s ease',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 4 Day Count KPI Metrics Micro-Cards */}
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gap: '8px',
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: '#F0FDF4',
+                      border: '1px solid #DCFCE7',
+                      borderRadius: '12px',
+                      padding: '10px 4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{onTimeCount}</span>
+                    <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Tepat' : 'On Time'}</span>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#FFFBEB',
+                      border: '1px solid #FEF3C7',
+                      borderRadius: '12px',
+                      padding: '10px 4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>{lateCount}</span>
+                    <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '12px',
+                      padding: '10px 4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>{leaveCount}</span>
+                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
+                  </div>
+
+                  <div
+                    style={{
+                      backgroundColor: '#FEF2F2',
+                      border: '1px solid #FEE2E2',
+                      borderRadius: '12px',
+                      padding: '10px 4px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '2px',
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>{alphaCount}</span>
+                    <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Attendance Logs List Header & Filter Tabs */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredPersonalLogs.length === 0 ? 1 : 'initial' }}>
+                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
+                  {periodMode === 'weekly'
+                    ? (language === 'id' ? 'Riwayat Absensi Mingguan' : 'Weekly Attendance Records')
+                    : (language === 'id' ? 'Riwayat Absensi Bulanan' : 'Monthly Attendance Records')}
+                </h3>
+
+                {/* Status Filter Tabs */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    overflowX: 'auto',
+                    paddingBottom: '2px',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                  }}
+                >
+                  {[
+                    { id: 'ALL', label: language === 'id' ? 'Semua' : 'All', count: totalLogs },
+                    { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time', count: onTimeCount },
+                    { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late', count: lateCount },
+                    { id: 'LEAVE', label: language === 'id' ? 'Izin/Cuti' : 'Leave', count: leaveCount },
+                    { id: 'ALPHA', label: 'Alpha', count: alphaCount },
+                  ].map((filterTab) => {
+                    const isActive = activeFilter === filterTab.id;
+                    return (
+                      <button
+                        key={filterTab.id}
+                        type="button"
+                        onClick={() => setActiveFilter(filterTab.id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 12px',
+                          borderRadius: '9999px',
+                          border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
+                          backgroundColor: isActive ? '#02388A' : '#FFFFFF',
+                          color: isActive ? '#FFFFFF' : '#475569',
+                          fontSize: '0.75rem',
+                          fontWeight: isActive ? 700 : 500,
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          flexShrink: 0,
+                          transition: 'all 0.15s ease',
+                          outline: 'none',
+                        }}
+                      >
+                        <span>{filterTab.label}</span>
+                        <span
+                          style={{
+                            fontSize: '0.6875rem',
+                            fontWeight: 700,
+                            backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : '#F1F5F9',
+                            color: isActive ? '#FFFFFF' : '#64748B',
+                            padding: '1px 6px',
+                            borderRadius: '9999px',
+                          }}
+                        >
+                          {filterTab.count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* List of Attendance Cards */}
+                {filteredPersonalLogs.length === 0 ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '32px 16px',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '16px',
+                      border: '1px solid #E2E8F0',
+                      gap: '12px',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <img
+                      src={attendanceEmptySearch}
+                      alt="No attendance records"
+                      style={{ width: '110px', height: 'auto', objectFit: 'contain' }}
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                        {language === 'id' ? 'Tidak Ada Catatan Presensi' : 'No Attendance Records'}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                        {language === 'id' ? 'Tidak ada data pada filter yang dipilih.' : 'No data found for the selected filter.'}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  filteredPersonalLogs.map((log) => {
+                    const dateObj = log.date;
+                    const dayOfWeek = dateObj.getDay();
+                    const dayName = language === 'id' ? DAY_NAMES_ID[dayOfWeek] : DAY_NAMES[dayOfWeek];
+                    const monthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
+                    const dateFormatted = `${dayName}, ${log.dayNumber} ${monthName} ${selectedYear}`;
+
+                    return (
+                      <div
+                        key={log.id}
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          borderRadius: '14px',
+                          border: '1px solid #E2E8F0',
+                          padding: '14px 16px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#334155' }}>
+                            {dateFormatted}
+                          </span>
+                          {renderLogBadges(log)}
+                        </div>
+
+                        <div
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: '10px',
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: '10px',
+                            padding: '8px 12px',
+                            border: '1px solid #E2E8F0',
+                          }}
+                        >
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                              {language === 'id' ? 'Masuk' : 'Clock In'}
+                            </span>
+                            <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                              {log.clockIn}
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                              {language === 'id' ? 'Keluar' : 'Clock Out'}
+                            </span>
+                            <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                              {log.clockOut}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
+                          <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                            {log.shift || 'Shift Pagi (08:00 - 17:00)'}
+                          </span>
+                          <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
+                            {language === 'id' ? `Durasi: ${log.workDuration}` : `Duration: ${log.workDuration}`}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* =========================================================================
+          VIEW 2: ALL EMPLOYEES ATTENDANCE (BM ONLY)
+          ========================================================================= */}
+      {isBM && activeMainTab === 'EMPLOYEES' && (
+        <>
+          {/* 1. Overall Employees KPI Summary Card */}
+          <div
             style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
-              color: safeDay <= 1 ? '#CBD5E1' : '#334155',
+              backgroundColor: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '16px',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: safeDay <= 1 ? 'not-allowed' : 'pointer',
-              padding: 0,
+              flexDirection: 'column',
+              gap: '14px',
+              boxShadow: 'none',
+              border: '1px solid #E2E8F0',
             }}
           >
-            <CaretLeft size={16} weight="bold" />
-          </button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+              <div>
+                <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+                  {language === 'id' ? 'Presensi Seluruh Karyawan' : 'All Employee Attendance'}
+                </h2>
+                <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
+                  {periodMode === 'daily'
+                    ? (language === 'id' ? `${DAY_NAMES_ID[new Date(selectedYear, selectedMonth, safeDay).getDay()]}, ${safeDay} ${MONTH_NAMES_ID[selectedMonth]} ${selectedYear}` : `${safeDay} ${MONTH_NAMES[selectedMonth]} ${selectedYear}`)
+                    : periodMode === 'weekly'
+                    ? (language === 'id' ? `Minggu ${selectedWeek} (${currentWeekObj.startDay}-${currentWeekObj.endDay} ${MONTH_SHORT_ID[selectedMonth]})` : `Week ${selectedWeek}`)
+                    : (language === 'id' ? `Bulan ${MONTH_NAMES_ID[selectedMonth]} ${selectedYear}` : `${MONTH_NAMES[selectedMonth]} ${selectedYear}`)}
+                </p>
+              </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <CalendarBlank size={16} weight="bold" color="#02388A" />
-            <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
-              {selectedDayFullText}
-            </span>
+              <div
+                style={{
+                  backgroundColor: '#EFF6FF',
+                  color: '#1D4ED8',
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  padding: '3px 8px',
+                  borderRadius: '9999px',
+                  border: '1px solid #DBEAFE',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                }}
+              >
+                {totalEmpCount} {language === 'id' ? 'Karyawan' : 'Employees'}
+              </div>
+            </div>
+
+            {/* 4 Day Count KPI Metrics Micro-Cards */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '8px',
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: '#F0FDF4',
+                  border: '1px solid #DCFCE7',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{empKpiHadir}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Hadir' : 'Present'}</span>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: '#FFFBEB',
+                  border: '1px solid #FEF3C7',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>{empKpiLate}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>{empKpiLeave}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin/Libur' : 'Leave/Off'}</span>
+              </div>
+
+              <div
+                style={{
+                  backgroundColor: '#FEF2F2',
+                  border: '1px solid #FEE2E2',
+                  borderRadius: '12px',
+                  padding: '10px 4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '2px',
+                }}
+              >
+                <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>{empKpiAlpha}</span>
+                <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
+              </div>
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setEmployeeSelectedDay((prev) => Math.min(daysInSelectedMonth, prev + 1))}
-            disabled={safeDay >= daysInSelectedMonth}
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
-              color: safeDay >= daysInSelectedMonth ? '#CBD5E1' : '#334155',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: safeDay >= daysInSelectedMonth ? 'not-allowed' : 'pointer',
-              padding: 0,
-            }}
-          >
-            <CaretRight size={16} weight="bold" />
-          </button>
-        </div>
+          {/* 2. Department Breakdown Progress Accordion Card (For Monthly / Weekly modes) */}
+          {periodMode !== 'daily' && (
+            <div
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: '16px',
+                border: '1px solid #E2E8F0',
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '14px',
+              }}
+            >
+              <div>
+                <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
+                  {periodMode === 'weekly'
+                    ? (language === 'id' ? 'Kehadiran Mingguan Per Departemen' : 'Weekly Attendance by Department')
+                    : (language === 'id' ? 'Kehadiran Bulanan Per Departemen' : 'Monthly Attendance by Department')}
+                </h3>
+                <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
+                  {language === 'id'
+                    ? 'Rata-rata tingkat kehadiran & pemenuhan shift kerja'
+                    : 'Average attendance rate & shift fulfillment'}
+                </p>
+              </div>
 
-        {/* Horizontal Scrollable Day Strip */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '6px',
-            overflowX: 'auto',
-            paddingBottom: '2px',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          }}
-        >
-          {Array.from({ length: daysInSelectedMonth }, (_, i) => i + 1).map((d) => {
-            const dObj = new Date(selectedYear, selectedMonth, d);
-            const dayName = language === 'id' ? DAY_SHORT_ID[dObj.getDay()] : DAY_SHORT_EN[dObj.getDay()];
-            const isSelected = safeDay === d;
-            return (
-              <button
-                key={d}
-                type="button"
-                onClick={() => setEmployeeSelectedDay(d)}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {DEPARTMENTS_DATA.map((dept) => {
+                  const ratioPercent = Math.round((dept.present / dept.totalAssigned) * 100);
+                  return (
+                    <div key={dept.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                          {dept.name}
+                        </span>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B' }}>
+                          {dept.present}/{dept.totalAssigned} ({ratioPercent}%)
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          width: '100%',
+                          height: '7px',
+                          backgroundColor: '#F1F5F9',
+                          borderRadius: '9999px',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: `${ratioPercent}%`,
+                            height: '100%',
+                            backgroundColor: '#02388A',
+                            borderRadius: '9999px',
+                            transition: 'width 0.4s ease-out',
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* 3. Employee List Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: displayEmployeesList.length === 0 ? 1 : 'initial' }}>
+            <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
+              {periodMode === 'daily'
+                ? (language === 'id' ? 'Daftar Presensi Karyawan Harian' : 'Daily Employee Attendance List')
+                : periodMode === 'weekly'
+                ? (language === 'id' ? 'Rekap Presensi Karyawan Mingguan' : 'Weekly Employee Attendance Recap')
+                : (language === 'id' ? 'Rekap Presensi Karyawan Bulanan' : 'Monthly Employee Attendance Recap')}
+            </h3>
+
+            {/* Search Input Bar */}
+            <div
+              style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#FFFFFF',
+                borderRadius: '12px',
+                border: '1px solid #E2E8F0',
+                padding: '0 12px',
+                height: '42px',
+                gap: '8px',
+              }}
+            >
+              <MagnifyingGlass size={18} color="#64748B" weight="bold" />
+              <input
+                type="text"
+                value={employeeSearchQuery}
+                onChange={(e) => setEmployeeSearchQuery(e.target.value)}
+                placeholder={language === 'id' ? 'Cari nama karyawan / divisi...' : 'Search employee / dept...'}
+                style={{
+                  border: 'none',
+                  outline: 'none',
+                  width: '100%',
+                  fontSize: '0.8125rem',
+                  color: '#334155',
+                  backgroundColor: 'transparent',
+                }}
+              />
+              {employeeSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setEmployeeSearchQuery('')}
+                  style={{
+                    border: 'none',
+                    backgroundColor: 'transparent',
+                    color: '#64748B',
+                    cursor: 'pointer',
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <X size={16} weight="bold" />
+                </button>
+              )}
+            </div>
+
+            {/* Status Filter Tabs */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                overflowX: 'auto',
+                paddingBottom: '2px',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+              }}
+            >
+              {[
+                { id: 'ALL', label: language === 'id' ? 'Semua' : 'All', count: totalEmpCount },
+                { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time', count: empKpiHadir },
+                { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late', count: empKpiLate },
+                { id: 'LEAVE', label: language === 'id' ? 'Izin/Libur' : 'Leave/Off', count: empKpiLeave },
+                { id: 'ALPHA', label: 'Alpha', count: empKpiAlpha },
+              ].map((filterTab) => {
+                const isActive = employeeStatusFilter === filterTab.id;
+                return (
+                  <button
+                    key={filterTab.id}
+                    type="button"
+                    onClick={() => setEmployeeStatusFilter(filterTab.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
+                      borderRadius: '9999px',
+                      border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
+                      backgroundColor: isActive ? '#02388A' : '#FFFFFF',
+                      color: isActive ? '#FFFFFF' : '#475569',
+                      fontSize: '0.75rem',
+                      fontWeight: isActive ? 700 : 500,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      transition: 'all 0.15s ease',
+                      outline: 'none',
+                    }}
+                  >
+                    <span>{filterTab.label}</span>
+                    <span
+                      style={{
+                        fontSize: '0.6875rem',
+                        fontWeight: 700,
+                        backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : '#F1F5F9',
+                        color: isActive ? '#FFFFFF' : '#64748B',
+                        padding: '1px 6px',
+                        borderRadius: '9999px',
+                      }}
+                    >
+                      {filterTab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* List of Employee Cards */}
+            {displayEmployeesList.length === 0 ? (
+              <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  minWidth: '40px',
-                  padding: '6px 4px',
-                  borderRadius: '10px',
-                  border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
-                  backgroundColor: isSelected ? '#02388A' : '#F8FAFC',
-                  color: isSelected ? '#FFFFFF' : '#475569',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'all 0.15s ease',
+                  padding: '32px 16px',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '16px',
+                  border: '1px solid #E2E8F0',
+                  gap: '12px',
+                  textAlign: 'center',
                 }}
               >
-                <span style={{ fontSize: '0.625rem', fontWeight: 600, opacity: isSelected ? 0.9 : 0.7 }}>
-                  {dayName}
-                </span>
-                <span style={{ fontSize: '0.875rem', fontWeight: 800 }}>
-                  {d}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 1. Overall Employees KPI Summary Card */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
-          padding: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-          boxShadow: 'none',
-          border: '1px solid #E2E8F0',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-          <h2 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
-            {language === 'id' ? 'Presensi Seluruh Karyawan' : 'All Employee Attendance'}
-          </h2>
-
-          <div
-            style={{
-              backgroundColor: '#EFF6FF',
-              color: '#1D4ED8',
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              padding: '3px 8px',
-              borderRadius: '9999px',
-              border: '1px solid #DBEAFE',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
-          >
-            {dailyEmployeesList.length} {language === 'id' ? 'Karyawan' : 'Employees'}
-          </div>
-        </div>
-
-        {/* 4 Day Count KPI Metrics Micro-Cards */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '8px',
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: '#F0FDF4',
-              border: '1px solid #DCFCE7',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{dailyPresentCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Hadir' : 'Present'}</span>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: '#FFFBEB',
-              border: '1px solid #FEF3C7',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>{dailyLateCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: '#F8FAFC',
-              border: '1px solid #E2E8F0',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>{dailyLeaveCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin/Libur' : 'Leave/Off'}</span>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: '#FEF2F2',
-              border: '1px solid #FEE2E2',
-              borderRadius: '12px',
-              padding: '10px 4px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-            }}
-          >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>{dailyAlphaCount}</span>
-            <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Department Breakdown Progress Accordion Card */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          padding: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px',
-        }}
-      >
-        <div>
-          <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: 0 }}>
-            {language === 'id' ? 'Kehadiran Bulanan Per Departemen' : 'Monthly Attendance by Department'}
-          </h3>
-          <p style={{ fontSize: '0.6875rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: 500 }}>
-            {language === 'id'
-              ? 'Rata-rata tingkat kehadiran & pemenuhan shift bulanan'
-              : 'Monthly average attendance rate & shift fulfillment'}
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {DEPARTMENTS_DATA.map((dept) => {
-            const ratioPercent = Math.round((dept.present / dept.totalAssigned) * 100);
-            return (
-              <div key={dept.id} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <img
+                  src={attendanceEmptySearch}
+                  alt="No employee data"
+                  style={{ width: '110px', height: 'auto', objectFit: 'contain' }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
-                    {dept.name}
+                    {language === 'id' ? 'Karyawan Tidak Ditemukan' : 'Employee Not Found'}
                   </span>
-                  <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B' }}>
-                    {dept.present}/{dept.totalAssigned} ({ratioPercent}%)
+                  <span style={{ fontSize: '0.75rem', color: '#64748B' }}>
+                    {language === 'id' ? 'Tidak ada data presensi yang cocok dengan filter.' : 'No employee matching the selected criteria.'}
                   </span>
                 </div>
+              </div>
+            ) : (
+              displayEmployeesList.map((emp) => {
+                // If DAILY MODE
+                if (periodMode === 'daily') {
+                  return (
+                    <div
+                      key={emp.id}
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '14px',
+                        border: '1px solid #E2E8F0',
+                        padding: '14px 16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                      }}
+                    >
+                      {/* Top: Name, Dept & Status Badge */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                            {emp.name}
+                          </span>
+                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                            {emp.dept} • {emp.role}
+                          </span>
+                        </div>
+                        {renderDailyEmployeeBadges(emp)}
+                      </div>
 
-                <div
-                  style={{
-                    width: '100%',
-                    height: '7px',
-                    backgroundColor: '#F1F5F9',
-                    borderRadius: '9999px',
-                    overflow: 'hidden',
-                  }}
-                >
+                      {/* Clock In & Out Grid */}
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr',
+                          gap: '10px',
+                          backgroundColor: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '10px',
+                          padding: '8px 12px',
+                        }}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                            {language === 'id' ? 'Masuk' : 'Clock In'}
+                          </span>
+                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                            {emp.clockIn || '-- : --'}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                            {language === 'id' ? 'Keluar' : 'Clock Out'}
+                          </span>
+                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                            {emp.clockOut || '-- : --'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Footer Shift & Duration */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
+                        <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                          {emp.shift}
+                        </span>
+                        <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
+                          {language === 'id' ? `Durasi: ${emp.duration || '--'}` : `Duration: ${emp.duration || '--'}`}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+
+                // If WEEKLY OR MONTHLY RECAP MODE
+                return (
                   <div
+                    key={emp.id}
                     style={{
-                      width: `${ratioPercent}%`,
-                      height: '100%',
-                      backgroundColor: '#02388A',
-                      borderRadius: '9999px',
-                      transition: 'width 0.4s ease-out',
+                      backgroundColor: '#FFFFFF',
+                      borderRadius: '14px',
+                      border: '1px solid #E2E8F0',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px',
                     }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                          {emp.name}
+                        </span>
+                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                          {emp.dept} • {emp.role}
+                        </span>
+                      </div>
 
-      {/* 3. Employee List Section */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: filteredEmployees.length === 0 ? 1 : 'initial' }}>
-        <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155', margin: '4px 0 0 0' }}>
-          {language === 'id' ? 'Daftar Presensi Karyawan' : 'Employee Attendance List'}
-        </h3>
+                      <span
+                        style={{
+                          backgroundColor: emp.rate >= 90 ? '#DCFCE7' : emp.rate >= 75 ? '#FEF3C7' : '#FEE2E2',
+                          color: emp.rate >= 90 ? '#16A34A' : emp.rate >= 75 ? '#D97706' : '#DC2626',
+                          fontSize: '0.6875rem',
+                          fontWeight: 800,
+                          padding: '2px 8px',
+                          borderRadius: '9999px',
+                        }}
+                      >
+                        {emp.rate}% {language === 'id' ? 'Hadir' : 'Rate'}
+                      </span>
+                    </div>
 
-        {/* Search Input Bar */}
-        <div
-          style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#FFFFFF',
-            borderRadius: '12px',
-            border: '1px solid #E2E8F0',
-            padding: '8px 12px',
-            gap: '8px',
-          }}
-        >
-          <MagnifyingGlass size={18} color="#64748B" />
-          <input
-            type="text"
-            value={employeeSearchQuery}
-            onChange={(e) => setEmployeeSearchQuery(e.target.value)}
-            placeholder={language === 'id' ? 'Cari nama karyawan atau divisi...' : 'Search employee name or dept...'}
-            style={{
-              border: 'none',
-              outline: 'none',
-              backgroundColor: 'transparent',
-              fontSize: '0.8125rem',
-              color: '#334155',
-              width: '100%',
-              fontFamily: 'var(--font-sans)',
-            }}
-          />
-          {employeeSearchQuery && (
-            <button
-              type="button"
-              onClick={() => setEmployeeSearchQuery('')}
-              style={{
-                border: 'none',
-                background: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                color: '#94A3B8',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <X size={14} weight="bold" />
-            </button>
-          )}
-        </div>
+                    {/* Stats Micro Grid */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(4, 1fr)',
+                        gap: '6px',
+                        backgroundColor: '#F8FAFC',
+                        border: '1px solid #E2E8F0',
+                        borderRadius: '10px',
+                        padding: '8px 10px',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#16A34A' }}>{emp.present}/{emp.total}</span>
+                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Hadir' : 'Present'}</span>
+                      </div>
 
-        {/* Department Filter Pills */}
-        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
-          {[
-            { id: 'ALL', label: language === 'id' ? 'Semua Dept' : 'All Depts' },
-            { id: 'Engineering', label: 'Engineering' },
-            { id: 'Housekeeping', label: 'Housekeeping' },
-            { id: 'Security', label: 'Security' },
-            { id: 'Management', label: 'Management' },
-          ].map((tab) => {
-            const isActive = employeeDeptFilter === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setEmployeeDeptFilter(tab.id)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '9999px',
-                  fontSize: '0.6875rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
-                  backgroundColor: isActive ? '#02388A' : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : '#475569',
-                  transition: 'all 0.15s ease',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#D97706' }}>{emp.late}x</span>
+                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Telat' : 'Late'}</span>
+                      </div>
 
-        {/* Status Filter Tabs */}
-        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
-          {[
-            { id: 'ALL', label: language === 'id' ? `Semua (${dailyEmployeesList.length})` : `All (${dailyEmployeesList.length})` },
-            { id: 'ONTIME', label: language === 'id' ? `Tepat (${dailyOntimeCount})` : `On Time (${dailyOntimeCount})` },
-            { id: 'LATE', label: language === 'id' ? `Terlambat (${dailyLateCount})` : `Late (${dailyLateCount})` },
-            { id: 'LEAVE', label: language === 'id' ? `Izin/Libur (${dailyLeaveCount})` : `Leave/Off (${dailyLeaveCount})` },
-            { id: 'ALPHA', label: `Alpha (${dailyAlphaCount})` },
-          ].map((tab) => {
-            const isActive = employeeStatusFilter === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setEmployeeStatusFilter(tab.id)}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: '20px',
-                  fontSize: '0.6875rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  border: isActive ? '1px solid #475569' : '1px solid #E2E8F0',
-                  backgroundColor: isActive ? '#334155' : '#FFFFFF',
-                  color: isActive ? '#FFFFFF' : '#64748B',
-                  transition: 'all 0.15s ease',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#475569' }}>{emp.leave}x</span>
+                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
+                      </div>
 
-        {/* Employee Cards List */}
-        {filteredEmployees.length === 0 ? (
-          <div
-            style={{
-              backgroundColor: '#FFFFFF',
-              borderRadius: '20px',
-              padding: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              border: '1px solid #E2E8F0',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-              flex: 1,
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
-            <img
-              src={attendanceEmptySearch}
-              alt="No Attendance Records Found"
-              style={{
-                width: '100%',
-                height: 'auto',
-                maxHeight: '200px',
-                objectFit: 'contain',
-                marginBottom: '12px',
-                filter: 'drop-shadow(0 6px 14px rgba(2, 56, 138, 0.08))',
-              }}
-            />
-            <h4
-              style={{
-                fontSize: '1.0625rem',
-                fontWeight: 800,
-                color: '#334155',
-                margin: '0 0 6px 0',
-                letterSpacing: '-0.2px',
-                textAlign: 'center',
-              }}
-            >
-              {language === 'id' ? 'Tidak Ada Karyawan Ditemukan' : 'No Employees Found'}
-            </h4>
-            <p
-              style={{
-                fontSize: '0.8125rem',
-                color: '#64748B',
-                margin: 0,
-                lineHeight: 1.45,
-                maxWidth: '300px',
-                fontWeight: 500,
-                textAlign: 'center',
-              }}
-            >
-              {language === 'id'
-                ? 'Tidak ada data presensi karyawan yang cocok dengan filter atau pencarian Anda.'
-                : 'There are no employee attendance records matching your search or filter.'}
-            </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#DC2626' }}>{emp.alpha}x</span>
+                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>Alpha</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
-        ) : (
-          filteredEmployees.map((emp) => {
-            const isLate = emp.status === 'LATE';
-            const isAlpha = emp.status === 'ALPHA';
-            const isLeave = emp.status === 'LEAVE';
-            const isOntime = emp.status === 'ONTIME';
+        </>
+      )}
 
-            let cardBg = '#FFFFFF';
-            let cardBorder = '1px solid #E2E8F0';
-            let tileBg = '#F8FAFC';
-            let tileBorder = '1px solid #F1F5F9';
-
-            if (isAlpha) {
-              cardBg = '#FEF2F2';
-              cardBorder = '1px solid #FECACA';
-              tileBg = '#FFFFFF';
-              tileBorder = '1px solid #FEE2E2';
-            } else if (isLate) {
-              cardBg = '#FFFBEB';
-              cardBorder = '1px solid #FDE68A';
-              tileBg = '#FFFFFF';
-              tileBorder = '1px solid #FEF3C7';
-            } else if (isLeave) {
-              cardBg = '#F1F5F9';
-              cardBorder = '1px solid #E2E8F0';
-              tileBg = '#FFFFFF';
-              tileBorder = '1px solid #E2E8F0';
-            }
-
-            return (
-              <div
-                key={emp.id}
-                style={{
-                  backgroundColor: cardBg,
-                  borderRadius: '14px',
-                  border: cardBorder,
-                  padding: '14px 16px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '10px',
-                }}
-              >
-                {/* Top: Name, Dept & Status Badge */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
-                      {emp.name}
-                    </span>
-                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
-                      {emp.dept} • {emp.role}
-                    </span>
-                  </div>
-
-                  {/* Status Badge */}
-                  {renderEmployeeBadges(emp)}
-                </div>
-
-                {/* Clock In & Out Grid */}
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '10px',
-                    backgroundColor: tileBg,
-                    border: tileBorder,
-                    borderRadius: '10px',
-                    padding: '8px 12px',
-                  }}
-                >
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                      {language === 'id' ? 'Masuk' : 'Clock In'}
-                    </span>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                      {emp.clockIn || '-- : --'}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                      {language === 'id' ? 'Keluar' : 'Clock Out'}
-                    </span>
-                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                      {emp.clockOut || '-- : --'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Shift & Duration */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                  <span style={{ fontSize: '0.6875rem', fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
-                    {emp.shift}
-                  </span>
-                  <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#334155', flexShrink: 0 }}>
-                    {language === 'id' ? `Durasi: ${emp.duration || '--'}` : `Duration: ${emp.duration || '--'}`}
-                  </span>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-    </>
-  )}
-
-      {/* Month & Year Picker Bottom Sheet Modal (In-Frame) */}
+      {/* Picker Bottom Sheet Modal (In-Frame Portal) */}
       {isPickerOpen && (() => {
         const modalTarget = typeof document !== 'undefined'
           ? document.getElementById('phone-screen-container') || document.querySelector('.android-device-screen') || document.body
@@ -2078,7 +2130,11 @@ export const MonthlyAttendanceDetailView = ({
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
-                  {language === 'id' ? 'Pilih Periode Bulan' : 'Select Month Period'}
+                  {periodMode === 'daily'
+                    ? (language === 'id' ? 'Pilih Tanggal Presensi' : 'Select Attendance Date')
+                    : periodMode === 'weekly'
+                    ? (language === 'id' ? 'Pilih Periode Minggu' : 'Select Week Period')
+                    : (language === 'id' ? 'Pilih Periode Bulan' : 'Select Month Period')}
                 </h3>
                 <button
                   type="button"
@@ -2100,87 +2156,305 @@ export const MonthlyAttendanceDetailView = ({
                 </button>
               </div>
 
-              {/* Year Switcher */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  backgroundColor: '#F8FAFC',
-                  borderRadius: '12px',
-                  padding: '6px 12px',
-                  border: '1px solid #F1F5F9',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setPickerTempYear((y) => y - 1)}
-                  style={{
-                    border: 'none',
-                    backgroundColor: 'transparent',
-                    cursor: 'pointer',
-                    color: '#475569',
-                    padding: '4px',
-                  }}
-                >
-                  <CaretLeft size={16} weight="bold" />
-                </button>
-                <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                  {pickerTempYear}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setPickerTempYear((y) => y + 1)}
-                  style={{
-                    border: 'none',
-                    backgroundColor: 'transparent',
-                    cursor: 'pointer',
-                    color: '#475569',
-                    padding: '4px',
-                  }}
-                >
-                  <CaretRight size={16} weight="bold" />
-                </button>
-              </div>
-
-              {/* 12 Month Grid */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '8px',
-                }}
-              >
-                {(language === 'id' ? MONTH_NAMES_ID : MONTH_NAMES).map((mName, idx) => {
-                  const isSelected = pickerTempMonth === idx;
-                  return (
+              {/* 1. PICKER FOR MONTHLY MODE */}
+              {periodMode === 'monthly' && (
+                <>
+                  {/* Year Switcher */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: '12px',
+                      padding: '6px 12px',
+                      border: '1px solid #F1F5F9',
+                    }}
+                  >
                     <button
-                      key={mName}
                       type="button"
-                      onClick={() => setPickerTempMonth(idx)}
+                      onClick={() => setPickerTempYear((y) => y - 1)}
                       style={{
-                        padding: '10px 4px',
-                        borderRadius: '10px',
-                        border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
-                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
-                        color: isSelected ? '#02388A' : '#334155',
-                        fontSize: '0.8125rem',
-                        fontWeight: isSelected ? 800 : 600,
+                        border: 'none',
+                        backgroundColor: 'transparent',
                         cursor: 'pointer',
-                        textAlign: 'center',
-                        transition: 'all 0.15s ease',
+                        color: '#475569',
+                        padding: '4px',
                       }}
                     >
-                      {mName.slice(0, 3)}
+                      <CaretLeft size={16} weight="bold" />
                     </button>
-                  );
-                })}
-              </div>
+                    <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                      {pickerTempYear}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPickerTempYear((y) => y + 1)}
+                      style={{
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        color: '#475569',
+                        padding: '4px',
+                      }}
+                    >
+                      <CaretRight size={16} weight="bold" />
+                    </button>
+                  </div>
+
+                  {/* 12 Month Grid */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: '8px',
+                    }}
+                  >
+                    {(language === 'id' ? MONTH_NAMES_ID : MONTH_NAMES).map((mName, idx) => {
+                      const isSelected = pickerTempMonth === idx;
+                      return (
+                        <button
+                          key={mName}
+                          type="button"
+                          onClick={() => setPickerTempMonth(idx)}
+                          style={{
+                            padding: '10px 4px',
+                            borderRadius: '10px',
+                            border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                            backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                            color: isSelected ? '#02388A' : '#334155',
+                            fontSize: '0.8125rem',
+                            fontWeight: isSelected ? 800 : 600,
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          {mName.slice(0, 3)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {/* 2. PICKER FOR WEEKLY MODE */}
+              {periodMode === 'weekly' && (
+                <>
+                  {/* Month / Year Switcher */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: '12px',
+                      padding: '6px 12px',
+                      border: '1px solid #F1F5F9',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (pickerTempMonth === 0) {
+                          setPickerTempMonth(11);
+                          setPickerTempYear((y) => y - 1);
+                        } else {
+                          setPickerTempMonth((m) => m - 1);
+                        }
+                      }}
+                      style={{
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        color: '#475569',
+                        padding: '4px',
+                      }}
+                    >
+                      <CaretLeft size={16} weight="bold" />
+                    </button>
+                    <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                      {language === 'id' ? MONTH_NAMES_ID[pickerTempMonth] : MONTH_NAMES[pickerTempMonth]} {pickerTempYear}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (pickerTempMonth === 11) {
+                          setPickerTempMonth(0);
+                          setPickerTempYear((y) => y + 1);
+                        } else {
+                          setPickerTempMonth((m) => m + 1);
+                        }
+                      }}
+                      style={{
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        color: '#475569',
+                        padding: '4px',
+                      }}
+                    >
+                      <CaretRight size={16} weight="bold" />
+                    </button>
+                  </div>
+
+                  {/* Weeks List */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {getMonthWeeks(pickerTempYear, pickerTempMonth).map((w) => {
+                      const isSelected = pickerTempWeek === w.weekNumber;
+                      const monthShort = language === 'id' ? MONTH_SHORT_ID[pickerTempMonth] : MONTH_SHORT[pickerTempMonth];
+                      return (
+                        <button
+                          key={w.weekNumber}
+                          type="button"
+                          onClick={() => setPickerTempWeek(w.weekNumber)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '10px 14px',
+                            borderRadius: '10px',
+                            border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                            backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
+                            color: isSelected ? '#02388A' : '#334155',
+                            cursor: 'pointer',
+                            fontSize: '0.8125rem',
+                            fontWeight: isSelected ? 800 : 600,
+                          }}
+                        >
+                          <span>{language === 'id' ? `Minggu ${w.weekNumber}` : `Week ${w.weekNumber}`}</span>
+                          <span style={{ fontSize: '0.75rem', color: isSelected ? '#02388A' : '#64748B', fontWeight: 500 }}>
+                            {w.startDay} - {w.endDay} {monthShort} {pickerTempYear}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
+              {/* 3. PICKER FOR DAILY MODE */}
+              {periodMode === 'daily' && (
+                <>
+                  {/* Month / Year Switcher */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: '12px',
+                      padding: '6px 12px',
+                      border: '1px solid #F1F5F9',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (pickerTempMonth === 0) {
+                          setPickerTempMonth(11);
+                          setPickerTempYear((y) => y - 1);
+                        } else {
+                          setPickerTempMonth((m) => m - 1);
+                        }
+                      }}
+                      style={{
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        color: '#475569',
+                        padding: '4px',
+                      }}
+                    >
+                      <CaretLeft size={16} weight="bold" />
+                    </button>
+                    <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                      {language === 'id' ? MONTH_NAMES_ID[pickerTempMonth] : MONTH_NAMES[pickerTempMonth]} {pickerTempYear}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (pickerTempMonth === 11) {
+                          setPickerTempMonth(0);
+                          setPickerTempYear((y) => y + 1);
+                        } else {
+                          setPickerTempMonth((m) => m + 1);
+                        }
+                      }}
+                      style={{
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer',
+                        color: '#475569',
+                        padding: '4px',
+                      }}
+                    >
+                      <CaretRight size={16} weight="bold" />
+                    </button>
+                  </div>
+
+                  {/* Calendar Days Grid */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {/* Weekday headers */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center' }}>
+                      {(language === 'id' ? DAY_SHORT_ID : DAY_SHORT_EN).map((dName) => (
+                        <span key={dName} style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#94A3B8' }}>
+                          {dName}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Date grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
+                      {(() => {
+                        const daysInMonth = new Date(pickerTempYear, pickerTempMonth + 1, 0).getDate();
+                        const firstDayOfWeek = new Date(pickerTempYear, pickerTempMonth, 1).getDay(); // 0 = Sun
+                        const daysArray = [];
+
+                        // Empty slots before 1st of month
+                        for (let i = 0; i < firstDayOfWeek; i++) {
+                          daysArray.push(<div key={`empty-${i}`} style={{ height: '36px' }} />);
+                        }
+
+                        // Day numbers
+                        for (let d = 1; d <= daysInMonth; d++) {
+                          const isSelected = pickerTempDay === d;
+                          daysArray.push(
+                            <button
+                              key={`day-${d}`}
+                              type="button"
+                              onClick={() => setPickerTempDay(d)}
+                              style={{
+                                height: '36px',
+                                borderRadius: '10px',
+                                border: isSelected ? '1.5px solid #02388A' : '1px solid transparent',
+                                backgroundColor: isSelected ? '#02388A' : '#F8FAFC',
+                                color: isSelected ? '#FFFFFF' : '#334155',
+                                fontSize: '0.8125rem',
+                                fontWeight: isSelected ? 800 : 600,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.15s ease',
+                              }}
+                            >
+                              {d}
+                            </button>
+                          );
+                        }
+
+                        return daysArray;
+                      })()}
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* Apply Button */}
               <button
                 type="button"
-                onClick={handleApplyMonthPicker}
+                onClick={handleApplyPicker}
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -2205,3 +2479,5 @@ export const MonthlyAttendanceDetailView = ({
     </div>
   );
 };
+
+export default MonthlyAttendanceDetailView;
