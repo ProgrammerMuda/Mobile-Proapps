@@ -90,6 +90,14 @@ export const AttendanceRecordDetailHeader = ({ onBack, data }) => {
 };
 
 /**
+ * Helper to remove any duplicate WIB substring
+ */
+const cleanTime = (val) => {
+  if (!val || val === '-' || val === '--:--' || val === '-- : --') return '';
+  return String(val).replace(/\s*WIB\s*/gi, '').trim();
+};
+
+/**
  * Real Live Attendance Location Map of Indonesia (Senayan / Jakarta)
  * Features:
  * - Real live Map Tiles of Indonesia (CartoDB / OpenStreetMap)
@@ -243,6 +251,7 @@ const AttendanceMapFull = ({ data, language }) => {
         iconAnchor: [22, 56],
       });
 
+      const formattedCheckIn = cleanTime(data?.clockIn) || '08:30';
       const checkInPopupHtml = `
         <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
           <div style="
@@ -257,7 +266,7 @@ const AttendanceMapFull = ({ data, language }) => {
             font-family: system-ui, -apple-system, sans-serif;
             letter-spacing: -0.2px;
           ">
-            Clock In: ${data?.clockIn || '08:30'} WIB
+            Clock In: ${formattedCheckIn} WIB
           </div>
           <div style="
             width: 0;
@@ -296,6 +305,7 @@ const AttendanceMapFull = ({ data, language }) => {
         iconAnchor: [22, 56],
       });
 
+      const formattedCheckOut = cleanTime(data?.clockOut) || '17:30';
       const checkOutPopupHtml = `
         <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
           <div style="
@@ -310,7 +320,7 @@ const AttendanceMapFull = ({ data, language }) => {
             font-family: system-ui, -apple-system, sans-serif;
             letter-spacing: -0.2px;
           ">
-            Clock Out: ${data?.clockOut || '17:30'} WIB
+            Clock Out: ${formattedCheckOut} WIB
           </div>
           <div style="
             width: 0;
@@ -924,7 +934,7 @@ export const AttendanceRecordDetailView = ({ data }) => {
                 </div>
 
                 <div style={{ fontSize: '1.375rem', fontWeight: 800, color: '#334155', lineHeight: 1.1 }}>
-                  {data.clockIn || '--:--'} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>WIB</span>
+                  {cleanTime(data.clockIn) || '--:--'} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>WIB</span>
                 </div>
 
                 <div style={{ fontSize: '0.6875rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '3px' }}>
@@ -976,7 +986,7 @@ export const AttendanceRecordDetailView = ({ data }) => {
 
                 <div style={{ fontSize: '1.375rem', fontWeight: 800, color: '#334155', lineHeight: 1.1 }}>
                   {hasClockOut ? (
-                    <>{data.clockOut} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>WIB</span></>
+                    <>{cleanTime(data.clockOut)} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748B' }}>WIB</span></>
                   ) : (
                     <span style={{ fontSize: '1rem', fontWeight: 700, color: '#0284C7' }}>
                       {language === 'id' ? 'Sedang Bekerja...' : 'Working...'}
@@ -1046,8 +1056,8 @@ export const AttendanceRecordDetailView = ({ data }) => {
                   <span style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4 }}>
                     {isLate
                       ? (language === 'id'
-                          ? `Jadwal masuk shift: 08:00 WIB • Tercatat masuk: ${data.clockIn} WIB`
-                          : `Shift starts: 08:00 WIB • Clock-in: ${data.clockIn} WIB`)
+                          ? `Jadwal masuk shift: 08:00 WIB • Tercatat masuk: ${cleanTime(data.clockIn)} WIB`
+                          : `Shift starts: 08:00 WIB • Clock-in: ${cleanTime(data.clockIn)} WIB`)
                       : (language === 'id'
                           ? `Presensi masuk dilakukan sebelum batas toleransi jadwal shift (08:00 WIB)`
                           : `Clock-in recorded before shift start tolerance (08:00 WIB)`)}
@@ -1082,8 +1092,8 @@ export const AttendanceRecordDetailView = ({ data }) => {
                     <span style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4 }}>
                       {isEarlyOut
                         ? (language === 'id'
-                            ? `Keluar pukul ${data.clockOut} WIB (Jadwal shift selesai: 17:00 WIB)`
-                            : `Left at ${data.clockOut} WIB (Shift scheduled end: 17:00 WIB)`)
+                            ? `Keluar pukul ${cleanTime(data.clockOut)} WIB (Jadwal shift selesai: 17:00 WIB)`
+                            : `Left at ${cleanTime(data.clockOut)} WIB (Shift scheduled end: 17:00 WIB)`)
                         : (language === 'id'
                             ? `Presensi keluar dilakukan setelah jam operasional shift selesai (17:00 WIB)`
                             : `Clock-out recorded after shift completed (17:00 WIB)`)}
