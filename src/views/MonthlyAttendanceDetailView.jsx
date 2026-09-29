@@ -1725,36 +1725,15 @@ export const MonthlyAttendanceDetailView = ({
                   gap: '10px',
                 }}
               >
-                {/* Top: Avatar, Name, Dept & Status Badge */}
+                {/* Top: Name, Dept & Status Badge */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    {/* Avatar */}
-                    <div
-                      style={{
-                        width: '38px',
-                        height: '38px',
-                        borderRadius: '50%',
-                        backgroundColor: emp.avatarBg,
-                        color: '#FFFFFF',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '0.8125rem',
-                        fontWeight: 800,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {emp.initials}
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
-                        {emp.name}
-                      </span>
-                      <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
-                        {emp.dept} • {emp.role}
-                      </span>
-                    </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
+                      {emp.name}
+                    </span>
+                    <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
+                      {emp.dept} • {emp.role}
+                    </span>
                   </div>
 
                   {/* Status Badge */}
