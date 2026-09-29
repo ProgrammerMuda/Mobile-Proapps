@@ -166,7 +166,7 @@ const AttendanceMapFull = ({ data, language }) => {
           align-items: center;
           justify-content: center;
           box-sizing: border-box;
-          outline: none;
+          cursor: pointer;
         ">
           ${buildingSvgString}
         </div>
@@ -175,9 +175,33 @@ const AttendanceMapFull = ({ data, language }) => {
       iconAnchor: [22, 22],
     });
 
+    const officePopupHtml = `
+      <div style="
+        background-color: #053079;
+        color: #FFFFFF;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 4px 12px rgba(5, 48, 121, 0.35);
+        white-space: nowrap;
+        font-family: system-ui, -apple-system, sans-serif;
+      ">
+        <svg width="12" height="12" viewBox="0 0 256 256" fill="#FFFFFF"><path d="M240,208H224V96a16,16,0,0,0-16-16H160V40a16,16,0,0,0-16-16H48A16,16,0,0,0,32,40V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM48,40h96V208H48ZM208,96V208H160V96Z"/></svg>
+        <span>${language === 'id' ? 'Lokasi Kantor' : 'Office Site'}</span>
+      </div>
+    `;
+
     L.marker(officeCoords, { icon: buildingIcon, zIndexOffset: 100 })
       .addTo(map)
-      .bindTooltip(language === 'id' ? 'Lokasi Kantor' : 'Office Site', { direction: 'top', offset: [0, -24] });
+      .bindPopup(officePopupHtml, {
+        offset: [0, -24],
+        closeButton: false,
+        className: 'custom-map-popup',
+      });
 
     // Render exact Phosphor User Fill Icon for Check In and Check Out pins
     const userFillSvgString = renderToStaticMarkup(
@@ -189,7 +213,7 @@ const AttendanceMapFull = ({ data, language }) => {
       const checkInIcon = L.divIcon({
         className: 'real-map-checkin-icon',
         html: `
-          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative;">
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative; cursor: pointer;">
             <svg width="44" height="56" viewBox="0 0 44 56" fill="none" style="display: block;">
               <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#DCFCE7" stroke="#22C55E" stroke-width="2"/>
               <circle cx="22" cy="22" r="15" fill="#16A34A"/>
@@ -203,15 +227,39 @@ const AttendanceMapFull = ({ data, language }) => {
         iconAnchor: [22, 56],
       });
 
+      const checkInPopupHtml = `
+        <div style="
+          background-color: #16A34A;
+          color: #FFFFFF;
+          padding: 5px 10px;
+          border-radius: 8px;
+          font-size: 11px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+          white-space: nowrap;
+          font-family: system-ui, -apple-system, sans-serif;
+        ">
+          <svg width="12" height="12" viewBox="0 0 256 256" fill="#FFFFFF"><circle cx="128" cy="96" r="56"/><path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z"/></svg>
+          <span>${language === 'id' ? 'Clock In' : 'Clock In'}: ${data?.clockIn || '08:30'} WIB</span>
+        </div>
+      `;
+
       L.marker(checkInCoords, { icon: checkInIcon, zIndexOffset: 200 })
         .addTo(map)
-        .bindTooltip(`${language === 'id' ? 'Masuk' : 'Clock In'}: ${data?.clockIn || '08:30'}`, { direction: 'top', offset: [0, -56] });
+        .bindPopup(checkInPopupHtml, {
+          offset: [0, -56],
+          closeButton: false,
+          className: 'custom-map-popup',
+        });
 
       // 4. Red Person Pin for Check Out (Inside Radius, Solid Phosphor User Fill Icon)
       const checkOutIcon = L.divIcon({
         className: 'real-map-checkout-icon',
         html: `
-          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative;">
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative; cursor: pointer;">
             <svg width="44" height="56" viewBox="0 0 44 56" fill="none" style="display: block;">
               <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
               <circle cx="22" cy="22" r="15" fill="#DC2626"/>
@@ -225,9 +273,33 @@ const AttendanceMapFull = ({ data, language }) => {
         iconAnchor: [22, 56],
       });
 
+      const checkOutPopupHtml = `
+        <div style="
+          background-color: #DC2626;
+          color: #FFFFFF;
+          padding: 5px 10px;
+          border-radius: 8px;
+          font-size: 11px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+          white-space: nowrap;
+          font-family: system-ui, -apple-system, sans-serif;
+        ">
+          <svg width="12" height="12" viewBox="0 0 256 256" fill="#FFFFFF"><circle cx="128" cy="96" r="56"/><path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z"/></svg>
+          <span>${language === 'id' ? 'Clock Out' : 'Clock Out'}: ${data?.clockOut || '17:30'} WIB</span>
+        </div>
+      `;
+
       L.marker(checkOutCoords, { icon: checkOutIcon, zIndexOffset: 200 })
         .addTo(map)
-        .bindTooltip(`${language === 'id' ? 'Keluar' : 'Clock Out'}: ${data?.clockOut || '17:30'}`, { direction: 'top', offset: [0, -56] });
+        .bindPopup(checkOutPopupHtml, {
+          offset: [0, -56],
+          closeButton: false,
+          className: 'custom-map-popup',
+        });
     }
 
     // Update zoom level state on map zoom
@@ -271,6 +343,29 @@ const AttendanceMapFull = ({ data, language }) => {
         overflow: 'hidden',
       }}
     >
+      {/* Scoped CSS for Leaflet popups and custom marker icons */}
+      <style>{`
+        .custom-map-popup .leaflet-popup-content-wrapper {
+          background: transparent !important;
+          box-shadow: none !important;
+          padding: 0 !important;
+          border-radius: 8px !important;
+        }
+        .custom-map-popup .leaflet-popup-content {
+          margin: 0 !important;
+          line-height: 1 !important;
+        }
+        .custom-map-popup .leaflet-popup-tip-container {
+          display: none !important;
+        }
+        .real-map-building-icon,
+        .real-map-checkin-icon,
+        .real-map-checkout-icon {
+          background: transparent !important;
+          border: none !important;
+        }
+      `}</style>
+
       {/* Real Live Map Container */}
       <div
         ref={mapContainerRef}
