@@ -130,10 +130,10 @@ const AttendanceMapFull = ({ data, language }) => {
 
     mapInstanceRef.current = map;
 
-    // Add CartoDB Voyager real map tiles (Indonesian streets & landmarks)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
-      maxZoom: 20,
+    // Add 100% Free OpenStreetMap real tiles (No API Key Required)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors',
     }).addTo(map);
 
     // 1. Geofence Radius Circle (Secondary Color #09B2FF)
@@ -359,7 +359,7 @@ const AttendanceMapFull = ({ data, language }) => {
         </button>
       </div>
 
-      {/* Mapbox / Real Map Watermark (Bottom Left) */}
+      {/* OpenStreetMap Real Map Badge (Bottom Left) */}
       <div
         style={{
           position: 'absolute',
@@ -368,23 +368,20 @@ const AttendanceMapFull = ({ data, language }) => {
           display: 'flex',
           alignItems: 'center',
           gap: '4px',
-          backgroundColor: 'rgba(255, 255, 255, 0.88)',
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
           backdropFilter: 'blur(2px)',
-          padding: '2px 6px',
+          padding: '2px 7px',
           borderRadius: '4px',
           fontSize: '9px',
-          fontWeight: 800,
-          color: '#1E293B',
-          letterSpacing: '-0.2px',
+          fontWeight: 700,
+          color: '#334155',
+          border: '1px solid #E2E8F0',
           zIndex: 500,
           pointerEvents: 'none',
         }}
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="11" fill="#3B82F6" />
-          <path d="M12 6L16 14L12 12L8 14L12 6Z" fill="#FFFFFF" />
-        </svg>
-        <span>mapbox</span>
+        <MapPin size={11} weight="fill" color="#0284C7" />
+        <span>OpenStreetMap</span>
       </div>
 
       {/* Real Map Attribution + Indonesian City Label (Bottom Right) */}
@@ -402,28 +399,17 @@ const AttendanceMapFull = ({ data, language }) => {
       >
         <div
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.88)',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(2px)',
-            padding: '1px 6px',
-            borderRadius: '3px',
-            fontSize: '7.5px',
-            fontWeight: 600,
+            padding: '2px 6px',
+            borderRadius: '4px',
+            fontSize: '8px',
+            fontWeight: 700,
             color: '#053079',
+            border: '1px solid #E2E8F0',
           }}
         >
           🇮🇩 Jakarta, Indonesia
-        </div>
-        <div
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.88)',
-            backdropFilter: 'blur(2px)',
-            padding: '1px 5px',
-            borderRadius: '3px',
-            fontSize: '7.5px',
-            color: '#64748B',
-          }}
-        >
-          © Mapbox © OSM
         </div>
       </div>
 
