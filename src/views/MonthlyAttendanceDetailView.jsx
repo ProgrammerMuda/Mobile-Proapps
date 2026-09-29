@@ -626,8 +626,8 @@ export const MonthlyAttendanceDetailView = ({
       return (
         <span
           style={{
-            backgroundColor: '#F1F5F9',
-            color: '#64748B',
+            backgroundColor: '#64748B',
+            color: '#FFFFFF',
             fontSize: '0.6875rem',
             fontWeight: 700,
             padding: '2px 8px',
@@ -778,8 +778,8 @@ export const MonthlyAttendanceDetailView = ({
       return (
         <span
           style={{
-            backgroundColor: '#F1F5F9',
-            color: '#64748B',
+            backgroundColor: '#64748B',
+            color: '#FFFFFF',
             fontSize: '0.6875rem',
             fontWeight: 700,
             padding: '2px 8px',

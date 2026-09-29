@@ -579,8 +579,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           style={{
             fontSize: '0.6875rem',
             fontWeight: 700,
-            backgroundColor: '#F1F5F9',
-            color: '#64748B',
+            backgroundColor: '#64748B',
+            color: '#FFFFFF',
             padding: '2px 8px',
             borderRadius: '9999px',
           }}
