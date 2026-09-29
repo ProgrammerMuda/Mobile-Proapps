@@ -84,11 +84,11 @@ export const AttendanceRecordDetailHeader = ({ onBack, data }) => {
 };
 
 /**
- * Attendance Location Map with Mapbox Streets Style
+ * Attendance Location Map with Warm Mapbox Streets Style
  * - Primary color (#053079) center building badge
  * - Secondary color (#09B2FF) geofence radius circle
  * - Green person pin for Check In & Red person pin for Check Out
- * - Authentic Mapbox Streets aesthetic, logo watermark, and map controls
+ * - Warm Mapbox Streets aesthetic (warm beige/stone landuse, crisp white streets, pastel greens)
  */
 const AttendanceMapFull = ({ data, language }) => {
   const isOff = data?.status === 'LIBUR' || data?.status === 'off' || data?.status === 'LEAVE' || data?.status === 'IZIN';
@@ -102,14 +102,14 @@ const AttendanceMapFull = ({ data, language }) => {
         width: '100%',
         height: '240px',
         borderRadius: '16px',
-        backgroundColor: '#EDF1F4',
+        backgroundColor: '#EBE9E4',
         border: '1px solid #E2E8F0',
         position: 'relative',
         overflow: 'hidden',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
       }}
     >
-      {/* SVG Map Canvas with Mapbox Streets styling */}
+      {/* SVG Map Canvas with authentic Warm Mapbox Streets palette */}
       <svg
         viewBox="0 0 400 240"
         style={{
@@ -121,65 +121,58 @@ const AttendanceMapFull = ({ data, language }) => {
         <defs>
           {/* Shadow for map pins */}
           <filter id="mapboxPinShadow" x="-40%" y="-30%" width="180%" height="180%">
-            <feDropShadow dx="0.8" dy="3" stdDeviation="2.5" floodColor="#0F172A" floodOpacity="0.25" />
+            <feDropShadow dx="1" dy="3.5" stdDeviation="2.5" floodColor="#0F172A" floodOpacity="0.28" />
           </filter>
           <filter id="mapboxBadgeShadow" x="-40%" y="-30%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="2.5" stdDeviation="3" floodColor="#053079" floodOpacity="0.35" />
+            <feDropShadow dx="0" dy="2.5" stdDeviation="3.5" floodColor="#053079" floodOpacity="0.35" />
           </filter>
         </defs>
 
-        {/* 1. Mapbox Streets Base Land Background */}
-        <rect width="400" height="240" fill="#EDF1F5" />
+        {/* 1. Base Map Warm Stone/Beige Canvas */}
+        <rect width="400" height="240" fill="#E8E5DF" />
 
-        {/* Mapbox Urban Blocks & Landuse */}
-        <path d="M 0,0 L 120,0 L 105,70 L 0,60 Z" fill="#F4F7F9" />
-        <path d="M 135,0 L 235,0 L 225,50 L 118,55 Z" fill="#F4F7F9" />
-        <path d="M 245,0 L 340,0 L 330,60 L 235,55 Z" fill="#F4F7F9" />
-        <path d="M 350,0 L 400,0 L 400,80 L 340,65 Z" fill="#F4F7F9" />
+        {/* Warm Land Parcels & Urban Blocks */}
+        <path d="M 0,0 L 115,0 L 100,70 L 0,60 Z" fill="#F4F2EC" />
+        <path d="M 130,0 L 235,0 L 225,50 L 115,55 Z" fill="#F4F2EC" />
+        <path d="M 245,0 L 340,0 L 330,60 L 235,55 Z" fill="#F4F2EC" />
+        <path d="M 350,0 L 400,0 L 400,80 L 340,65 Z" fill="#F4F2EC" />
 
-        <path d="M 0,75 L 85,85 L 70,170 L 0,165 Z" fill="#F4F7F9" />
-        <path d="M 315,75 L 400,90 L 400,180 L 305,170 Z" fill="#F4F7F9" />
+        <path d="M 0,75 L 85,85 L 70,170 L 0,165 Z" fill="#F4F2EC" />
+        <path d="M 315,75 L 400,90 L 400,180 L 305,170 Z" fill="#F4F2EC" />
 
-        <path d="M 0,180 L 70,185 L 55,240 L 0,240 Z" fill="#F4F7F9" />
-        <path d="M 75,190 L 170,185 L 160,240 L 65,240 Z" fill="#F4F7F9" />
-        <path d="M 180,190 L 270,185 L 265,240 L 170,240 Z" fill="#F4F7F9" />
-        <path d="M 280,180 L 400,190 L 400,240 L 275,240 Z" fill="#F4F7F9" />
+        <path d="M 0,180 L 70,185 L 55,240 L 0,240 Z" fill="#F4F2EC" />
+        <path d="M 75,190 L 170,185 L 160,240 L 65,240 Z" fill="#F4F2EC" />
+        <path d="M 180,190 L 270,185 L 265,240 L 170,240 Z" fill="#F4F2EC" />
+        <path d="M 280,180 L 400,190 L 400,240 L 275,240 Z" fill="#F4F2EC" />
 
-        {/* Mapbox Parks & Green Spaces (Soft Emerald Pastel) */}
-        <path d="M 45,8 L 75,14 L 68,36 L 38,30 Z" fill="#DCF2DE" stroke="#C9E8CD" strokeWidth="0.5" />
-        <path d="M 365,115 L 392,115 L 392,142 L 365,142 Z" fill="#DCF2DE" stroke="#C9E8CD" strokeWidth="0.5" />
-        <path d="M 65,225 L 82,225 L 82,240 L 65,240 Z" fill="#DCF2DE" />
+        {/* Secondary Warm Parcel Blocks (Slightly warmer beige tone) */}
+        <path d="M 115,75 L 175,70 L 170,105 L 110,102 Z" fill="#EFECE5" />
+        <path d="M 110,115 L 170,118 L 165,160 L 105,155 Z" fill="#EFECE5" />
+        <path d="M 220,70 L 285,75 L 280,115 L 215,110 Z" fill="#EFECE5" />
+        <path d="M 215,125 L 280,128 L 275,170 L 210,165 Z" fill="#EFECE5" />
 
-        {/* Mapbox 2D Building Footprints */}
-        <rect x="25" y="100" width="22" height="16" rx="1.5" fill="#E2E8F0" />
-        <rect x="52" y="105" width="18" height="24" rx="1.5" fill="#E2E8F0" />
-        <rect x="330" y="100" width="28" height="20" rx="1.5" fill="#E2E8F0" />
-        <rect x="335" y="130" width="20" height="18" rx="1.5" fill="#E2E8F0" />
-        <rect x="130" y="15" width="25" height="18" rx="1.5" fill="#E2E8F0" />
-        <rect x="270" y="18" width="22" height="20" rx="1.5" fill="#E2E8F0" />
-        <rect x="105" y="200" width="28" height="18" rx="1.5" fill="#E2E8F0" />
-        <rect x="210" y="202" width="24" height="20" rx="1.5" fill="#E2E8F0" />
+        {/* Parks & Vegetation (Soft Lime / Pastel Green) */}
+        <path d="M 45,8 L 75,14 L 68,36 L 38,30 Z" fill="#D8EBCF" stroke="#C8DFBE" strokeWidth="0.8" />
+        <path d="M 368,110 L 396,110 L 396,140 L 368,140 Z" fill="#D8EBCF" stroke="#C8DFBE" strokeWidth="0.8" />
+        <path d="M 68,228 L 84,228 L 84,240 L 68,240 Z" fill="#D8EBCF" />
+        <path d="M 360,20 L 380,20 L 375,35 L 355,35 Z" fill="#D8EBCF" />
 
-        {/* Secondary Inner Building Block Outlines */}
-        <path
-          d="M 115,100 L 190,95 L 185,145 L 110,140 Z"
-          fill="#EAEFF5"
-          stroke="#DEE5ED"
-          strokeWidth="1.2"
-        />
-        <path
-          d="M 225,95 L 295,100 L 290,150 L 220,145 Z"
-          fill="#EAEFF5"
-          stroke="#DEE5ED"
-          strokeWidth="1.2"
-        />
+        {/* Subtle Mapbox Building Footprints (Warm Light Grey/Cream) */}
+        <rect x="25" y="100" width="22" height="16" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
+        <rect x="52" y="105" width="18" height="24" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
+        <rect x="330" y="100" width="28" height="20" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
+        <rect x="335" y="130" width="20" height="18" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
+        <rect x="130" y="15" width="25" height="18" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
+        <rect x="270" y="18" width="22" height="20" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
+        <rect x="105" y="200" width="28" height="18" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
+        <rect x="210" y="202" width="24" height="20" rx="1" fill="#DFDBD1" stroke="#D3CFCE" strokeWidth="0.5" />
 
-        {/* Road Casings (Subtle shadow / borders typical of Mapbox vector styles) */}
-        <path d="M -10,65 Q 180,130 410,60" fill="none" stroke="#DDE3EA" strokeWidth="18" strokeLinecap="round" />
-        <path d="M -10,175 Q 190,180 410,180" fill="none" stroke="#DDE3EA" strokeWidth="18" strokeLinecap="round" />
-        <path d="M 100,-10 Q 90,110 70,250" fill="none" stroke="#DDE3EA" strokeWidth="15" strokeLinecap="round" />
-        <path d="M 215,-10 Q 215,115 240,250" fill="none" stroke="#DDE3EA" strokeWidth="15" strokeLinecap="round" />
-        <path d="M 320,-10 Q 300,115 285,250" fill="none" stroke="#DDE3EA" strokeWidth="15" strokeLinecap="round" />
+        {/* Road Casings (Warm soft border stroke) */}
+        <path d="M -10,65 Q 180,130 410,60" fill="none" stroke="#D5D1C6" strokeWidth="18" strokeLinecap="round" />
+        <path d="M -10,175 Q 190,180 410,180" fill="none" stroke="#D5D1C6" strokeWidth="18" strokeLinecap="round" />
+        <path d="M 100,-10 Q 90,110 70,250" fill="none" stroke="#D5D1C6" strokeWidth="15" strokeLinecap="round" />
+        <path d="M 215,-10 Q 215,115 240,250" fill="none" stroke="#D5D1C6" strokeWidth="15" strokeLinecap="round" />
+        <path d="M 320,-10 Q 300,115 285,250" fill="none" stroke="#D5D1C6" strokeWidth="15" strokeLinecap="round" />
 
         {/* Road Surfaces (Crisp Pure White) */}
         <path d="M -10,65 Q 180,130 410,60" fill="none" stroke="#FFFFFF" strokeWidth="15" strokeLinecap="round" />
@@ -188,20 +181,27 @@ const AttendanceMapFull = ({ data, language }) => {
         <path d="M 215,-10 Q 215,115 240,250" fill="none" stroke="#FFFFFF" strokeWidth="12" strokeLinecap="round" />
         <path d="M 320,-10 Q 300,115 285,250" fill="none" stroke="#FFFFFF" strokeWidth="12" strokeLinecap="round" />
 
-        {/* Secondary Connecting Lanes */}
+        {/* Secondary Inner Building Block White Lanes */}
         <path d="M 115,100 L 190,95 L 185,145 L 110,140 Z" fill="none" stroke="#FFFFFF" strokeWidth="5" />
         <path d="M 225,95 L 295,100 L 290,150 L 220,145 Z" fill="none" stroke="#FFFFFF" strokeWidth="5" />
 
-        {/* Street & Landmark Labels (Mapbox Typography Style) */}
+        {/* Street & Landmark Labels */}
         <text x="18" y="185" fontSize="7.5" fontWeight="600" fill="#64748B" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.2px">
-          Jl. Senopati
+          Jalan Senopati
         </text>
         <text x="295" y="85" fontSize="8" fontWeight="700" fill="#475569" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.2px">
           Senayan
         </text>
-        <text x="8" y="235" fontSize="7.5" fontWeight="600" fill="#64748B" fontFamily="system-ui, -apple-system, sans-serif">
-          Kebayoran Baru
+        <text x="6" y="235" fontSize="7.5" fontWeight="600" fill="#64748B" fontFamily="system-ui, -apple-system, sans-serif">
+          OK I
         </text>
+
+        {/* Yellow/Orange Restaurant POI (matching reference) */}
+        <g transform="translate(173, 230)">
+          <circle cx="0" cy="0" r="6" fill="#F59E0B" />
+          <path d="M -2.5,-3.5 L -2.5,0.5 L -1.5,0.5 L -1.5,3.5 L -0.5,3.5 L -0.5,0.5 L 0.5,0.5 L 0.5,-3.5 L -0.5,-3.5 L -0.5,-1.5 L -1.5,-1.5 L -1.5,-3.5 Z" fill="#FFFFFF" transform="scale(0.8) translate(0, -0.5)" />
+          <path d="M 1.5,-3.5 Q 3,-3.5 3,-1 Q 3,0.5 2,1 L 2,3.5 L 1,3.5 L 1,0.5 L 1.5,0.5 Z" fill="#FFFFFF" transform="scale(0.8) translate(0, -0.5)" />
+        </g>
 
         {/* 2. SECONDARY COLOR GEOFENCE RADIUS CIRCLE (#09B2FF) */}
         <circle
@@ -209,7 +209,7 @@ const AttendanceMapFull = ({ data, language }) => {
           cy="115"
           r="96"
           fill="#09B2FF"
-          fillOpacity="0.18"
+          fillOpacity="0.16"
           stroke="#09B2FF"
           strokeWidth="2.5"
         />
