@@ -5,6 +5,7 @@ import {
   Clock,
   CalendarBlank,
   Buildings,
+  User,
   CheckCircle,
   WarningCircle,
   Timer,
@@ -203,34 +204,24 @@ const AttendanceMapFull = ({ data, language }) => {
           strokeWidth="2.5"
         />
 
-        {/* 3. PRIMARY COLOR CENTER BUILDING BADGE (#053079) */}
-        <g transform="translate(195, 115)">
-          {/* Primary Color Circle */}
-          <circle cx="0" cy="0" r="19" fill="#053079" />
+        {/* 3. PRIMARY COLOR CENTER BUILDING BADGE (#053079) WITH PHOSPHOR BUILDINGS ICON */}
+        <foreignObject x={195 - 19} y={115 - 19} width={38} height={38}>
+          <div
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              backgroundColor: '#053079',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Buildings size={20} weight="fill" color="#FFFFFF" />
+          </div>
+        </foreignObject>
 
-          {/* White Building Graphic */}
-          <g transform="translate(-8, -8)">
-            {/* Center Main Building */}
-            <rect x="3" y="1" width="10" height="14" rx="0.5" fill="#FFFFFF" />
-            {/* Windows in main building */}
-            <rect x="4.5" y="3" width="2" height="2" rx="0.3" fill="#053079" />
-            <rect x="9.5" y="3" width="2" height="2" rx="0.3" fill="#053079" />
-            <rect x="4.5" y="6.5" width="2" height="2" rx="0.3" fill="#053079" />
-            <rect x="9.5" y="6.5" width="2" height="2" rx="0.3" fill="#053079" />
-            {/* Center door */}
-            <rect x="7" y="10" width="2" height="5" rx="0.3" fill="#053079" />
-
-            {/* Left side wing */}
-            <rect x="0" y="6" width="3" height="9" rx="0.3" fill="#FFFFFF" />
-            <rect x="0.8" y="7.5" width="1.4" height="1.5" rx="0.2" fill="#053079" />
-
-            {/* Right side wing */}
-            <rect x="13" y="6" width="3" height="9" rx="0.3" fill="#FFFFFF" />
-            <rect x="13.8" y="7.5" width="1.4" height="1.5" rx="0.2" fill="#053079" />
-          </g>
-        </g>
-
-        {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) */}
+        {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) WITH PHOSPHOR USER ICON */}
         <g transform="translate(145, 70)">
           {/* Teardrop Pin Shape (Green) */}
           <path
@@ -243,19 +234,23 @@ const AttendanceMapFull = ({ data, language }) => {
           {/* Inner Dark Green Circle */}
           <circle cx="0" cy="-28" r="12" fill="#16A34A" />
 
-          {/* White Person Avatar Icon inside Green Pin */}
-          <g transform="translate(0, -28)">
-            {/* Person Head */}
-            <circle cx="0" cy="-3.5" r="3" fill="#FFFFFF" />
-            {/* Person Body/Shoulders */}
-            <path
-              d="M -5.5,5.5 C -5.5,1.5 -2.5,0.5 0,0.5 C 2.5,0.5 5.5,1.5 5.5,5.5 Z"
-              fill="#FFFFFF"
-            />
-          </g>
+          {/* Phosphor User Icon inside Green Pin */}
+          <foreignObject x={-8} y={-36} width={16} height={16}>
+            <div
+              style={{
+                width: '16px',
+                height: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <User size={13} weight="bold" color="#FFFFFF" />
+            </div>
+          </foreignObject>
         </g>
 
-        {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) */}
+        {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) WITH PHOSPHOR USER ICON */}
         <g transform="translate(240, 155)">
           {/* Teardrop Pin Shape (Red) */}
           <path
@@ -268,16 +263,20 @@ const AttendanceMapFull = ({ data, language }) => {
           {/* Inner Dark Red Circle */}
           <circle cx="0" cy="-28" r="12" fill="#DC2626" />
 
-          {/* White Person Avatar Icon inside Red Pin */}
-          <g transform="translate(0, -28)">
-            {/* Person Head */}
-            <circle cx="0" cy="-3.5" r="3" fill="#FFFFFF" />
-            {/* Person Body/Shoulders */}
-            <path
-              d="M -5.5,5.5 C -5.5,1.5 -2.5,0.5 0,0.5 C 2.5,0.5 5.5,1.5 5.5,5.5 Z"
-              fill="#FFFFFF"
-            />
-          </g>
+          {/* Phosphor User Icon inside Red Pin */}
+          <foreignObject x={-8} y={-36} width={16} height={16}>
+            <div
+              style={{
+                width: '16px',
+                height: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <User size={13} weight="bold" color="#FFFFFF" />
+            </div>
+          </foreignObject>
         </g>
 
         {/* Off Day / Alpha note overlay if applicable */}
