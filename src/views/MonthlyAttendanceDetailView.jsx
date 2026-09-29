@@ -1809,7 +1809,7 @@ export const MonthlyAttendanceDetailView = ({
                 gap: '8px',
               }}
             >
-              <MagnifyingGlass size={18} color="#64748B" weight="bold" />
+              <MagnifyingGlass size={18} color="#64748B" weight="bold" style={{ flexShrink: 0 }} />
               <input
                 type="text"
                 value={employeeSearchQuery}
@@ -1818,6 +1818,11 @@ export const MonthlyAttendanceDetailView = ({
                 style={{
                   border: 'none',
                   outline: 'none',
+                  padding: 0,
+                  margin: 0,
+                  boxShadow: 'none',
+                  flex: 1,
+                  minWidth: 0,
                   width: '100%',
                   fontSize: '0.8125rem',
                   color: '#334155',
@@ -1836,6 +1841,7 @@ export const MonthlyAttendanceDetailView = ({
                     padding: 0,
                     display: 'flex',
                     alignItems: 'center',
+                    flexShrink: 0,
                   }}
                 >
                   <X size={16} weight="bold" />
