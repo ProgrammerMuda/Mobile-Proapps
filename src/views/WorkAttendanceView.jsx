@@ -727,13 +727,26 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
     );
   };
 
+  // Filter counts calculation
+  const totalHistoryCount = last7DaysHistory.length;
+  const historyOnTimeCount = last7DaysHistory.filter((i) => i.status === 'HADIR' || i.inStatus === 'ON_TIME' || i.inStatus === 'EARLY_IN').length;
+  const historyLateCount = last7DaysHistory.filter((i) => i.status === 'TERLAMBAT' || i.inStatus === 'LATE' || i.outStatus === 'EARLY_OUT').length;
+  const historyAlphaCount = last7DaysHistory.filter((i) => i.status === 'ALPHA').length;
+  const historyLeaveCount = last7DaysHistory.filter((i) => i.status === 'LIBUR' || i.status === 'LEAVE' || i.status === 'OFF').length;
+
   // Filter history
   const filteredHistory = last7DaysHistory.filter((item) => {
     if (historyFilter === 'ALL') return true;
-    if (historyFilter === 'HADIR') return item.status === 'HADIR';
-    if (historyFilter === 'TERLAMBAT') return item.status === 'TERLAMBAT';
+    if (historyFilter === 'ONTIME' || historyFilter === 'HADIR') {
+      return item.status === 'HADIR' || item.inStatus === 'ON_TIME' || item.inStatus === 'EARLY_IN';
+    }
+    if (historyFilter === 'LATE' || historyFilter === 'TERLAMBAT') {
+      return item.status === 'TERLAMBAT' || item.inStatus === 'LATE' || item.outStatus === 'EARLY_OUT';
+    }
     if (historyFilter === 'ALPHA') return item.status === 'ALPHA';
-    if (historyFilter === 'LIBUR') return item.status === 'LIBUR';
+    if (historyFilter === 'LEAVE' || historyFilter === 'LIBUR') {
+      return item.status === 'LIBUR' || item.status === 'LEAVE' || item.status === 'OFF';
+    }
     return true;
   });
 
@@ -1451,35 +1464,70 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
             </button>
           </div>
 
-          {/* Filter Pills */}
-          <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
+          {/* Filter Pills (Matching Monthly Attendance Record design) */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              overflowX: 'auto',
+              paddingBottom: '2px',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+          >
             {[
-              { id: 'ALL', label: language === 'id' ? 'Semua (7)' : 'All (7)' },
-              { id: 'HADIR', label: language === 'id' ? 'Hadir (4)' : 'Present (4)' },
-              { id: 'TERLAMBAT', label: language === 'id' ? 'Terlambat (1)' : 'Late (1)' },
-              { id: 'ALPHA', label: 'Alpha (1)' },
-              { id: 'LIBUR', label: language === 'id' ? 'Libur (1)' : 'Off (1)' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setHistoryFilter(tab.id)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: '9999px',
-                  fontSize: '0.6875rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  border: historyFilter === tab.id ? '1px solid #02388A' : '1px solid #E2E8F0',
-                  backgroundColor: historyFilter === tab.id ? '#02388A' : '#FFFFFF',
-                  color: historyFilter === tab.id ? '#FFFFFF' : '#475569',
-                  transition: 'all 0.15s ease',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: 'ALL', label: language === 'id' ? 'Semua' : 'All', count: totalHistoryCount },
+              { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time', count: historyOnTimeCount },
+              { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late', count: historyLateCount },
+              { id: 'LEAVE', label: language === 'id' ? 'Izin/Libur' : 'Leave/Off', count: historyLeaveCount },
+              { id: 'ALPHA', label: 'Alpha', count: historyAlphaCount },
+            ].map((tab) => {
+              const isActive =
+                historyFilter === tab.id ||
+                (historyFilter === 'HADIR' && tab.id === 'ONTIME') ||
+                (historyFilter === 'TERLAMBAT' && tab.id === 'LATE') ||
+                (historyFilter === 'LIBUR' && tab.id === 'LEAVE');
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setHistoryFilter(tab.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 12px',
+                    borderRadius: '9999px',
+                    border: isActive ? '1px solid #02388A' : '1px solid #E2E8F0',
+                    backgroundColor: isActive ? '#02388A' : '#FFFFFF',
+                    color: isActive ? '#FFFFFF' : '#475569',
+                    fontSize: '0.75rem',
+                    fontWeight: isActive ? 700 : 500,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease',
+                    outline: 'none',
+                  }}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    style={{
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : '#F1F5F9',
+                      color: isActive ? '#FFFFFF' : '#64748B',
+                      padding: '1px 6px',
+                      borderRadius: '9999px',
+                    }}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* History Cards List */}
