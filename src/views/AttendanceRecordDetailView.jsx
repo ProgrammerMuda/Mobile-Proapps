@@ -10,6 +10,8 @@ import {
   Buildings,
   BuildingApartment,
   User,
+  Camera,
+  QrCode,
   CheckCircle,
   WarningCircle,
   Timer,
@@ -623,8 +625,11 @@ export const AttendanceRecordDetailView = ({ data }) => {
   const earlyOutMinutes = data.earlyOutMinutes || (isEarlyOut ? 20 : 0);
 
   const scheduleText = data.shift || (language === 'id' ? 'Shift Pagi (08:00 - 17:00 WIB)' : 'Morning Shift (08:00 - 17:00 WIB)');
-  const siteName = data.siteName || 'Thamrin Executive Residences';
-  const attendanceMethod = data.attendanceMethod || (language === 'id' ? 'GPS & Verifikasi Wajah (Face Biometric)' : 'GPS & Face Biometric Verification');
+  const siteName = data.siteName || data.site || 'Thamrin Executive Residences';
+  
+  // Attendance Method: only Foto or Scan QR
+  const isQrMethod = data.attendanceMethod?.toLowerCase().includes('qr') || data.method?.toLowerCase().includes('qr');
+  const attendanceMethod = isQrMethod ? 'Scan QR' : 'Foto';
 
   const clockInLoc = data.clockInLocation || (language === 'id' ? 'Lobby Tower A (Radius 8m)' : 'Tower A Lobby (8m Radius)');
   const clockOutLoc = data.clockOutLocation || (language === 'id' ? 'West Security Gate (Radius 12m)' : 'West Security Gate (12m Radius)');
@@ -696,18 +701,18 @@ export const AttendanceRecordDetailView = ({ data }) => {
           }}
         >
           {/* Row 1: Schedule */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                backgroundColor: '#EFF6FF',
-                border: '1px solid #DBEAFE',
+                backgroundColor: '#F0F9FF',
+                border: '1px solid #BAE6FD',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#02388A',
+                color: '#0284C7',
                 flexShrink: 0,
               }}
             >
@@ -725,23 +730,27 @@ export const AttendanceRecordDetailView = ({ data }) => {
 
           <div style={{ height: '1px', backgroundColor: '#F1F5F9', width: '100%' }} />
 
-          {/* Row 2: Attendance Method */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+          {/* Row 2: Attendance Method (Hanya Foto / Scan QR) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                backgroundColor: '#EEF2FF',
-                border: '1px solid #E0E7FF',
+                backgroundColor: '#F0F9FF',
+                border: '1px solid #BAE6FD',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#4F46E5',
+                color: '#0284C7',
                 flexShrink: 0,
               }}
             >
-              <UserFocus size={20} weight="bold" />
+              {isQrMethod ? (
+                <QrCode size={20} weight="bold" />
+              ) : (
+                <Camera size={20} weight="fill" />
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
               <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
@@ -755,33 +764,30 @@ export const AttendanceRecordDetailView = ({ data }) => {
 
           <div style={{ height: '1px', backgroundColor: '#F1F5F9', width: '100%' }} />
 
-          {/* Row 3: Attendance Site */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+          {/* Row 3: Attendance Site (Hanya Nama Site, tanpa desc) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div
               style={{
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                backgroundColor: '#FFFBEB',
-                border: '1px solid #FEF3C7',
+                backgroundColor: '#F0F9FF',
+                border: '1px solid #BAE6FD',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#D97706',
+                color: '#0284C7',
                 flexShrink: 0,
               }}
             >
-              <Buildings size={20} weight="fill" />
+              <BuildingApartment size={20} weight="fill" />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
               <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                {language === 'id' ? 'Site / Lokasi Presensi' : 'Attendance Site'}
+                {language === 'id' ? 'Site Presensi' : 'Attendance Site'}
               </span>
               <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155' }}>
                 {siteName}
-              </span>
-              <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>
-                {data.location && data.location !== '-' ? data.location : 'Gedung Pengelola - Area Kerja'}
               </span>
             </div>
           </div>
