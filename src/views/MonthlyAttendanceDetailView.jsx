@@ -1853,13 +1853,13 @@ export const MonthlyAttendanceDetailView = ({
                       {renderDailyEmployeeBadges(emp)}
                     </div>
 
-                    {/* Middle: Employee Name & Role Only (No Department/Jabatan duplicate) */}
+                    {/* Middle: Employee Name & Role Only (No Jabatan) */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '-2px' }}>
                       <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
                         {emp.name}
                       </span>
                       <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>
-                        {emp.role}
+                        {emp.dept || emp.role}
                       </span>
                     </div>
 
