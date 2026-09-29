@@ -982,6 +982,9 @@ export const MonthlyAttendanceDetailView = ({
             fontWeight: 700,
             padding: '2px 8px',
             borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
           }}
         >
           {emp.status === 'OFF' || emp.status === 'LIBUR'
@@ -1000,6 +1003,9 @@ export const MonthlyAttendanceDetailView = ({
             fontWeight: 700,
             padding: '2px 8px',
             borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
           }}
         >
           Alpha
@@ -1016,6 +1022,9 @@ export const MonthlyAttendanceDetailView = ({
             fontWeight: 700,
             padding: '2px 8px',
             borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
           }}
         >
           {emp.lateMinutes
@@ -1037,6 +1046,9 @@ export const MonthlyAttendanceDetailView = ({
           fontWeight: 700,
           padding: '2px 8px',
           borderRadius: '9999px',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
+          display: 'inline-block',
         }}
       >
         {language === 'id' ? 'Tepat Waktu' : 'On Time'}
@@ -1833,34 +1845,22 @@ export const MonthlyAttendanceDetailView = ({
                       gap: '10px',
                     }}
                   >
-                    {/* Top: Name + Date badge & Status Badge */}
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                          <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
-                            {emp.name}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '0.6875rem',
-                              fontWeight: 700,
-                              color: '#02388A',
-                              backgroundColor: '#EFF6FF',
-                              padding: '1px 7px',
-                              borderRadius: '6px',
-                              border: '1px solid #DBEAFE',
-                            }}
-                          >
-                            {dateText}
-                          </span>
-                        </div>
-                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
-                          {emp.dept} • {emp.role}
-                        </span>
-                      </div>
-
-                      {/* Status Badge */}
+                    {/* Top Row: Date on Left, Status Badge on Right (Consistent with My Attendance, never drops down) */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                      <span style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#334155' }}>
+                        {dateText}
+                      </span>
                       {renderDailyEmployeeBadges(emp)}
+                    </div>
+
+                    {/* Middle: Employee Name & Role Only (No Department/Jabatan duplicate) */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '-2px' }}>
+                      <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                        {emp.name}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>
+                        {emp.role}
+                      </span>
                     </div>
 
                     {/* Clock In & Out Grid */}
