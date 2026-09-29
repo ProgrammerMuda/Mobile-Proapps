@@ -898,8 +898,8 @@ export const MonthlyAttendanceDetailView = ({
       return (
         <span
           style={{
-            backgroundColor: '#DCFCE7',
-            color: '#16A34A',
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
             fontSize: '0.6875rem',
             fontWeight: 700,
             padding: '2px 8px',
@@ -933,15 +933,17 @@ export const MonthlyAttendanceDetailView = ({
         <span
           key="in"
           style={{
-            backgroundColor: '#DCFCE7',
-            color: '#16A34A',
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
             fontSize: '0.6875rem',
             fontWeight: 700,
             padding: '2px 8px',
             borderRadius: '9999px',
           }}
         >
-          {language === 'id' ? 'Masuk Awal' : 'Early In'}
+          {inStatus === 'EARLY_IN'
+            ? (language === 'id' ? 'Masuk Awal' : 'Early In')
+            : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
         </span>
       );
     }
@@ -1040,8 +1042,8 @@ export const MonthlyAttendanceDetailView = ({
     return (
       <span
         style={{
-          backgroundColor: '#DCFCE7',
-          color: '#16A34A',
+          backgroundColor: '#16A34A',
+          color: '#FFFFFF',
           fontSize: '0.6875rem',
           fontWeight: 700,
           padding: '2px 8px',
@@ -1051,7 +1053,9 @@ export const MonthlyAttendanceDetailView = ({
           display: 'inline-block',
         }}
       >
-        {language === 'id' ? 'Tepat Waktu' : 'On Time'}
+        {emp.inStatus === 'EARLY_IN'
+          ? (language === 'id' ? 'Masuk Awal' : 'Early In')
+          : (language === 'id' ? 'Tepat Waktu' : 'On Time')}
       </span>
     );
   };

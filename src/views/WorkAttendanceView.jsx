@@ -634,8 +634,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           style={{
             fontSize: '0.6875rem',
             fontWeight: 700,
-            backgroundColor: '#DCFCE7',
-            color: '#16A34A',
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
             padding: '2px 8px',
             borderRadius: '9999px',
           }}
@@ -655,8 +655,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           style={{
             fontSize: '0.6875rem',
             fontWeight: 700,
-            backgroundColor: '#DCFCE7',
-            color: '#16A34A',
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
             padding: '2px 8px',
             borderRadius: '9999px',
           }}
@@ -687,8 +687,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           style={{
             fontSize: '0.6875rem',
             fontWeight: 700,
-            backgroundColor: '#DCFCE7',
-            color: '#16A34A',
+            backgroundColor: '#16A34A',
+            color: '#FFFFFF',
             padding: '2px 8px',
             borderRadius: '9999px',
           }}
