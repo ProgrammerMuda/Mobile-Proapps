@@ -103,8 +103,10 @@ const AttendanceMapFull = ({ data, language }) => {
 
   // Office Location coordinates: Senayan / Senopati, Jakarta Selatan, Indonesia
   const officeCoords = [-6.2275, 106.8058];
-  const checkInCoords = [-6.2269, 106.8051];
-  const checkOutCoords = [-6.2282, 106.8066];
+  // Check In (North-West, inside radius ~58m from center)
+  const checkInCoords = [-6.22715, 106.80540];
+  // Check Out (South-East, inside radius ~58m from center)
+  const checkOutCoords = [-6.22785, 106.80620];
 
   const isOff = data?.status === 'LIBUR' || data?.status === 'off' || data?.status === 'LEAVE' || data?.status === 'IZIN';
   const isAlpha = data?.status === 'ALPHA' || data?.status === 'alpha';
@@ -136,12 +138,12 @@ const AttendanceMapFull = ({ data, language }) => {
       attribution: '© OpenStreetMap contributors',
     }).addTo(map);
 
-    // 1. Geofence Radius Circle (Secondary Color #09B2FF)
+    // 1. Geofence Radius Circle (Secondary Color #09B2FF) - 140m radius
     L.circle(officeCoords, {
-      radius: 110,
+      radius: 140,
       color: '#09B2FF',
       fillColor: '#09B2FF',
-      fillOpacity: 0.16,
+      fillOpacity: 0.18,
       weight: 2.5,
     }).addTo(map);
 
@@ -172,18 +174,19 @@ const AttendanceMapFull = ({ data, language }) => {
       .addTo(map)
       .bindTooltip(language === 'id' ? 'Lokasi Kantor' : 'Office Site', { direction: 'top', offset: [0, -24] });
 
-    // 3. Green Person Pin for Check In (with subtle drop shadow)
+    // 3. Green Person Pin for Check In (Inside Radius, Solid Phosphor User Fill Icon)
     if (!isOff && !isAlpha) {
       const checkInIcon = L.divIcon({
         className: 'real-map-checkin-icon',
         html: `
-          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center;">
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center; position: relative;">
             <svg width="44" height="56" viewBox="0 0 44 56" fill="none">
               <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#DCFCE7" stroke="#22C55E" stroke-width="2"/>
               <circle cx="22" cy="22" r="14.5" fill="#16A34A"/>
-              <g transform="translate(13.5, 13.5)">
-                <svg width="17" height="17" viewBox="0 0 256 256" fill="#FFFFFF">
-                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212ZM72,96a56,56,0,1,1,56,56A56.1,56.1,0,0,1,72,96Z"/>
+              <g transform="translate(12, 12)">
+                <svg width="20" height="20" viewBox="0 0 256 256" fill="#FFFFFF">
+                  <circle cx="128" cy="96" r="56" fill="#FFFFFF"/>
+                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z" fill="#FFFFFF"/>
                 </svg>
               </g>
             </svg>
@@ -197,17 +200,18 @@ const AttendanceMapFull = ({ data, language }) => {
         .addTo(map)
         .bindTooltip(`${language === 'id' ? 'Masuk' : 'Clock In'}: ${data?.clockIn || '08:30'}`, { direction: 'top', offset: [0, -56] });
 
-      // 4. Red Person Pin for Check Out (with subtle drop shadow)
+      // 4. Red Person Pin for Check Out (Inside Radius, Solid Phosphor User Fill Icon)
       const checkOutIcon = L.divIcon({
         className: 'real-map-checkout-icon',
         html: `
-          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center;">
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center; position: relative;">
             <svg width="44" height="56" viewBox="0 0 44 56" fill="none">
               <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
               <circle cx="22" cy="22" r="14.5" fill="#DC2626"/>
-              <g transform="translate(13.5, 13.5)">
-                <svg width="17" height="17" viewBox="0 0 256 256" fill="#FFFFFF">
-                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212ZM72,96a56,56,0,1,1,56,56A56.1,56.1,0,0,1,72,96Z"/>
+              <g transform="translate(12, 12)">
+                <svg width="20" height="20" viewBox="0 0 256 256" fill="#FFFFFF">
+                  <circle cx="128" cy="96" r="56" fill="#FFFFFF"/>
+                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z" fill="#FFFFFF"/>
                 </svg>
               </g>
             </svg>
