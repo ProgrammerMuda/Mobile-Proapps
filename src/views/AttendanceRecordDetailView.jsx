@@ -122,6 +122,11 @@ const AttendanceMapFull = ({ data, language }) => {
       mapInstanceRef.current = null;
     }
 
+    // Clean up any stale leaflet ID on the DOM container (prevents HMR reload requirement)
+    if (mapContainerRef.current._leaflet_id) {
+      delete mapContainerRef.current._leaflet_id;
+    }
+
     // Initialize real Leaflet map
     const map = L.map(mapContainerRef.current, {
       center: officeCoords,
@@ -133,6 +138,10 @@ const AttendanceMapFull = ({ data, language }) => {
     });
 
     mapInstanceRef.current = map;
+
+    const resizeTimer = setTimeout(() => {
+      if (map) map.invalidateSize();
+    }, 60);
 
     // Add 100% Free OpenStreetMap real tiles (No API Key Required)
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -329,8 +338,14 @@ const AttendanceMapFull = ({ data, language }) => {
     });
 
     return () => {
-      map.remove();
-      mapInstanceRef.current = null;
+      clearTimeout(resizeTimer);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+      if (mapContainerRef.current && mapContainerRef.current._leaflet_id) {
+        delete mapContainerRef.current._leaflet_id;
+      }
     };
   }, [language, data]);
 
