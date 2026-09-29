@@ -101,6 +101,9 @@ const DAY_NAMES_ID = [
   'Sabtu',
 ];
 
+const DAY_SHORT_ID = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+const DAY_SHORT_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 // Mock monthly attendance log generator
 const generateMonthlyLogs = (year, monthIndex) => {
   // Generate mock logs for 24 work days
@@ -285,17 +288,112 @@ const DEPARTMENTS_DATA = [
   },
 ];
 
-// Mock Real-time Employees Attendance for BM
-const MOCK_EMPLOYEES_LIST = [
-  { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:02 WIB', duration: '9h 07m', status: 'ONTIME', avatarBg: '#2563EB', initials: 'BS' },
-  { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', status: 'ONTIME', avatarBg: '#059669', initials: 'SR' },
-  { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:18 WIB', clockOut: '20:05 WIB', duration: '11h 47m', lateMinutes: 18, status: 'LATE', avatarBg: '#D97706', initials: 'AS' },
-  { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE', avatarBg: '#0891B2', initials: 'DL' },
-  { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', status: 'ONTIME', avatarBg: '#4F46E5', initials: 'RH' },
-  { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA', avatarBg: '#DC2626', initials: 'SW' },
-  { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME', avatarBg: '#0D9488', initials: 'HG' },
-  { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:42 WIB', clockOut: '17:32 WIB', duration: '8h 50m', lateMinutes: 12, status: 'LATE', avatarBg: '#E11D48', initials: 'FH' },
-];
+// Helper to generate realistic employee attendance status for any selected day
+const getEmployeesAttendanceForDay = (year, monthIndex, day) => {
+  if (day === 24) {
+    return [
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:02 WIB', duration: '9h 07m', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:18 WIB', clockOut: '20:05 WIB', duration: '11h 47m', lateMinutes: 18, status: 'LATE' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:42 WIB', clockOut: '17:32 WIB', duration: '8h 50m', lateMinutes: 12, status: 'LATE' },
+    ];
+  }
+
+  if (day === 21) {
+    return [
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:48 WIB', clockOut: '16:45 WIB', duration: '8h 57m', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:48 WIB', clockOut: '16:02 WIB', duration: '9h 14m', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:52 WIB', clockOut: '17:00 WIB', duration: '9h 08m', status: 'ONTIME' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'OFF' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:55 WIB', clockOut: '16:00 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+    ];
+  }
+
+  if (day === 18) {
+    return [
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:50 WIB', clockOut: '17:02 WIB', duration: '9h 12m', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:55 WIB', clockOut: '16:00 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '08:15 WIB', clockOut: '17:00 WIB', duration: '8h 45m', lateMinutes: 15, status: 'LATE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:10 WIB', duration: '12h 20m', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'OFF' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:22 WIB', clockOut: '17:30 WIB', duration: '9h 08m', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+    ];
+  }
+
+  if (day === 17) {
+    return [
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:50 WIB', clockOut: '17:00 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '08:15 WIB', clockOut: '20:00 WIB', duration: '11h 45m', lateMinutes: 15, status: 'LATE' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
+    ];
+  }
+
+  if (day === 14) {
+    return [
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '08:14 WIB', clockOut: '17:05 WIB', duration: '8h 51m', lateMinutes: 14, status: 'LATE' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:55 WIB', clockOut: '20:00 WIB', duration: '12h 05m', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:52 WIB', clockOut: '16:00 WIB', duration: '9h 08m', status: 'ONTIME' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+    ];
+  }
+
+  if (day === 8) {
+    return [
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:58 WIB', clockOut: '17:00 WIB', duration: '9h 02m', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Libur Reguler', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'OFF' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'LEAVE' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+    ];
+  }
+
+  if (day === 3) {
+    return [
+      { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:50 WIB', clockOut: '20:00 WIB', duration: '12h 10m', status: 'ONTIME' },
+      { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
+      { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:00 WIB', duration: '12h 15m', status: 'ONTIME' },
+      { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '-- : --', clockOut: '-- : --', duration: '0h 0m', status: 'ALPHA' },
+      { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:20 WIB', clockOut: '17:30 WIB', duration: '9h 10m', status: 'ONTIME' },
+      { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:30 WIB', duration: '9h 05m', status: 'ONTIME' },
+    ];
+  }
+
+  // General weekdays
+  const isAltLate = day % 3 === 0;
+  return [
+    { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:02 WIB', duration: '9h 07m', status: 'ONTIME' },
+    { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:05 WIB', duration: '9h 15m', status: 'ONTIME' },
+    { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: isAltLate ? '08:18 WIB' : '07:50 WIB', clockOut: '20:05 WIB', duration: isAltLate ? '11h 47m' : '12h 15m', lateMinutes: isAltLate ? 18 : 0, status: isAltLate ? 'LATE' : 'ONTIME' },
+    { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', shift: 'Shift Pagi (08:00 - 17:00)', clockIn: '07:55 WIB', clockOut: '17:00 WIB', duration: '9h 05m', status: 'ONTIME' },
+    { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', shift: 'Shift Pagi (08:00 - 20:00)', clockIn: '07:45 WIB', clockOut: '20:10 WIB', duration: '12h 25m', status: 'ONTIME' },
+    { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', shift: 'Shift Pagi (07:00 - 16:00)', clockIn: '06:50 WIB', clockOut: '16:00 WIB', duration: '9h 10m', status: 'ONTIME' },
+    { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: '08:25 WIB', clockOut: '17:35 WIB', duration: '9h 10m', status: 'ONTIME' },
+    { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', shift: 'Shift Pagi (08:30 - 17:30)', clockIn: isAltLate ? '08:42 WIB' : '08:25 WIB', clockOut: '17:32 WIB', duration: isAltLate ? '8h 50m' : '9h 07m', lateMinutes: isAltLate ? 12 : 0, status: isAltLate ? 'LATE' : 'ONTIME' },
+  ];
+};
 
 /**
  * Mini Department Donut Chart Component
@@ -566,10 +664,28 @@ export const MonthlyAttendanceDetailView = ({
   // For BM: Tab switcher between 'MY_ATTENDANCE' and 'EMPLOYEES'
   const [activeMainTab, setActiveMainTab] = useState('MY_ATTENDANCE');
 
-  // Employee tab filters (BM)
+  // Employee tab date & filters (BM)
+  const [employeeSelectedDay, setEmployeeSelectedDay] = useState(24);
   const [employeeDeptFilter, setEmployeeDeptFilter] = useState('ALL');
   const [employeeStatusFilter, setEmployeeStatusFilter] = useState('ALL');
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
+
+  // Days in month calculation for BM All Employee view
+  const daysInSelectedMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
+  const safeDay = Math.min(Math.max(1, employeeSelectedDay), daysInSelectedMonth);
+  const currentEmployeeDayObj = new Date(selectedYear, selectedMonth, safeDay);
+  const selectedDayName = language === 'id' ? DAY_NAMES_ID[currentEmployeeDayObj.getDay()] : DAY_NAMES[currentEmployeeDayObj.getDay()];
+  const selectedDayMonthName = language === 'id' ? MONTH_NAMES_ID[selectedMonth] : MONTH_NAMES[selectedMonth];
+  const selectedDayFullText = `${selectedDayName}, ${safeDay} ${selectedDayMonthName} ${selectedYear}`;
+
+  // Daily employee attendance dataset for the chosen day
+  const dailyEmployeesList = getEmployeesAttendanceForDay(selectedYear, selectedMonth, safeDay);
+
+  const dailyOntimeCount = dailyEmployeesList.filter((e) => e.status === 'ONTIME').length;
+  const dailyLateCount = dailyEmployeesList.filter((e) => e.status === 'LATE').length;
+  const dailyLeaveCount = dailyEmployeesList.filter((e) => e.status === 'LEAVE' || e.status === 'OFF').length;
+  const dailyAlphaCount = dailyEmployeesList.filter((e) => e.status === 'ALPHA').length;
+  const dailyPresentCount = dailyOntimeCount + dailyLateCount;
 
   // Personal Attendance filters
   const [activeFilter, setActiveFilter] = useState('ALL');
@@ -595,13 +711,16 @@ export const MonthlyAttendanceDetailView = ({
     return true;
   });
 
-  // Filtered employees for BM tab
-  const filteredEmployees = MOCK_EMPLOYEES_LIST.filter((emp) => {
+  // Filtered employees for BM tab on that day
+  const filteredEmployees = dailyEmployeesList.filter((emp) => {
     if (employeeDeptFilter !== 'ALL' && emp.dept.toLowerCase() !== employeeDeptFilter.toLowerCase()) {
       return false;
     }
-    if (employeeStatusFilter !== 'ALL' && emp.status !== employeeStatusFilter) {
-      return false;
+    if (employeeStatusFilter !== 'ALL') {
+      if (employeeStatusFilter === 'ONTIME' && emp.status !== 'ONTIME') return false;
+      if (employeeStatusFilter === 'LATE' && emp.status !== 'LATE') return false;
+      if (employeeStatusFilter === 'LEAVE' && (emp.status !== 'LEAVE' && emp.status !== 'OFF')) return false;
+      if (employeeStatusFilter === 'ALPHA' && emp.status !== 'ALPHA') return false;
     }
     if (employeeSearchQuery.trim()) {
       const q = employeeSearchQuery.toLowerCase();
@@ -1331,6 +1450,118 @@ export const MonthlyAttendanceDetailView = ({
       ========================================================================= */}
   {isBM && activeMainTab === 'EMPLOYEES' && (
     <>
+      {/* 0. Day Selector Strip / Navigator for Daily Roster Filter */}
+      <div
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderRadius: '16px',
+          border: '1px solid #E2E8F0',
+          padding: '12px 14px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
+      >
+        {/* Day Header with Prev / Next Day Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <button
+            type="button"
+            onClick={() => setEmployeeSelectedDay((prev) => Math.max(1, prev - 1))}
+            disabled={safeDay <= 1}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              color: safeDay <= 1 ? '#CBD5E1' : '#334155',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: safeDay <= 1 ? 'not-allowed' : 'pointer',
+              padding: 0,
+            }}
+          >
+            <CaretLeft size={16} weight="bold" />
+          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <CalendarBlank size={16} weight="bold" color="#02388A" />
+            <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
+              {selectedDayFullText}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setEmployeeSelectedDay((prev) => Math.min(daysInSelectedMonth, prev + 1))}
+            disabled={safeDay >= daysInSelectedMonth}
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: '#F8FAFC',
+              border: '1px solid #E2E8F0',
+              color: safeDay >= daysInSelectedMonth ? '#CBD5E1' : '#334155',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: safeDay >= daysInSelectedMonth ? 'not-allowed' : 'pointer',
+              padding: 0,
+            }}
+          >
+            <CaretRight size={16} weight="bold" />
+          </button>
+        </div>
+
+        {/* Horizontal Scrollable Day Strip */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '6px',
+            overflowX: 'auto',
+            paddingBottom: '2px',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
+          {Array.from({ length: daysInSelectedMonth }, (_, i) => i + 1).map((d) => {
+            const dObj = new Date(selectedYear, selectedMonth, d);
+            const dayName = language === 'id' ? DAY_SHORT_ID[dObj.getDay()] : DAY_SHORT_EN[dObj.getDay()];
+            const isSelected = safeDay === d;
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setEmployeeSelectedDay(d)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minWidth: '40px',
+                  padding: '6px 4px',
+                  borderRadius: '10px',
+                  border: isSelected ? '1.5px solid #02388A' : '1px solid #E2E8F0',
+                  backgroundColor: isSelected ? '#02388A' : '#F8FAFC',
+                  color: isSelected ? '#FFFFFF' : '#475569',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <span style={{ fontSize: '0.625rem', fontWeight: 600, opacity: isSelected ? 0.9 : 0.7 }}>
+                  {dayName}
+                </span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 800 }}>
+                  {d}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 1. Overall Employees KPI Summary Card */}
       <div
         style={{
@@ -1362,7 +1593,7 @@ export const MonthlyAttendanceDetailView = ({
               flexShrink: 0,
             }}
           >
-            218 {language === 'id' ? 'Karyawan' : 'Employees'}
+            {dailyEmployeesList.length} {language === 'id' ? 'Karyawan' : 'Employees'}
           </div>
         </div>
 
@@ -1387,7 +1618,7 @@ export const MonthlyAttendanceDetailView = ({
               gap: '2px',
             }}
           >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>101</span>
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>{dailyPresentCount}</span>
             <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{language === 'id' ? 'Hadir' : 'Present'}</span>
           </div>
 
@@ -1404,7 +1635,7 @@ export const MonthlyAttendanceDetailView = ({
               gap: '2px',
             }}
           >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>17</span>
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>{dailyLateCount}</span>
             <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{language === 'id' ? 'Terlambat' : 'Late'}</span>
           </div>
 
@@ -1421,8 +1652,8 @@ export const MonthlyAttendanceDetailView = ({
               gap: '2px',
             }}
           >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>44</span>
-            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>{dailyLeaveCount}</span>
+            <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin/Libur' : 'Leave/Off'}</span>
           </div>
 
           <div
@@ -1438,7 +1669,7 @@ export const MonthlyAttendanceDetailView = ({
               gap: '2px',
             }}
           >
-            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>56</span>
+            <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>{dailyAlphaCount}</span>
             <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>Alpha</span>
           </div>
         </div>
@@ -1597,11 +1828,11 @@ export const MonthlyAttendanceDetailView = ({
         {/* Status Filter Tabs */}
         <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '2px' }}>
           {[
-            { id: 'ALL', label: language === 'id' ? 'Semua Status' : 'All Status' },
-            { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time' },
-            { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late' },
-            { id: 'LEAVE', label: language === 'id' ? 'Izin' : 'Leave' },
-            { id: 'ALPHA', label: 'Alpha' },
+            { id: 'ALL', label: language === 'id' ? `Semua (${dailyEmployeesList.length})` : `All (${dailyEmployeesList.length})` },
+            { id: 'ONTIME', label: language === 'id' ? `Tepat (${dailyOntimeCount})` : `On Time (${dailyOntimeCount})` },
+            { id: 'LATE', label: language === 'id' ? `Terlambat (${dailyLateCount})` : `Late (${dailyLateCount})` },
+            { id: 'LEAVE', label: language === 'id' ? `Izin/Libur (${dailyLeaveCount})` : `Leave/Off (${dailyLeaveCount})` },
+            { id: 'ALPHA', label: `Alpha (${dailyAlphaCount})` },
           ].map((tab) => {
             const isActive = employeeStatusFilter === tab.id;
             return (
