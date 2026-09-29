@@ -205,7 +205,7 @@ const AttendanceMapFull = ({ data, language }) => {
     L.marker(officeCoords, { icon: buildingIcon, zIndexOffset: 100 })
       .addTo(map)
       .bindPopup(officePopupHtml, {
-        offset: [0, -24],
+        offset: [0, -18],
         closeButton: false,
         className: 'custom-map-popup',
       });
@@ -264,7 +264,7 @@ const AttendanceMapFull = ({ data, language }) => {
       L.marker(checkInCoords, { icon: checkInIcon, zIndexOffset: 200 })
         .addTo(map)
         .bindPopup(checkInPopupHtml, {
-          offset: [0, -56],
+          offset: [0, -44],
           closeButton: false,
           className: 'custom-map-popup',
         });
@@ -317,7 +317,7 @@ const AttendanceMapFull = ({ data, language }) => {
       L.marker(checkOutCoords, { icon: checkOutIcon, zIndexOffset: 200 })
         .addTo(map)
         .bindPopup(checkOutPopupHtml, {
-          offset: [0, -56],
+          offset: [0, -44],
           closeButton: false,
           className: 'custom-map-popup',
         });
