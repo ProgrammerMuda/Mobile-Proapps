@@ -5552,7 +5552,7 @@ const HousekeepingOverviewContent = ({ t, onNavigateDetails }) => {
  * 4. Utility Recording (Water meter & Electric meter + Month Picker Filter)
  */
 export const OverviewReportView = ({ user, onNavigateDetails }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const isTenant = user?.roleCode === 'TENANT';
   const isEngineering = user?.roleCode === 'ENG';
   const isHousekeeping = user?.roleCode === 'HK';
@@ -6836,6 +6836,232 @@ export const OverviewReportView = ({ user, onNavigateDetails }) => {
               >
                 Rp 1,3 M
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================================================
+          SECTION: My Attendance (Absensi Saya) - Khusus BM
+          ========================================================================= */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {/* Section Header OUTSIDE Card */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2
+            style={{
+              fontSize: '1.0625rem',
+              fontWeight: 700,
+              color: '#334155',
+              margin: 0,
+              letterSpacing: '-0.2px',
+            }}
+          >
+            {language === 'id' ? 'Absensi Saya' : 'My Attendance'}
+          </h2>
+
+          <button
+            type="button"
+            onClick={() => handleViewDetails('My attendance')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#02388A',
+              fontSize: '0.8125rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px',
+              cursor: 'pointer',
+              padding: 0,
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            <span>{t('overview.viewDetails')}</span>
+            <CaretRight size={14} weight="bold" />
+          </button>
+        </div>
+
+        {/* Card Body */}
+        <div
+          style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '16px',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+            boxShadow: 'none',
+            border: '1px solid #E2E8F0',
+          }}
+        >
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 600 }}>
+            {language === 'id' ? 'Bulan Ini (September 2026)' : 'This Month (September 2026)'}
+          </div>
+
+          {/* Hero Fill Attendance Rate Banner */}
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #02388A 0%, #0052CC 60%, #0284C7 100%)',
+              borderRadius: '14px',
+              padding: '13px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Subtle background glow effect */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '90px',
+                height: '90px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(2, 56, 138, 0) 70%)',
+                pointerEvents: 'none',
+              }}
+            />
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CalendarBlank size={18} weight="fill" color="#38BDF8" />
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.1px' }}>
+                  {t('overview.eng.attendancePct')}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: '#FFFFFF',
+                    fontSize: '0.6875rem',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '9999px',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  23/24 {language === 'id' ? 'Hari' : 'Days'}
+                </span>
+                <span
+                  style={{
+                    fontSize: '1.25rem',
+                    fontWeight: 900,
+                    color: '#FFFFFF',
+                    lineHeight: 1,
+                    letterSpacing: '-0.5px',
+                  }}
+                >
+                  96%
+                </span>
+              </div>
+            </div>
+
+            {/* Glowing White Progress Bar on Semi-transparent Track */}
+            <div
+              style={{
+                width: '100%',
+                height: '8px',
+                backgroundColor: 'rgba(255, 255, 255, 0.22)',
+                borderRadius: '9999px',
+                overflow: 'hidden',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              <div
+                style={{
+                  width: '96%',
+                  height: '100%',
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '9999px',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* 4 Day Count KPI Metrics Micro-Cards */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '8px',
+            }}
+          >
+            {/* On Time */}
+            <div
+              style={{
+                backgroundColor: '#F0FDF4',
+                border: '1px solid #DCFCE7',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#16A34A', lineHeight: 1.1 }}>22</span>
+              <span style={{ fontSize: '0.6875rem', color: '#15803D', fontWeight: 600 }}>{t('overview.eng.onTime')}</span>
+            </div>
+
+            {/* Late */}
+            <div
+              style={{
+                backgroundColor: '#FFFBEB',
+                border: '1px solid #FEF3C7',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#D97706', lineHeight: 1.1 }}>1</span>
+              <span style={{ fontSize: '0.6875rem', color: '#B45309', fontWeight: 600 }}>{t('overview.eng.late')}</span>
+            </div>
+
+            {/* Leave */}
+            <div
+              style={{
+                backgroundColor: '#F8FAFC',
+                border: '1px solid #E2E8F0',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#475569', lineHeight: 1.1 }}>1</span>
+              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>{t('overview.eng.leaveDays')}</span>
+            </div>
+
+            {/* Alpha */}
+            <div
+              style={{
+                backgroundColor: '#FEF2F2',
+                border: '1px solid #FEE2E2',
+                borderRadius: '12px',
+                padding: '10px 4px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '2px',
+              }}
+            >
+              <span style={{ fontSize: '1.1875rem', fontWeight: 800, color: '#DC2626', lineHeight: 1.1 }}>0</span>
+              <span style={{ fontSize: '0.6875rem', color: '#991B1B', fontWeight: 600 }}>{t('overview.eng.alpha')}</span>
             </div>
           </div>
         </div>

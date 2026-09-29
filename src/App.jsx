@@ -439,7 +439,7 @@ function App() {
               setMonthlyAttendancePreviousScreen('overview');
               setMonthlyAttendanceMainTab('EMPLOYEES');
               setCurrentScreen('monthly-attendance');
-            } else if (secLower === 'monthly attendance') {
+            } else if (secLower === 'monthly attendance' || secLower === 'my attendance' || secLower === 'absensi saya') {
               setMonthlyAttendancePreviousScreen('overview');
               setMonthlyAttendanceMainTab('MY_ATTENDANCE');
               setCurrentScreen('monthly-attendance');
