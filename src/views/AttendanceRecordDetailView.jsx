@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -7,6 +8,7 @@ import {
   Clock,
   CalendarBlank,
   Buildings,
+  BuildingApartment,
   User,
   CheckCircle,
   WarningCircle,
@@ -92,9 +94,9 @@ export const AttendanceRecordDetailHeader = ({ onBack, data }) => {
  * Features:
  * - Real live Map Tiles of Indonesia (CartoDB / OpenStreetMap)
  * - Interactive Pan, Zoom In & Zoom Out (+ / − controls, touch pinch, mouse scroll)
- * - Primary color (#053079) center building badge with Phosphor Buildings icon
- * - Secondary color (#09B2FF) geofence radius circle
- * - Green person pin for Check In & Red person pin for Check Out with subtle drop shadow
+ * - Primary color (#053079) center building badge with Phosphor BuildingApartment fill icon
+ * - Secondary color (#09B2FF) geofence radius circle (140m)
+ * - Green person pin for Check In & Red person pin for Check Out with Phosphor User fill icon
  */
 const AttendanceMapFull = ({ data, language }) => {
   const mapContainerRef = useRef(null);
@@ -147,7 +149,11 @@ const AttendanceMapFull = ({ data, language }) => {
       weight: 2.5,
     }).addTo(map);
 
-    // 2. Primary Color Center Building Badge (#053079) with Phosphor Buildings Icon
+    // 2. Primary Color Center Building Badge (#053079) with exact Phosphor BuildingApartment Fill Icon
+    const buildingSvgString = renderToStaticMarkup(
+      <BuildingApartment size={26} weight="fill" color="#FFFFFF" />
+    );
+
     const buildingIcon = L.divIcon({
       className: 'real-map-building-icon',
       html: `
@@ -160,10 +166,9 @@ const AttendanceMapFull = ({ data, language }) => {
           align-items: center;
           justify-content: center;
           box-sizing: border-box;
+          outline: none;
         ">
-          <svg width="24" height="24" viewBox="0 0 256 256" fill="#FFFFFF">
-            <path d="M240,208H224V96a16,16,0,0,0-16-16H160V40a16,16,0,0,0-16-16H48A16,16,0,0,0,32,40V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM48,40h96V208H48ZM208,96V208H160V96ZM88,80a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,80Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,112Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,144Zm0,32a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H96A8,8,0,0,1,88,176Zm96-64a8,8,0,0,1,8-8h8a8,8,0,0,1,0,16h-8A8,8,0,0,1,184,112Zm0,32a8,8,0,0,1,8-8h8a8,8,0,0,1,0,16h-8A8,8,0,0,1,184,144Zm0,32a8,8,0,0,1,8-8h8a8,8,0,0,1,0,16h-8A8,8,0,0,1,184,176Z"/>
-          </svg>
+          ${buildingSvgString}
         </div>
       `,
       iconSize: [44, 44],
@@ -174,22 +179,24 @@ const AttendanceMapFull = ({ data, language }) => {
       .addTo(map)
       .bindTooltip(language === 'id' ? 'Lokasi Kantor' : 'Office Site', { direction: 'top', offset: [0, -24] });
 
+    // Render exact Phosphor User Fill Icon for Check In and Check Out pins
+    const userFillSvgString = renderToStaticMarkup(
+      <User size={20} weight="fill" color="#FFFFFF" />
+    );
+
     // 3. Green Person Pin for Check In (Inside Radius, Solid Phosphor User Fill Icon)
     if (!isOff && !isAlpha) {
       const checkInIcon = L.divIcon({
         className: 'real-map-checkin-icon',
         html: `
-          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center; position: relative;">
-            <svg width="44" height="56" viewBox="0 0 44 56" fill="none">
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative;">
+            <svg width="44" height="56" viewBox="0 0 44 56" fill="none" style="display: block;">
               <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#DCFCE7" stroke="#22C55E" stroke-width="2"/>
-              <circle cx="22" cy="22" r="14.5" fill="#16A34A"/>
-              <g transform="translate(12, 12)">
-                <svg width="20" height="20" viewBox="0 0 256 256" fill="#FFFFFF">
-                  <circle cx="128" cy="96" r="56" fill="#FFFFFF"/>
-                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z" fill="#FFFFFF"/>
-                </svg>
-              </g>
+              <circle cx="22" cy="22" r="15" fill="#16A34A"/>
             </svg>
+            <div style="position: absolute; top: 0; left: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+              ${userFillSvgString}
+            </div>
           </div>
         `,
         iconSize: [44, 56],
@@ -204,17 +211,14 @@ const AttendanceMapFull = ({ data, language }) => {
       const checkOutIcon = L.divIcon({
         className: 'real-map-checkout-icon',
         html: `
-          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; display: flex; align-items: center; justify-content: center; position: relative;">
-            <svg width="44" height="56" viewBox="0 0 44 56" fill="none">
+          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative;">
+            <svg width="44" height="56" viewBox="0 0 44 56" fill="none" style="display: block;">
               <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
-              <circle cx="22" cy="22" r="14.5" fill="#DC2626"/>
-              <g transform="translate(12, 12)">
-                <svg width="20" height="20" viewBox="0 0 256 256" fill="#FFFFFF">
-                  <circle cx="128" cy="96" r="56" fill="#FFFFFF"/>
-                  <path d="M231.9,212a120.7,120.7,0,0,0-67.1-54.2,72,72,0,1,0-73.6,0A120.7,120.7,0,0,0,24.1,212a8,8,0,1,0,13.8,8A104.1,104.1,0,0,1,128,136a104.1,104.1,0,0,1,90.1,84,8,8,0,0,0,7.8,6.7,8.6,8.6,0,0,0,6-.8A8,8,0,0,0,231.9,212Z" fill="#FFFFFF"/>
-                </svg>
-              </g>
+              <circle cx="22" cy="22" r="15" fill="#DC2626"/>
             </svg>
+            <div style="position: absolute; top: 0; left: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+              ${userFillSvgString}
+            </div>
           </div>
         `,
         iconSize: [44, 56],
