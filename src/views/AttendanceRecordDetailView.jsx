@@ -106,7 +106,6 @@ const AttendanceMapFull = ({ data, language }) => {
         border: '1px solid #E2E8F0',
         position: 'relative',
         overflow: 'hidden',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
       }}
     >
       {/* SVG Map Canvas with authentic Warm Mapbox Streets palette */}
@@ -118,16 +117,6 @@ const AttendanceMapFull = ({ data, language }) => {
           display: 'block',
         }}
       >
-        <defs>
-          {/* Shadow for map pins */}
-          <filter id="mapboxPinShadow" x="-40%" y="-30%" width="180%" height="180%">
-            <feDropShadow dx="1" dy="3.5" stdDeviation="2.5" floodColor="#0F172A" floodOpacity="0.28" />
-          </filter>
-          <filter id="mapboxBadgeShadow" x="-40%" y="-30%" width="180%" height="180%">
-            <feDropShadow dx="0" dy="2.5" stdDeviation="3.5" floodColor="#053079" floodOpacity="0.35" />
-          </filter>
-        </defs>
-
         {/* 1. Base Map Warm Stone/Beige Canvas */}
         <rect width="400" height="240" fill="#E8E5DF" />
 
@@ -215,7 +204,7 @@ const AttendanceMapFull = ({ data, language }) => {
         />
 
         {/* 3. PRIMARY COLOR CENTER BUILDING BADGE (#053079) */}
-        <g transform="translate(195, 115)" filter="url(#mapboxBadgeShadow)">
+        <g transform="translate(195, 115)">
           {/* Primary Color Circle */}
           <circle cx="0" cy="0" r="19" fill="#053079" />
 
@@ -242,7 +231,7 @@ const AttendanceMapFull = ({ data, language }) => {
         </g>
 
         {/* 4. PIN HIJAU UNTUK CHECK IN (Top-Left: 145, 70) */}
-        <g transform="translate(145, 70)" filter="url(#mapboxPinShadow)">
+        <g transform="translate(145, 70)">
           {/* Teardrop Pin Shape (Green) */}
           <path
             d="M 0,0 C -9,-9 -18,-18 -18,-29 C -18,-39 -10,-47 0,-47 C 10,-47 18,-39 18,-29 C 18,-18 9,-9 0,0 Z"
@@ -267,7 +256,7 @@ const AttendanceMapFull = ({ data, language }) => {
         </g>
 
         {/* 5. PIN MERAH UNTUK CHECK OUT (Bottom-Right: 240, 155) */}
-        <g transform="translate(240, 155)" filter="url(#mapboxPinShadow)">
+        <g transform="translate(240, 155)">
           {/* Teardrop Pin Shape (Red) */}
           <path
             d="M 0,0 C -9,-9 -18,-18 -18,-29 C -18,-39 -10,-47 0,-47 C 10,-47 18,-39 18,-29 C 18,-18 9,-9 0,0 Z"
@@ -294,7 +283,7 @@ const AttendanceMapFull = ({ data, language }) => {
         {/* Off Day / Alpha note overlay if applicable */}
         {(isOff || isAlpha) && (
           <g transform="translate(195, 115)">
-            <rect x="-85" y="-18" width="170" height="36" rx="12" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.5" filter="url(#mapboxBadgeShadow)" />
+            <rect x="-85" y="-18" width="170" height="36" rx="12" fill="#FFFFFF" stroke="#CBD5E1" strokeWidth="1.5" />
             <text x="0" y="4" fontSize="8.5" fontWeight="800" fill={isAlpha ? '#DC2626' : '#64748B'} textAnchor="middle" fontFamily="sans-serif">
               {isAlpha
                 ? (language === 'id' ? '⚠️ Tanpa Catatan Presensi' : '⚠️ No Attendance Recorded')
@@ -314,7 +303,6 @@ const AttendanceMapFull = ({ data, language }) => {
           flexDirection: 'column',
           backgroundColor: '#FFFFFF',
           borderRadius: '8px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.12)',
           border: '1px solid #E2E8F0',
           overflow: 'hidden',
           zIndex: 10,
@@ -381,7 +369,6 @@ const AttendanceMapFull = ({ data, language }) => {
           color: '#1E293B',
           letterSpacing: '-0.2px',
           zIndex: 10,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
         }}
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
