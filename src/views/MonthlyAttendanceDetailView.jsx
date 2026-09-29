@@ -414,32 +414,57 @@ const getEmployeesAttendanceForDay = (year, monthIndex, day) => {
   ];
 };
 
-// Helper to generate monthly employee recap list
-const getEmployeesAttendanceForMonth = (year, monthIndex) => {
-  return [
-    { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', present: 22, total: 24, rate: 92, ontime: 20, late: 2, leave: 1, alpha: 1 },
-    { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', present: 23, total: 24, rate: 96, ontime: 23, late: 0, leave: 1, alpha: 0 },
-    { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', present: 20, total: 24, rate: 83, ontime: 17, late: 3, leave: 2, alpha: 2 },
-    { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', present: 21, total: 24, rate: 88, ontime: 20, late: 1, leave: 3, alpha: 0 },
-    { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', present: 24, total: 24, rate: 100, ontime: 24, late: 0, leave: 0, alpha: 0 },
-    { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', present: 19, total: 24, rate: 79, ontime: 19, late: 0, leave: 2, alpha: 3 },
-    { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', present: 24, total: 24, rate: 100, ontime: 24, late: 0, leave: 0, alpha: 0 },
-    { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', present: 22, total: 24, rate: 92, ontime: 20, late: 2, leave: 2, alpha: 0 },
-  ];
-};
+// Helper to generate full chronological employee attendance records for any period (daily, weekly, monthly)
+const getEmployeesAttendanceForPeriod = (year, monthIndex, periodMode, weekNumber, dayNumber) => {
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const targetDays = [];
 
-// Helper to generate weekly employee recap list
-const getEmployeesAttendanceForWeek = (year, monthIndex, weekNumber) => {
-  return [
-    { id: 'emp-1', name: 'Budi Santoso', dept: 'Engineering', role: 'Civil & Plumbing', present: 5, total: 5, rate: 100, ontime: 4, late: 1, leave: 0, alpha: 0 },
-    { id: 'emp-2', name: 'Siti Rahma', dept: 'Housekeeping', role: 'Leader Cleaner', present: 5, total: 5, rate: 100, ontime: 5, late: 0, leave: 0, alpha: 0 },
-    { id: 'emp-3', name: 'Agus Setiawan', dept: 'Security', role: 'Patrol Guard', present: 4, total: 5, rate: 80, ontime: 3, late: 1, leave: 1, alpha: 0 },
-    { id: 'emp-4', name: 'Dewi Lestari', dept: 'Engineering', role: 'HVAC Specialist', present: 4, total: 5, rate: 80, ontime: 4, late: 0, leave: 1, alpha: 0 },
-    { id: 'emp-5', name: 'Rudi Hartono', dept: 'Security', role: 'Security Commander', present: 5, total: 5, rate: 100, ontime: 5, late: 0, leave: 0, alpha: 0 },
-    { id: 'emp-6', name: 'Sri Wahyuni', dept: 'Housekeeping', role: 'Public Area Cleaner', present: 3, total: 5, rate: 60, ontime: 3, late: 0, leave: 1, alpha: 1 },
-    { id: 'emp-7', name: 'Hendra Gunawan', dept: 'Management', role: 'Billing Officer', present: 5, total: 5, rate: 100, ontime: 5, late: 0, leave: 0, alpha: 0 },
-    { id: 'emp-8', name: 'Fitri Handayani', dept: 'Management', role: 'Tenant Relation', present: 4, total: 5, rate: 80, ontime: 3, late: 1, leave: 0, alpha: 1 },
-  ];
+  if (periodMode === 'daily') {
+    targetDays.push(Math.min(Math.max(1, dayNumber), daysInMonth));
+  } else if (periodMode === 'weekly') {
+    const weeks = getMonthWeeks(year, monthIndex);
+    const currWeekObj = weeks.find((w) => w.weekNumber === weekNumber) || weeks[weeks.length - 1] || { startDay: 22, endDay: 28 };
+    for (let d = currWeekObj.endDay; d >= currWeekObj.startDay; d--) {
+      const dObj = new Date(year, monthIndex, d);
+      const dayOfWeek = dObj.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) continue; // skip weekends
+      targetDays.push(d);
+    }
+  } else {
+    // monthly: all work days of the month descending (e.g. 30, 29, ... 1)
+    for (let d = daysInMonth; d >= 1; d--) {
+      const dObj = new Date(year, monthIndex, d);
+      const dayOfWeek = dObj.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) continue; // skip weekends
+      targetDays.push(d);
+    }
+  }
+
+  const allRecords = [];
+  targetDays.forEach((d) => {
+    const dObj = new Date(year, monthIndex, d);
+    const dayName = DAY_NAMES_ID[dObj.getDay()];
+    const dayNameEn = DAY_NAMES[dObj.getDay()];
+    const monthShort = MONTH_SHORT_ID[monthIndex];
+    const monthShortEn = MONTH_SHORT[monthIndex];
+
+    const dateFormattedId = `${dayName}, ${d} ${monthShort} ${year}`;
+    const dateFormattedEn = `${dayNameEn}, ${d} ${monthShortEn} ${year}`;
+
+    const dayEmployees = getEmployeesAttendanceForDay(year, monthIndex, d);
+    dayEmployees.forEach((emp) => {
+      allRecords.push({
+        ...emp,
+        recordId: `${emp.id}-${year}-${monthIndex}-${d}`,
+        dayNumber: d,
+        dateObj: dObj,
+        dateFormattedId,
+        dateFormattedEn,
+      });
+    });
+  });
+
+  return allRecords;
 };
 
 /**
@@ -780,78 +805,43 @@ export const MonthlyAttendanceDetailView = ({
   };
 
   // 2. DATASETS FOR EMPLOYEES ATTENDANCE (BM TAB)
-  const dailyEmployeesList = useMemo(() => getEmployeesAttendanceForDay(selectedYear, selectedMonth, safeDay), [selectedYear, selectedMonth, safeDay]);
-  const weeklyEmployeesList = useMemo(() => getEmployeesAttendanceForWeek(selectedYear, selectedMonth, selectedWeek), [selectedYear, selectedMonth, selectedWeek]);
-  const monthlyEmployeesList = useMemo(() => getEmployeesAttendanceForMonth(selectedYear, selectedMonth), [selectedYear, selectedMonth]);
+  const allPeriodEmployeeRecords = useMemo(
+    () => getEmployeesAttendanceForPeriod(selectedYear, selectedMonth, periodMode, selectedWeek, safeDay),
+    [selectedYear, selectedMonth, periodMode, selectedWeek, safeDay]
+  );
 
-  // Employee KPI metrics depending on periodMode
-  let empKpiHadir = 0;
-  let empKpiLate = 0;
-  let empKpiLeave = 0;
-  let empKpiAlpha = 0;
-  let totalEmpCount = 0;
-
-  if (periodMode === 'daily') {
-    empKpiHadir = dailyEmployeesList.filter((e) => e.status === 'ONTIME').length;
-    empKpiLate = dailyEmployeesList.filter((e) => e.status === 'LATE').length;
-    empKpiLeave = dailyEmployeesList.filter((e) => e.status === 'LEAVE' || e.status === 'OFF').length;
-    empKpiAlpha = dailyEmployeesList.filter((e) => e.status === 'ALPHA').length;
-    totalEmpCount = dailyEmployeesList.length;
-  } else if (periodMode === 'weekly') {
-    empKpiHadir = weeklyEmployeesList.reduce((acc, curr) => acc + curr.ontime, 0);
-    empKpiLate = weeklyEmployeesList.reduce((acc, curr) => acc + curr.late, 0);
-    empKpiLeave = weeklyEmployeesList.reduce((acc, curr) => acc + curr.leave, 0);
-    empKpiAlpha = weeklyEmployeesList.reduce((acc, curr) => acc + curr.alpha, 0);
-    totalEmpCount = weeklyEmployeesList.length;
-  } else {
-    // monthly
-    empKpiHadir = monthlyEmployeesList.reduce((acc, curr) => acc + curr.ontime, 0);
-    empKpiLate = monthlyEmployeesList.reduce((acc, curr) => acc + curr.late, 0);
-    empKpiLeave = monthlyEmployeesList.reduce((acc, curr) => acc + curr.leave, 0);
-    empKpiAlpha = monthlyEmployeesList.reduce((acc, curr) => acc + curr.alpha, 0);
-    totalEmpCount = monthlyEmployeesList.length;
-  }
+  const totalEmpRecords = allPeriodEmployeeRecords.length;
+  const empKpiOntime = allPeriodEmployeeRecords.filter((e) => e.status === 'ONTIME').length;
+  const empKpiLate = allPeriodEmployeeRecords.filter((e) => e.status === 'LATE').length;
+  const empKpiLeave = allPeriodEmployeeRecords.filter((e) => e.status === 'LEAVE' || e.status === 'OFF' || e.status === 'LIBUR').length;
+  const empKpiAlpha = allPeriodEmployeeRecords.filter((e) => e.status === 'ALPHA').length;
+  const empKpiHadir = empKpiOntime + empKpiLate;
 
   // Filtered employees list for display in BM tab
   const displayEmployeesList = useMemo(() => {
-    let sourceList = [];
-    if (periodMode === 'daily') {
-      sourceList = dailyEmployeesList;
-    } else if (periodMode === 'weekly') {
-      sourceList = weeklyEmployeesList;
-    } else {
-      sourceList = monthlyEmployeesList;
-    }
-
-    return sourceList.filter((emp) => {
+    return allPeriodEmployeeRecords.filter((emp) => {
       if (employeeDeptFilter !== 'ALL' && emp.dept.toLowerCase() !== employeeDeptFilter.toLowerCase()) {
         return false;
       }
       if (employeeStatusFilter !== 'ALL') {
-        if (periodMode === 'daily') {
-          if (employeeStatusFilter === 'ONTIME' && emp.status !== 'ONTIME') return false;
-          if (employeeStatusFilter === 'LATE' && emp.status !== 'LATE') return false;
-          if (employeeStatusFilter === 'LEAVE' && (emp.status !== 'LEAVE' && emp.status !== 'OFF')) return false;
-          if (employeeStatusFilter === 'ALPHA' && emp.status !== 'ALPHA') return false;
-        } else {
-          // In weekly/monthly recap
-          if (employeeStatusFilter === 'ONTIME' && emp.rate < 90) return false;
-          if (employeeStatusFilter === 'LATE' && emp.late === 0) return false;
-          if (employeeStatusFilter === 'LEAVE' && emp.leave === 0) return false;
-          if (employeeStatusFilter === 'ALPHA' && emp.alpha === 0) return false;
-        }
+        if (employeeStatusFilter === 'ONTIME' && emp.status !== 'ONTIME') return false;
+        if (employeeStatusFilter === 'LATE' && emp.status !== 'LATE') return false;
+        if (employeeStatusFilter === 'LEAVE' && (emp.status !== 'LEAVE' && emp.status !== 'OFF' && emp.status !== 'LIBUR')) return false;
+        if (employeeStatusFilter === 'ALPHA' && emp.status !== 'ALPHA') return false;
       }
       if (employeeSearchQuery.trim()) {
         const q = employeeSearchQuery.toLowerCase();
         return (
           emp.name.toLowerCase().includes(q) ||
           emp.dept.toLowerCase().includes(q) ||
-          emp.role.toLowerCase().includes(q)
+          emp.role.toLowerCase().includes(q) ||
+          (emp.dateFormattedId && emp.dateFormattedId.toLowerCase().includes(q)) ||
+          (emp.dateFormattedEn && emp.dateFormattedEn.toLowerCase().includes(q))
         );
       }
       return true;
     });
-  }, [periodMode, dailyEmployeesList, weeklyEmployeesList, monthlyEmployeesList, employeeDeptFilter, employeeStatusFilter, employeeSearchQuery]);
+  }, [allPeriodEmployeeRecords, employeeDeptFilter, employeeStatusFilter, employeeSearchQuery]);
 
   const handleApplyPicker = () => {
     if (onPeriodChange) {
@@ -1529,7 +1519,7 @@ export const MonthlyAttendanceDetailView = ({
                   flexShrink: 0,
                 }}
               >
-                {totalEmpCount} {language === 'id' ? 'Karyawan' : 'Employees'}
+                {totalEmpRecords} {language === 'id' ? 'Presensi' : 'Records'}
               </div>
             </div>
 
@@ -1683,8 +1673,8 @@ export const MonthlyAttendanceDetailView = ({
               {periodMode === 'daily'
                 ? (language === 'id' ? 'Daftar Presensi Karyawan Harian' : 'Daily Employee Attendance List')
                 : periodMode === 'weekly'
-                ? (language === 'id' ? 'Rekap Presensi Karyawan Mingguan' : 'Weekly Employee Attendance Recap')
-                : (language === 'id' ? 'Rekap Presensi Karyawan Bulanan' : 'Monthly Employee Attendance Recap')}
+                ? (language === 'id' ? 'Daftar Presensi Karyawan Mingguan' : 'Weekly Employee Attendance List')
+                : (language === 'id' ? 'Daftar Presensi Karyawan Bulanan' : 'Monthly Employee Attendance List')}
             </h3>
 
             {/* Search Input Bar */}
@@ -1706,7 +1696,7 @@ export const MonthlyAttendanceDetailView = ({
                 type="text"
                 value={employeeSearchQuery}
                 onChange={(e) => setEmployeeSearchQuery(e.target.value)}
-                placeholder={language === 'id' ? 'Cari nama karyawan / divisi...' : 'Search employee / dept...'}
+                placeholder={language === 'id' ? 'Cari nama karyawan / tanggal / divisi...' : 'Search employee / date / dept...'}
                 style={{
                   border: 'none',
                   outline: 'none',
@@ -1748,8 +1738,8 @@ export const MonthlyAttendanceDetailView = ({
               }}
             >
               {[
-                { id: 'ALL', label: language === 'id' ? 'Semua' : 'All', count: totalEmpCount },
-                { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time', count: empKpiHadir },
+                { id: 'ALL', label: language === 'id' ? 'Semua' : 'All', count: totalEmpRecords },
+                { id: 'ONTIME', label: language === 'id' ? 'Tepat' : 'On Time', count: empKpiOntime },
                 { id: 'LATE', label: language === 'id' ? 'Terlambat' : 'Late', count: empKpiLate },
                 { id: 'LEAVE', label: language === 'id' ? 'Izin/Libur' : 'Leave/Off', count: empKpiLeave },
                 { id: 'ALPHA', label: 'Alpha', count: empKpiAlpha },
@@ -1828,82 +1818,11 @@ export const MonthlyAttendanceDetailView = ({
               </div>
             ) : (
               displayEmployeesList.map((emp) => {
-                // If DAILY MODE
-                if (periodMode === 'daily') {
-                  return (
-                    <div
-                      key={emp.id}
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRadius: '14px',
-                        border: '1px solid #E2E8F0',
-                        padding: '14px 16px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '10px',
-                      }}
-                    >
-                      {/* Top: Name, Dept & Status Badge */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
-                            {emp.name}
-                          </span>
-                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
-                            {emp.dept} • {emp.role}
-                          </span>
-                        </div>
-                        {renderDailyEmployeeBadges(emp)}
-                      </div>
+                const dateText = language === 'id' ? emp.dateFormattedId : emp.dateFormattedEn;
 
-                      {/* Clock In & Out Grid */}
-                      <div
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr',
-                          gap: '10px',
-                          backgroundColor: '#F8FAFC',
-                          border: '1px solid #E2E8F0',
-                          borderRadius: '10px',
-                          padding: '8px 12px',
-                        }}
-                      >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                            {language === 'id' ? 'Masuk' : 'Clock In'}
-                          </span>
-                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                            {emp.clockIn || '-- : --'}
-                          </div>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                          <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                            {language === 'id' ? 'Keluar' : 'Clock Out'}
-                          </span>
-                          <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                            {emp.clockOut || '-- : --'}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Footer Shift & Duration */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
-                        <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
-                          {emp.shift}
-                        </span>
-                        <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
-                          {language === 'id' ? `Durasi: ${emp.duration || '--'}` : `Duration: ${emp.duration || '--'}`}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                }
-
-                // If WEEKLY OR MONTHLY RECAP MODE
                 return (
                   <div
-                    key={emp.id}
+                    key={emp.recordId || emp.id}
                     style={{
                       backgroundColor: '#FFFFFF',
                       borderRadius: '14px',
@@ -1914,62 +1833,75 @@ export const MonthlyAttendanceDetailView = ({
                       gap: '10px',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
-                          {emp.name}
-                        </span>
+                    {/* Top: Name + Date badge & Status Badge */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
+                            {emp.name}
+                          </span>
+                          <span
+                            style={{
+                              fontSize: '0.6875rem',
+                              fontWeight: 700,
+                              color: '#02388A',
+                              backgroundColor: '#EFF6FF',
+                              padding: '1px 7px',
+                              borderRadius: '6px',
+                              border: '1px solid #DBEAFE',
+                            }}
+                          >
+                            {dateText}
+                          </span>
+                        </div>
                         <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
                           {emp.dept} • {emp.role}
                         </span>
                       </div>
 
-                      <span
-                        style={{
-                          backgroundColor: emp.rate >= 90 ? '#DCFCE7' : emp.rate >= 75 ? '#FEF3C7' : '#FEE2E2',
-                          color: emp.rate >= 90 ? '#16A34A' : emp.rate >= 75 ? '#D97706' : '#DC2626',
-                          fontSize: '0.6875rem',
-                          fontWeight: 800,
-                          padding: '2px 8px',
-                          borderRadius: '9999px',
-                        }}
-                      >
-                        {emp.rate}% {language === 'id' ? 'Hadir' : 'Rate'}
-                      </span>
+                      {/* Status Badge */}
+                      {renderDailyEmployeeBadges(emp)}
                     </div>
 
-                    {/* Stats Micro Grid */}
+                    {/* Clock In & Out Grid */}
                     <div
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(4, 1fr)',
-                        gap: '6px',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '10px',
                         backgroundColor: '#F8FAFC',
                         border: '1px solid #E2E8F0',
                         borderRadius: '10px',
-                        padding: '8px 10px',
-                        textAlign: 'center',
+                        padding: '8px 12px',
                       }}
                     >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#16A34A' }}>{emp.present}/{emp.total}</span>
-                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Hadir' : 'Present'}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                          {language === 'id' ? 'Masuk' : 'Clock In'}
+                        </span>
+                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                          {emp.clockIn || '-- : --'}
+                        </div>
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#D97706' }}>{emp.late}x</span>
-                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Telat' : 'Late'}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
+                          {language === 'id' ? 'Keluar' : 'Clock Out'}
+                        </span>
+                        <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                          {emp.clockOut || '-- : --'}
+                        </div>
                       </div>
+                    </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#475569' }}>{emp.leave}x</span>
-                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>{language === 'id' ? 'Izin' : 'Leave'}</span>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                        <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: '#DC2626' }}>{emp.alpha}x</span>
-                        <span style={{ fontSize: '0.625rem', color: '#64748B', fontWeight: 600 }}>Alpha</span>
-                      </div>
+                    {/* Footer Shift & Duration */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.6875rem', color: '#64748B' }}>
+                      <span style={{ fontWeight: 500, color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+                        {emp.shift}
+                      </span>
+                      <span style={{ fontWeight: 600, color: '#334155', flexShrink: 0 }}>
+                        {language === 'id' ? `Durasi: ${emp.duration || '--'}` : `Duration: ${emp.duration || '--'}`}
+                      </span>
                     </div>
                   </div>
                 );
