@@ -613,10 +613,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
           style={{
             fontSize: '0.6875rem',
             fontWeight: 700,
-            backgroundColor: '#EFF6FF',
-            color: '#1D4ED8',
+            backgroundColor: '#02388A',
+            color: '#FFFFFF',
             padding: '2px 8px',
             borderRadius: '9999px',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+            display: 'inline-block',
           }}
         >
           {language === 'id' ? 'Hari Ini' : 'Today'}
@@ -1590,11 +1593,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu }) => {
                           style={{
                             fontSize: '0.625rem',
                             fontWeight: 700,
-                            backgroundColor: '#EFF6FF',
-                            color: '#1D4ED8',
-                            padding: '1px 6px',
-                            borderRadius: '4px',
-                            border: '1px solid #DBEAFE',
+                            backgroundColor: '#02388A',
+                            color: '#FFFFFF',
+                            padding: '2px 8px',
+                            borderRadius: '9999px',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                            display: 'inline-block',
                           }}
                         >
                           {language === 'id' ? 'Hari Ini' : 'Today'}
