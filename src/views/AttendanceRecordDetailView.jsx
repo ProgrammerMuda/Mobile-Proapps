@@ -7,7 +7,6 @@ import {
   Clock,
   CalendarBlank,
   Buildings,
-  BuildingApartment,
   User,
   Camera,
   QrCode,
@@ -27,6 +26,7 @@ import avatarUser from '../assets/avatar-user.jpg';
 import clockInSelfie from '../assets/attendance-clockin-selfie.jpg';
 import clockOutSelfie from '../assets/attendance-clockout-selfie.jpg';
 import { useLanguage } from '../context/LanguageContext';
+import { getAttendanceLocations } from '../models/attendanceLocations';
 
 /**
  * Top Header Bar for Attendance Record Detail View
@@ -102,76 +102,32 @@ const cleanTime = (val) => {
   return String(val).replace(/\s*WIB\s*/gi, '').trim();
 };
 
-/**
- * Real Live Attendance Location Map of Indonesia (Senayan / Jakarta)
- * Features:
- * - Real live Map Tiles of Indonesia (CartoDB / OpenStreetMap)
- * - Interactive Pan, Zoom In & Zoom Out (+ / − controls, touch pinch, mouse scroll)
- * - Primary color (#053079) center building badge with Phosphor BuildingApartment fill icon
- * - Secondary color (#09B2FF) geofence radius circle (140m)
- * - Green person pin for Check In & Red person pin for Check Out with Phosphor User fill icon
- */
+/** One map shared by independently recorded clock-in and clock-out locations. */
 const AttendanceMapFull = ({ data, language }) => {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
-  const [zoomLevel, setZoomLevel] = useState(17);
-
-  // Office Location coordinates: Senayan / Senopati, Jakarta Selatan, Indonesia
-  const officeCoords = [-6.2275, 106.8058];
-  // Check In (North-West, inside radius ~58m from center)
-  const checkInCoords = [-6.22715, 106.80540];
-  // Check Out (South-East, inside radius ~58m from center)
-  const checkOutCoords = [-6.22785, 106.80620];
-
-  const isOff = data?.status === 'LIBUR' || data?.status === 'off' || data?.status === 'LEAVE' || data?.status === 'IZIN';
-  const isAlpha = data?.status === 'ALPHA' || data?.status === 'alpha';
+  const markersRef = useRef({});
+  const [focusedClock, setFocusedClock] = useState(null);
+  const locations = getAttendanceLocations(data);
+  const isId = language === 'id';
 
   useEffect(() => {
-    if (!mapContainerRef.current) return;
-
-    // Destroy existing instance if any
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.remove();
-      mapInstanceRef.current = null;
-    }
-
-    // Clean up any stale leaflet ID on the DOM container (prevents HMR reload requirement)
-    if (mapContainerRef.current._leaflet_id) {
-      delete mapContainerRef.current._leaflet_id;
-    }
-
-    // Initialize real Leaflet map
+    const entries = getAttendanceLocations(data).filter((entry) => entry.available);
     const map = L.map(mapContainerRef.current, {
-      center: officeCoords,
+      center: entries[0]?.coords || [-6.2275, 106.8058],
       zoom: 17,
-      minZoom: 14,
+      minZoom: 3,
       maxZoom: 19,
       zoomControl: false,
-      attributionControl: false,
+      attributionControl: true,
     });
-
     mapInstanceRef.current = map;
-
-    const resizeTimer = setTimeout(() => {
-      if (map) map.invalidateSize();
-    }, 60);
-
-    // Add 100% Free OpenStreetMap real tiles (No API Key Required)
+    markersRef.current = {};
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    // 1. Geofence Radius Circle (Secondary Color #09B2FF) - 140m radius
-    L.circle(officeCoords, {
-      radius: 140,
-      color: '#09B2FF',
-      fillColor: '#09B2FF',
-      fillOpacity: 0.18,
-      weight: 2.5,
-    }).addTo(map);
-
-    // 2. Primary Color Center Building Badge (#053079) with official Phosphor BuildingApartment Fill SVG
     const buildingSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M240,208h-8V72a8,8,0,0,0-8-8H184V40a8,8,0,0,0-8-8H80a8,8,0,0,0-8,8V96H32a8,8,0,0,0-8,8V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM80,176H64a8,8,0,0,1,0-16H80a8,8,0,0,1,0,16Zm0-32H64a8,8,0,0,1,0-16H80a8,8,0,0,1,0,16Zm64,64H112V168h32Zm-8-64H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm56,96H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Z"/></svg>`;
 
     const buildingIcon = L.divIcon({
@@ -196,53 +152,19 @@ const AttendanceMapFull = ({ data, language }) => {
       iconAnchor: [22, 22],
     });
 
-    const officePopupHtml = `
-      <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
-        <div style="
-          background-color: #053079;
-          color: #FFFFFF;
-          padding: 6px 12px;
-          border-radius: 8px;
-          font-size: 11px;
-          font-weight: 700;
-          box-shadow: 0 4px 12px rgba(5, 48, 121, 0.35);
-          white-space: nowrap;
-          font-family: system-ui, -apple-system, sans-serif;
-          letter-spacing: -0.2px;
-        ">
-          ${language === 'id' ? 'Lokasi Kantor' : 'Office Site'}
-        </div>
-        <div style="
-          width: 0;
-          height: 0;
-          border-left: 5px solid transparent;
-          border-right: 5px solid transparent;
-          border-top: 5px solid #053079;
-          margin-top: -1px;
-        "></div>
-      </div>
-    `;
+    const renderedSites = new Set();
 
-    L.marker(officeCoords, { icon: buildingIcon, zIndexOffset: 100 })
-      .addTo(map)
-      .bindPopup(officePopupHtml, {
-        offset: [0, -18],
-        closeButton: false,
-        className: 'custom-map-popup',
-      });
-
-    // Phosphor User Fill SVG for Check In and Check Out pins
     const userFillSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"/></svg>`;
 
-    // 3. Green Person Pin for Check In (Inside Radius, Solid Phosphor User Fill Icon)
-    if (!isOff && !isAlpha) {
-      const checkInIcon = L.divIcon({
-        className: 'real-map-checkin-icon',
+    entries.forEach((entry) => {
+      const color = entry.key === 'in' ? '#16A34A' : '#DC2626';
+      const icon = L.divIcon({
+        className: entry.key === 'in' ? 'real-map-checkin-icon' : 'real-map-checkout-icon',
         html: `
           <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative; cursor: pointer;">
             <svg width="44" height="56" viewBox="0 0 44 56" fill="none" style="display: block;">
-              <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#DCFCE7" stroke="#22C55E" stroke-width="2"/>
-              <circle cx="22" cy="22" r="15" fill="#16A34A"/>
+              <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="${entry.key === 'in' ? '#DCFCE7' : '#FEE2E2'}" stroke="${entry.key === 'in' ? '#22C55E' : '#EF4444'}" stroke-width="2"/>
+              <circle cx="22" cy="22" r="15" fill="${color}"/>
             </svg>
             <div style="position: absolute; top: 0; left: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
               ${userFillSvgString}
@@ -251,342 +173,130 @@ const AttendanceMapFull = ({ data, language }) => {
         `,
         iconSize: [44, 56],
         iconAnchor: [22, 56],
+        popupAnchor: [0, -44],
       });
-
-      const formattedCheckIn = cleanTime(data?.clockIn) || '08:30';
-      const checkInPopupHtml = `
-        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
-          <div style="
-            background-color: #16A34A;
-            color: #FFFFFF;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
-            white-space: nowrap;
-            font-family: system-ui, -apple-system, sans-serif;
-            letter-spacing: -0.2px;
-          ">
-            Clock In: ${formattedCheckIn} WIB
-          </div>
-          <div style="
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid #16A34A;
-            margin-top: -1px;
-          "></div>
-        </div>
-      `;
-
-      L.marker(checkInCoords, { icon: checkInIcon, zIndexOffset: 200 })
-        .addTo(map)
-        .bindPopup(checkInPopupHtml, {
-          offset: [0, -44],
+      // Text nodes keep site names and recorded times out of HTML interpolation.
+      const popup = document.createElement('div');
+      popup.style.cssText = 'font: 12px var(--font-sans); line-height: 1.5; max-width: 180px;';
+      const heading = document.createElement('strong');
+      heading.style.color = color;
+      heading.textContent = `${entry.key === 'in' ? 'Clock In' : 'Clock Out'} · ${cleanTime(entry.time)} WIB`;
+      const site = document.createElement('div');
+      site.textContent = entry.siteName;
+      popup.append(heading, site);
+      const marker = L.marker(entry.coords, {
+        icon,
+        zIndexOffset: 200,
+        title: `${entry.key === 'in' ? 'Clock In' : 'Clock Out'}: ${entry.siteName}`,
+      }).addTo(map).bindPopup(popup, { autoPan: false, closeButton: false });
+      marker.on('click', () => setFocusedClock(entry.key));
+      markersRef.current[entry.key] = marker;
+      const siteKey = entry.siteCoords?.join(',');
+      if (siteKey && !renderedSites.has(siteKey)) {
+        renderedSites.add(siteKey);
+        L.circle(entry.siteCoords, {
+          radius: 140,
+          color: '#09B2FF',
+          fillColor: '#09B2FF',
+          fillOpacity: 0.18,
+          weight: 2.5,
+        }).addTo(map);
+        const siteLabel = document.createElement('strong');
+        siteLabel.textContent = entry.siteName;
+        siteLabel.style.cssText = 'font: 700 12px var(--font-sans); color: #053079;';
+        L.marker(entry.siteCoords, {
+          icon: buildingIcon,
+          zIndexOffset: 100,
+          title: entry.siteName,
+        }).addTo(map).bindPopup(siteLabel, {
+          offset: [0, -18],
           closeButton: false,
-          className: 'custom-map-popup',
+          autoPan: false,
         });
-
-      // 4. Red Person Pin for Check Out (Inside Radius, Solid Phosphor User Fill Icon)
-      const checkOutIcon = L.divIcon({
-        className: 'real-map-checkout-icon',
-        html: `
-          <div style="filter: drop-shadow(0px 2.5px 2px rgba(15, 23, 42, 0.22)); width: 44px; height: 56px; position: relative; cursor: pointer;">
-            <svg width="44" height="56" viewBox="0 0 44 56" fill="none" style="display: block;">
-              <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="#FEE2E2" stroke="#EF4444" stroke-width="2"/>
-              <circle cx="22" cy="22" r="15" fill="#DC2626"/>
-            </svg>
-            <div style="position: absolute; top: 0; left: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
-              ${userFillSvgString}
-            </div>
-          </div>
-        `,
-        iconSize: [44, 56],
-        iconAnchor: [22, 56],
-      });
-
-      const formattedCheckOut = cleanTime(data?.clockOut) || '17:30';
-      const checkOutPopupHtml = `
-        <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
-          <div style="
-            background-color: #DC2626;
-            color: #FFFFFF;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
-            white-space: nowrap;
-            font-family: system-ui, -apple-system, sans-serif;
-            letter-spacing: -0.2px;
-          ">
-            Clock Out: ${formattedCheckOut} WIB
-          </div>
-          <div style="
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid #DC2626;
-            margin-top: -1px;
-          "></div>
-        </div>
-      `;
-
-      L.marker(checkOutCoords, { icon: checkOutIcon, zIndexOffset: 200 })
-        .addTo(map)
-        .bindPopup(checkOutPopupHtml, {
-          offset: [0, -44],
-          closeButton: false,
-          className: 'custom-map-popup',
-        });
-    }
-
-    // Update zoom level state on map zoom
-    map.on('zoomend', () => {
-      setZoomLevel(map.getZoom());
+      }
     });
 
-    return () => {
-      clearTimeout(resizeTimer);
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-      if (mapContainerRef.current && mapContainerRef.current._leaflet_id) {
-        delete mapContainerRef.current._leaflet_id;
+    const showBounds = () => {
+      map.invalidateSize();
+      if (entries.length) {
+        map.fitBounds(L.latLngBounds(entries.flatMap((entry) => entry.siteCoords ? [entry.coords, entry.siteCoords] : [entry.coords])), {
+          paddingTopLeft: [45, 70], paddingBottomRight: [45, 35], maxZoom: 17,
+          animate: false,
+        });
       }
     };
-  }, [language, data]);
+    showBounds();
+    const observer = new ResizeObserver(showBounds);
+    observer.observe(mapContainerRef.current);
+    return () => {
+      observer.disconnect();
+      map.remove();
+      mapInstanceRef.current = null;
+      markersRef.current = {};
+    };
+  }, [data, language]);
 
-  const handleZoomIn = () => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.zoomIn();
+  const focusLocation = (entry) => {
+    const map = mapInstanceRef.current;
+    const marker = markersRef.current[entry.key];
+    if (!map || !marker) return;
+    map.stop();
+    map.closePopup();
+    setFocusedClock(entry.key);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      map.setView(entry.coords, 17);
+    } else {
+      map.flyTo(entry.coords, 17, { duration: 1.1 });
     }
+    marker.openPopup();
   };
 
-  const handleZoomOut = () => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.zoomOut();
-    }
-  };
-
-  const handleRecenter = () => {
-    if (mapInstanceRef.current) {
-      mapInstanceRef.current.setView(officeCoords, 17, { animate: true });
-    }
+  const showAll = () => {
+    const map = mapInstanceRef.current;
+    const entries = locations.filter((entry) => entry.available);
+    if (!map || !entries.length) return;
+    map.stop();
+    map.closePopup();
+    setFocusedClock(null);
+    map.fitBounds(L.latLngBounds(entries.flatMap((entry) => entry.siteCoords ? [entry.coords, entry.siteCoords] : [entry.coords])), {
+      paddingTopLeft: [45, 70], paddingBottomRight: [45, 35], maxZoom: 17,
+      animate: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    });
   };
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '240px',
-        borderRadius: '16px',
-        backgroundColor: '#EBE9E4',
-        border: '1px solid #E2E8F0',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Scoped CSS for Leaflet popups and custom marker icons */}
-      <style>{`
-        .custom-map-popup .leaflet-popup-content-wrapper {
-          background: transparent !important;
-          box-shadow: none !important;
-          padding: 0 !important;
-          border-radius: 8px !important;
-        }
-        .custom-map-popup .leaflet-popup-content {
-          margin: 0 !important;
-          line-height: 1 !important;
-        }
-        .custom-map-popup .leaflet-popup-tip-container {
-          display: none !important;
-        }
-        .real-map-building-icon,
-        .real-map-checkin-icon,
-        .real-map-checkout-icon {
-          background: transparent !important;
-          border: none !important;
-        }
-      `}</style>
-
-      {/* Real Live Map Container */}
-      <div
-        ref={mapContainerRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          zIndex: 1,
-        }}
-      />
-
-      {/* Floating Zoom & Recenter Controls (Top Right) */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: '#FFFFFF',
-          borderRadius: '8px',
-          border: '1px solid #E2E8F0',
-          overflow: 'hidden',
-          zIndex: 500,
-        }}
-      >
-        <button
-          type="button"
-          onClick={handleZoomIn}
-          aria-label="Zoom in"
-          title="Zoom in"
-          style={{
-            width: '28px',
-            height: '28px',
-            border: 'none',
-            background: 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#334155',
-            fontSize: '16px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            borderBottom: '1px solid #F1F5F9',
-            padding: 0,
-            userSelect: 'none',
-          }}
-        >
-          +
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{ height: '260px', position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '1px solid #E2E8F0', background: '#EAF0F5' }}>
+        <div ref={mapContainerRef} aria-label={isId ? 'Peta lokasi clock in dan clock out' : 'Clock in and clock out locations'} style={{ height: '100%', width: '100%', zIndex: 1 }} />
+        <button type="button" onClick={showAll} disabled={!locations.some((entry) => entry.available)} style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 500, display: 'flex', alignItems: 'center', gap: '6px', minHeight: '36px', padding: '8px 10px', border: '1px solid #E2E8F0', borderRadius: '10px', background: '#FFFFFF', color: '#053079', fontFamily: 'inherit', fontSize: '11px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px #0F172A14' }}>
+          <ArrowsInCardinal size={16} weight="bold" />{isId ? 'Semua lokasi' : 'Show all locations'}
         </button>
-        <button
-          type="button"
-          onClick={handleZoomOut}
-          aria-label="Zoom out"
-          title="Zoom out"
-          style={{
-            width: '28px',
-            height: '28px',
-            border: 'none',
-            background: 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#334155',
-            fontSize: '17px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            padding: 0,
-            userSelect: 'none',
-          }}
-        >
-          −
-        </button>
-        <button
-          type="button"
-          onClick={handleRecenter}
-          aria-label="Recenter"
-          title="Recenter"
-          style={{
-            width: '28px',
-            height: '28px',
-            border: 'none',
-            background: '#F8FAFC',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#053079',
-            cursor: 'pointer',
-            borderTop: '1px solid #F1F5F9',
-            padding: 0,
-            userSelect: 'none',
-          }}
-        >
-          <ArrowsInCardinal size={15} weight="bold" />
-        </button>
-      </div>
-
-      {/* OpenStreetMap Real Map Badge (Bottom Left) */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '6px',
-          left: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px',
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(2px)',
-          padding: '2px 7px',
-          borderRadius: '4px',
-          fontSize: '9px',
-          fontWeight: 700,
-          color: '#334155',
-          border: '1px solid #E2E8F0',
-          zIndex: 500,
-          pointerEvents: 'none',
-        }}
-      >
-        <MapPin size={11} weight="fill" color="#0284C7" />
-        <span>OpenStreetMap</span>
-      </div>
-
-      {/* Real Map Attribution + Indonesian City Label (Bottom Right) */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '6px',
-          right: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          zIndex: 500,
-          pointerEvents: 'none',
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            backdropFilter: 'blur(2px)',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            fontSize: '8px',
-            fontWeight: 700,
-            color: '#053079',
-            border: '1px solid #E2E8F0',
-          }}
-        >
-          🇮🇩 Jakarta, Indonesia
+        <div style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 500, display: 'flex', flexDirection: 'column', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 8px #0F172A14' }}>
+          {[1, -1].map((direction) => (
+            <button key={direction} type="button" aria-label={direction === 1 ? 'Zoom in' : 'Zoom out'} onClick={() => mapInstanceRef.current?.setZoom(mapInstanceRef.current.getZoom() + direction)} style={{ width: '36px', height: '36px', border: '1px solid #E2E8F0', background: '#FFFFFF', color: '#334155', fontSize: '20px', cursor: 'pointer' }}>{direction === 1 ? '+' : '−'}</button>
+          ))}
         </div>
+        {!locations.some((entry) => entry.available) && (
+          <div style={{ position: 'absolute', inset: 0, zIndex: 450, display: 'grid', placeItems: 'center', pointerEvents: 'none', background: '#FFFFFF70' }}>
+            <span style={{ background: '#FFFFFF', padding: '12px', borderRadius: '12px', color: '#64748B', fontSize: '12px', fontWeight: 600 }}>{isId ? 'Tidak ada lokasi presensi' : 'No attendance locations'}</span>
+          </div>
+        )}
       </div>
-
-      {/* Off Day / Alpha overlay if applicable */}
-      {(isOff || isAlpha) && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 600,
-            backgroundColor: '#FFFFFF',
-            border: '1px solid #CBD5E1',
-            borderRadius: '12px',
-            padding: '8px 16px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          }}
-        >
-          <span style={{ fontSize: '11px', fontWeight: 800, color: isAlpha ? '#DC2626' : '#64748B' }}>
-            {isAlpha
-              ? (language === 'id' ? '⚠️ Tanpa Catatan Presensi' : '⚠️ No Attendance Recorded')
-              : (language === 'id' ? '🏖️ Hari Libur Terjadwal' : '🏖️ Scheduled Day Off')}
-          </span>
-        </div>
-      )}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+        {locations.map((entry) => {
+          const selected = focusedClock === entry.key;
+          const isIn = entry.key === 'in';
+          const color = isIn ? '#15803D' : '#DC2626';
+          const Icon = isIn ? SignIn : SignOut;
+          return (
+            <button key={entry.key} type="button" disabled={!entry.available} aria-pressed={selected} onClick={() => focusLocation(entry)} style={{ minWidth: 0, textAlign: 'left', padding: '12px', borderRadius: '12px', border: `1px solid ${selected ? color : '#E2E8F0'}`, background: selected ? (isIn ? '#F0FDF4' : '#FEF2F2') : '#FFFFFF', fontFamily: 'inherit', cursor: entry.available ? 'pointer' : 'default', opacity: entry.available ? 1 : 0.55, display: 'flex', flexDirection: 'column', gap: '6px', boxShadow: selected ? `0 0 0 1px ${color}` : 'none' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color, fontSize: '11px', fontWeight: 800 }}><Icon size={16} weight="bold" />{isId ? 'Lihat' : 'Show'} {isIn ? 'Clock In' : 'Clock Out'}</span>
+              <span style={{ fontSize: '11px', fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>{entry.siteName}</span>
+              <span style={{ fontSize: '10px', color: '#64748B', lineHeight: 1.4 }}>{entry.available ? `${cleanTime(entry.time)} WIB` : (isId ? 'Lokasi belum tersedia' : 'Location unavailable')}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -626,14 +336,12 @@ export const AttendanceRecordDetailView = ({ data }) => {
   const earlyOutMinutes = data.earlyOutMinutes || (isEarlyOut ? 20 : 0);
 
   const scheduleText = data.shift || (language === 'id' ? 'Shift Pagi (08:00 - 17:00 WIB)' : 'Morning Shift (08:00 - 17:00 WIB)');
-  const siteName = data.siteName || data.site || 'Thamrin Executive Residences';
+  const [inLocation, outLocation] = getAttendanceLocations(data);
   
   // Attendance Method: only Foto or Scan QR
   const isQrMethod = data.attendanceMethod?.toLowerCase().includes('qr') || data.method?.toLowerCase().includes('qr');
   const attendanceMethod = isQrMethod ? 'Scan QR' : 'Foto';
 
-  const clockInLoc = data.clockInLocation || (language === 'id' ? 'Lobby Tower A (Radius 8m)' : 'Tower A Lobby (8m Radius)');
-  const clockOutLoc = data.clockOutLocation || (language === 'id' ? 'West Security Gate (Radius 12m)' : 'West Security Gate (12m Radius)');
 
   return (
     <div
@@ -763,35 +471,6 @@ export const AttendanceRecordDetailView = ({ data }) => {
             </div>
           </div>
 
-          <div style={{ height: '1px', backgroundColor: '#F1F5F9', width: '100%' }} />
-
-          {/* Row 3: Attendance Site (Hanya Nama Site, tanpa desc) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                backgroundColor: '#F0F9FF',
-                border: '1px solid #BAE6FD',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#0284C7',
-                flexShrink: 0,
-              }}
-            >
-              <BuildingApartment size={20} weight="fill" />
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1 }}>
-              <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 600 }}>
-                {language === 'id' ? 'Site Presensi' : 'Attendance Site'}
-              </span>
-              <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#334155' }}>
-                {siteName}
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -898,8 +577,8 @@ export const AttendanceRecordDetailView = ({ data }) => {
               {/* Masuk (Clock In) */}
               <div
                 style={{
-                  backgroundColor: isLate ? '#FFFBEB' : '#F0FDF4',
-                  border: `1px solid ${isLate ? '#FEF3C7' : '#DCFCE7'}`,
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #E2E8F0',
                   borderRadius: '14px',
                   padding: '14px',
                   display: 'flex',
@@ -938,19 +617,19 @@ export const AttendanceRecordDetailView = ({ data }) => {
                   {cleanTime(data.clockIn) || '--:--'} <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B' }}>WIB</span>
                 </div>
 
-                <div style={{ height: '1px', backgroundColor: isLate ? '#FDE68A' : '#BBF7D0', width: '100%' }} />
+                <div style={{ height: '1px', backgroundColor: '#E2E8F0', width: '100%' }} />
+
+<div style={{ fontSize: '0.75rem', color: '#334155', fontWeight: 700 }}>{inLocation.siteName}</div>
 
                 {/* Location info */}
                 <div style={{ fontSize: '0.75rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, flexWrap: 'wrap' }}>
-                  <MapPin size={13} color={isLate ? '#D97706' : '#16A34A'} weight="fill" style={{ flexShrink: 0 }} />
+                  <MapPin size={13} color="#09B2FF" weight="fill" style={{ flexShrink: 0 }} />
                   <span>
-                    {data.clockInLat && data.clockInLng
-                      ? `${data.clockInLat}, ${data.clockInLng}`
-                      : '-6.22715, 106.80540'}
+                    {inLocation.coords?.join(', ') || '—'}
                   </span>
                   <span style={{ color: '#94A3B8', fontWeight: 400 }}>•</span>
                   <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
-                    Radius: {data.clockInRadius || '8m'}
+                    Radius: {inLocation.distanceLabel || data.clockInRadius || '8m'}
                   </span>
                 </div>
               </div>
@@ -958,8 +637,8 @@ export const AttendanceRecordDetailView = ({ data }) => {
               {/* Keluar (Clock Out) */}
               <div
                 style={{
-                  backgroundColor: isEarlyOut ? '#FFFBEB' : hasClockOut ? '#FEF2F2' : '#F8FAFC',
-                  border: `1px solid ${isEarlyOut ? '#FEF3C7' : hasClockOut ? '#FEE2E2' : '#E2E8F0'}`,
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #E2E8F0',
                   borderRadius: '14px',
                   padding: '14px',
                   display: 'flex',
@@ -975,12 +654,12 @@ export const AttendanceRecordDetailView = ({ data }) => {
                     </span>
                   </div>
 
-                  {/* Status pill */}
-                  <span
+                  {/* Only show early departure or an ongoing shift. */}
+                  {(isEarlyOut || !hasClockOut) && <span
                     style={{
                       fontSize: '0.625rem',
                       fontWeight: 700,
-                      backgroundColor: isEarlyOut ? '#D97706' : hasClockOut ? '#DC2626' : '#94A3B8',
+                      backgroundColor: isEarlyOut ? '#D97706' : '#94A3B8',
                       color: '#FFFFFF',
                       padding: '2px 8px',
                       borderRadius: '9999px',
@@ -988,10 +667,8 @@ export const AttendanceRecordDetailView = ({ data }) => {
                   >
                     {isEarlyOut
                       ? (language === 'id' ? `Pulang Awal` : `Early Out`)
-                      : hasClockOut
-                      ? (language === 'id' ? 'Selesai' : 'Completed')
                       : (language === 'id' ? 'Bekerja' : 'Working')}
-                  </span>
+                  </span>}
                 </div>
 
                 <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#334155', lineHeight: 1.1 }}>
@@ -1004,21 +681,21 @@ export const AttendanceRecordDetailView = ({ data }) => {
                   )}
                 </div>
 
-                <div style={{ height: '1px', backgroundColor: isEarlyOut ? '#FDE68A' : hasClockOut ? '#FECACA' : '#E2E8F0', width: '100%' }} />
+                <div style={{ height: '1px', backgroundColor: '#E2E8F0', width: '100%' }} />
+
+<div style={{ fontSize: '0.75rem', color: '#334155', fontWeight: 700 }}>{hasClockOut ? outLocation.siteName : '—'}</div>
 
                 {/* Location info */}
                 <div style={{ fontSize: '0.75rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, flexWrap: 'wrap' }}>
-                  <MapPin size={13} color={isEarlyOut ? '#D97706' : hasClockOut ? '#DC2626' : '#94A3B8'} weight="fill" style={{ flexShrink: 0 }} />
+                  <MapPin size={13} color="#09B2FF" weight="fill" style={{ flexShrink: 0 }} />
                   {hasClockOut ? (
                     <>
                       <span>
-                        {data.clockOutLat && data.clockOutLng
-                          ? `${data.clockOutLat}, ${data.clockOutLng}`
-                          : '-6.22785, 106.80620'}
+                        {outLocation.coords?.join(', ') || '—'}
                       </span>
                       <span style={{ color: '#94A3B8', fontWeight: 400 }}>•</span>
                       <span style={{ fontSize: '0.6875rem', color: '#64748B', fontWeight: 500 }}>
-                        Radius: {data.clockOutRadius || '12m'}
+                        Radius: {outLocation.distanceLabel || data.clockOutRadius || '12m'}
                       </span>
                     </>
                   ) : (
@@ -1031,22 +708,22 @@ export const AttendanceRecordDetailView = ({ data }) => {
             {/* Total Duration Row */}
             <div
               style={{
-                backgroundColor: '#F8FAFC',
+                backgroundColor: '#053079',
                 borderRadius: '12px',
                 padding: '12px 16px',
-                border: '1px solid #E2E8F0',
+                border: '1px solid #053079',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Timer size={20} weight="fill" color="#02388A" />
-                <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#64748B' }}>
+                <Timer size={20} weight="fill" color="#FFFFFF" />
+                <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: '#FFFFFF' }}>
                   {language === 'id' ? 'Total Durasi Kerja' : 'Total Work Duration'}
                 </span>
               </div>
-              <span style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#02388A' }}>
+              <span style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#09B2FF' }}>
                 {data.duration || (language === 'id' ? 'Sedang berjalan' : 'In progress')}
               </span>
             </div>
@@ -1110,7 +787,7 @@ export const AttendanceRecordDetailView = ({ data }) => {
                         ? (language === 'id' ? `Telat ${lateMinutes}m` : `Late ${lateMinutes}m`)
                         : (language === 'id' ? 'Tepat Waktu' : 'On Time'),
                       statusBg: isLate ? '#D97706' : '#16A34A',
-                      coords: data.clockInLat && data.clockInLng ? `${data.clockInLat}, ${data.clockInLng}` : '-6.22715, 106.80540',
+                      coords: inLocation.coords?.join(', ') || '—',
                     });
                   }}
                   style={{
@@ -1195,7 +872,7 @@ export const AttendanceRecordDetailView = ({ data }) => {
                           ? (language === 'id' ? `Pulang Awal` : `Early Out`)
                           : (language === 'id' ? 'Selesai' : 'Completed'),
                         statusBg: isEarlyOut ? '#D97706' : '#DC2626',
-                        coords: data.clockOutLat && data.clockOutLng ? `${data.clockOutLat}, ${data.clockOutLng}` : '-6.22785, 106.80620',
+                        coords: outLocation.coords?.join(', ') || '—',
                       });
                     }}
                     style={{
@@ -1430,4 +1107,3 @@ export const AttendanceRecordDetailView = ({ data }) => {
 };
 
 export default AttendanceRecordDetailView;
-

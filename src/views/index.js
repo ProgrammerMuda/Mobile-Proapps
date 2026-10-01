@@ -17,3 +17,5 @@ export * from './HomeServiceDetailView';
 export * from './WorkAttendanceView';
 export * from './AttendanceRecordDetailView';
 export * from './EmployeePermissionView';
+export * from './RequestPermissionView';
+export * from './RequestApprovalView';

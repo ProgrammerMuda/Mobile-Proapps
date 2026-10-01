@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { MULTI_SITE_ATTENDANCE_DEMO } from '../models/attendanceLocations';
 import {
   CaretLeft,
   CaretRight,
@@ -1573,6 +1574,7 @@ export const MonthlyAttendanceDetailView = ({
                         clockOutLocation: 'West Security Gate (Radius 12m)',
                         attendanceMethod: 'GPS & Face Biometric Verification',
                         siteName: 'Thamrin Executive Residences',
+                        ...(selectedYear === 2026 && selectedMonth === 8 && log.dayNumber === 26 ? MULTI_SITE_ATTENDANCE_DEMO : {}),
                         note: log.notes || (log.inStatus === 'LATE' ? 'Kepadatan lalu lintas pagi hari' : 'Presensi harian tercatat dalam geofence radius'),
                       };
                       if (onSelectAttendanceRecord) {

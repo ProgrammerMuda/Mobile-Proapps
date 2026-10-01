@@ -35,6 +35,8 @@ import {
   AttendanceRecordDetailView,
   AttendanceRecordDetailHeader,
   EmployeePermissionView,
+  RequestPermissionView,
+  RequestApprovalView,
 } from './views';
 
 function App() {
@@ -577,6 +579,10 @@ function App() {
             } else if (menuId === 'report-attendance' || menuId === 'monthly-attendance') {
               setMonthlyAttendancePreviousScreen('work-attendance');
               setCurrentScreen('monthly-attendance');
+            } else if (menuId === 'request-permission') {
+              setCurrentScreen('request-permission');
+            } else if (menuId === 'request-approval') {
+              setCurrentScreen('request-approval');
             } else if (menuId === 'employee-permission') {
               if (extraData) {
                 setEmployeePermissionMode(extraData);
@@ -591,6 +597,20 @@ function App() {
 
       {currentScreen === 'attendance-record-detail' && (
         <AttendanceRecordDetailView data={selectedAttendanceRecord} />
+      )}
+
+      {currentScreen === 'request-permission' && (
+        <RequestPermissionView
+          user={userSession}
+          onBack={() => setCurrentScreen('work-attendance')}
+        />
+      )}
+
+      {currentScreen === 'request-approval' && (
+        <RequestApprovalView
+          user={userSession}
+          onBack={() => setCurrentScreen('work-attendance')}
+        />
       )}
 
       {currentScreen === 'employee-permission' && (

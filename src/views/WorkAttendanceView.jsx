@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { MULTI_SITE_ATTENDANCE_DEMO } from '../models/attendanceLocations';
 import { useLanguage } from '../context/LanguageContext';
 import {
   CaretLeft,
@@ -569,6 +570,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
       clockOutLocation: isEng ? 'Ruang Panel B1 (Radius 12m)' : isHk ? 'Locker HK (Radius 12m)' : isSec ? 'Pos Timur (Radius 12m)' : 'Lobby Tower A (Radius 12m)',
       attendanceMethod: 'GPS & Face Biometric Verification',
       siteName: 'Thamrin Executive Residences',
+      ...MULTI_SITE_ATTENDANCE_DEMO,
       note: isEng ? 'Pekerjaan perbaikan lift lantai 10' : isHk ? 'General cleaning koridor' : isSec ? 'Patroli perimeter malam & CCTV' : 'Briefing vendor maintenance',
     },
     {
@@ -3746,7 +3748,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   onClick={() => {
                     setIsPermissionModalOpen(false);
                     if (onNavigateMenu) {
-                      onNavigateMenu('employee-permission', 'REQUEST');
+                      onNavigateMenu('request-permission');
                     }
                   }}
                   style={{
@@ -3798,7 +3800,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   onClick={() => {
                     setIsPermissionModalOpen(false);
                     if (onNavigateMenu) {
-                      onNavigateMenu('employee-permission', 'APPROVAL');
+                      onNavigateMenu('request-approval');
                     }
                   }}
                   style={{
