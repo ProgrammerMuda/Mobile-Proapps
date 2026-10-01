@@ -56,6 +56,7 @@ import payslip3d from '../assets/menu-icons/payslip-3d.png';
 import billingPayment3d from '../assets/menu-icons/billing-payment-3d.png';
 import dayOffIllustration from '../assets/day-off-illustration.png';
 import attendanceEmptySearch from '../assets/attendance-empty-search.png';
+import attendanceQrPlaqueCropped from '../assets/attendance-qr-plaque-cropped.png';
 
 /**
  * Top Header for Work Attendance
@@ -173,6 +174,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
   const [isMethodSheetOpen, setIsMethodSheetOpen] = useState(false);
   const [attendanceMethod, setAttendanceMethod] = useState('QR'); // 'QR' | 'PHOTO'
   const [isFlashlightOn, setIsFlashlightOn] = useState(false);
+  const [cameraZoom, setCameraZoom] = useState('1x');
   const [isActionModalOpen, setIsActionModalOpen] = useState(false);
   const [isSelfieFullscreenOpen, setIsSelfieFullscreenOpen] = useState(false);
   const [capturedSelfie, setCapturedSelfie] = useState(null);
@@ -189,9 +191,14 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isPayslipModalOpen, setIsPayslipModalOpen] = useState(false);
 
-  // Front camera stream & video ref
+  // Front camera stream & video ref (Selfie)
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+
+  // Environment camera stream & video ref (QR Scanner)
+  const qrVideoRef = useRef(null);
+  const qrStreamRef = useRef(null);
+  const [qrCameraError, setQrCameraError] = useState(false);
 
   // Real GPS coordinates state with realistic fallback
   const [userCoords, setUserCoords] = useState({ lat: -6.208824, lng: 106.845598 });
@@ -213,6 +220,48 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
       );
     }
   }, []);
+
+  // Environment Camera setup for Full-Screen QR Scanner
+  useEffect(() => {
+    if (isActionModalOpen) {
+      let isMounted = true;
+      const startQrCamera = async () => {
+        try {
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: { ideal: 'environment' }, width: { ideal: 720 }, height: { ideal: 1280 } },
+              audio: false,
+            });
+            if (isMounted) {
+              qrStreamRef.current = stream;
+              if (qrVideoRef.current) {
+                qrVideoRef.current.srcObject = stream;
+                qrVideoRef.current.play().catch(() => {});
+              }
+              setQrCameraError(false);
+            } else {
+              stream.getTracks().forEach((track) => track.stop());
+            }
+          } else {
+            setQrCameraError(true);
+          }
+        } catch (err) {
+          console.warn('Environment camera not accessible for QR scanner, using interactive simulation:', err);
+          if (isMounted) setQrCameraError(true);
+        }
+      };
+
+      startQrCamera();
+
+      return () => {
+        isMounted = false;
+        if (qrStreamRef.current) {
+          qrStreamRef.current.getTracks().forEach((track) => track.stop());
+          qrStreamRef.current = null;
+        }
+      };
+    }
+  }, [isActionModalOpen]);
 
   // Front Camera setup for Full-Screen Selfie
   useEffect(() => {
@@ -255,6 +304,15 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
       };
     }
   }, [isSelfieFullscreenOpen, capturedSelfie]);
+
+  // Handle closing QR Scanner
+  const handleCloseQrScanner = () => {
+    if (qrStreamRef.current) {
+      qrStreamRef.current.getTracks().forEach((track) => track.stop());
+      qrStreamRef.current = null;
+    }
+    setIsActionModalOpen(false);
+  };
 
   // Handle taking selfie photo
   const handleTakeSelfie = () => {
@@ -793,6 +851,10 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
 
   // Handle Clock Action Confirmation
   const handleConfirmClock = () => {
+    if (qrStreamRef.current) {
+      qrStreamRef.current.getTracks().forEach((track) => track.stop());
+      qrStreamRef.current = null;
+    }
     if (actionType === 'CLOCK_IN') {
       setIsClockedIn(true);
       setClockInTime('08:14 WIB');
@@ -1218,7 +1280,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
               boxSizing: 'border-box',
             }}
           >
-            {/* 1. Shift Schedule */}
+            {/* 1. Work Schedule */}
             <button
               type="button"
               onClick={() => setIsShiftModalOpen(true)}
@@ -1253,7 +1315,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
               >
                 <img
                   src={shiftSchedule3d}
-                  alt={language === 'id' ? 'Jadwal Shift' : 'Shift Schedule'}
+                  alt={language === 'id' ? 'Jadwal Kerja' : 'Work Schedule'}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -1271,7 +1333,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   lineHeight: 1.25,
                 }}
               >
-                {language === 'id' ? 'Jadwal Shift' : 'Shift Schedule'}
+                {language === 'id' ? 'Jadwal Kerja' : 'Work Schedule'}
               </span>
             </button>
 
@@ -1991,7 +2053,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
       })()}
 
       {/* =========================================================================
-          MODAL 1: SCAN QR CODE ACTION MODAL
+          MODAL 1: EXACT MATCH FULL-PAGE QR CODE SCANNER (USER REFERENCE DESIGN)
           ========================================================================= */}
       {isActionModalOpen && (() => {
         const modalTarget = getModalTarget();
@@ -2003,267 +2065,223 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(15, 23, 42, 0.65)',
-              zIndex: 9999,
+              backgroundColor: '#16181D',
+              zIndex: 99999,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'flex-end',
-              backdropFilter: 'blur(3px)',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              overflow: 'hidden',
+              fontFamily: 'var(--font-sans)',
+              padding: '20px 24px 28px 24px',
+              boxSizing: 'border-box',
             }}
           >
             <style>{`
-              @keyframes qrLaserAnim {
-                0% { top: 15%; opacity: 0.8; }
-                50% { top: 80%; opacity: 1; }
-                100% { top: 15%; opacity: 0.8; }
+              @keyframes qrRedLaserSweep {
+                0% {
+                  top: 14%;
+                  opacity: 0.85;
+                }
+                50% {
+                  top: 86%;
+                  opacity: 1;
+                }
+                100% {
+                  top: 14%;
+                  opacity: 0.85;
+                }
               }
             `}</style>
-            <div
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderTopLeftRadius: '24px',
-                borderTopRightRadius: '24px',
-                padding: '20px 20px 28px 20px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px',
-                maxHeight: '92%',
-                overflowY: 'auto',
-                animation: 'slideUp 0.25s ease-out',
-              }}
-            >
-              {/* Header */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#334155', margin: 0 }}>
-                      {actionType === 'CLOCK_IN' ? (language === 'id' ? 'Scan QR Clock In' : 'Scan QR Clock In') : (language === 'id' ? 'Scan QR Clock Out' : 'Scan QR Clock Out')}
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: '0.5625rem',
-                        fontWeight: 700,
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                        backgroundColor: '#EFF6FF',
-                        color: '#2563EB',
-                      }}
-                    >
-                      QR Scanner
-                    </span>
-                  </div>
-                  <span style={{ fontSize: '0.6875rem', color: '#64748B' }}>
-                    {currentTime} • 28 Sep 2026
-                  </span>
-                </div>
+
+            {/* Top Section: Header & Subtitle */}
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {/* Header Bar */}
+              <div
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingTop: '6px',
+                  paddingBottom: '14px',
+                }}
+              >
                 <button
                   type="button"
-                  onClick={() => setIsActionModalOpen(false)}
+                  onClick={handleCloseQrScanner}
                   style={{
                     border: 'none',
                     background: 'transparent',
-                    padding: '4px',
+                    padding: '8px 4px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    color: '#64748B',
-                    flexShrink: 0,
-                  }}
-                >
-                  <X size={20} weight="bold" />
-                </button>
-              </div>
-
-              {/* QR SCANNER VIEWPORT */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div
-                  style={{
-                    height: '180px',
-                    backgroundColor: '#090D16',
-                    borderRadius: '16px',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     color: '#FFFFFF',
-                    border: '1.5px solid #1E293B',
                   }}
                 >
-                  {/* Scanner Center Box */}
-                  <div
-                    style={{
-                      width: '120px',
-                      height: '120px',
-                      border: '2px solid rgba(56, 189, 248, 0.6)',
-                      borderRadius: '12px',
-                      position: 'relative',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: 'rgba(15, 23, 42, 0.4)',
-                    }}
-                  >
-                    {/* Corner Accents */}
-                    <div style={{ position: 'absolute', top: '-2px', left: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderTopLeftRadius: '4px' }} />
-                    <div style={{ position: 'absolute', top: '-2px', right: '-2px', width: '12px', height: '12px', borderTop: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderTopRightRadius: '4px' }} />
-                    <div style={{ position: 'absolute', bottom: '-2px', left: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderLeft: '3px solid #38BDF8', borderBottomLeftRadius: '4px' }} />
-                    <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', width: '12px', height: '12px', borderBottom: '3px solid #38BDF8', borderRight: '3px solid #38BDF8', borderBottomRightRadius: '4px' }} />
+                  <CaretLeft size={24} weight="bold" />
+                </button>
 
-                    {/* QR Icon in center */}
-                    <QrCode size={48} color="#94A3B8" weight="light" style={{ opacity: 0.65 }} />
+                <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+                  {actionType === 'CLOCK_IN'
+                    ? (language === 'id' ? 'Scan Clock In' : 'Scan Clock In')
+                    : (language === 'id' ? 'Scan Clock Out' : 'Scan Clock Out')}
+                </h2>
 
-                    {/* Animated Laser Line */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: '6px',
-                        right: '6px',
-                        height: '2px',
-                        background: 'linear-gradient(90deg, transparent 0%, #38BDF8 50%, transparent 100%)',
-                        boxShadow: '0 0 8px #38BDF8',
-                        animation: 'qrLaserAnim 2s infinite ease-in-out',
-                      }}
-                    />
-                  </div>
-
-                  {/* Top Right Flashlight Button */}
-                  <button
-                    type="button"
-                    onClick={() => setIsFlashlightOn(!isFlashlightOn)}
-                    style={{
-                      position: 'absolute',
-                      top: '10px',
-                      right: '10px',
-                      border: 'none',
-                      backgroundColor: isFlashlightOn ? '#FBBF24' : 'rgba(30, 41, 59, 0.8)',
-                      color: isFlashlightOn ? '#0F172A' : '#FFFFFF',
-                      borderRadius: '9999px',
-                      padding: '4px 10px',
-                      fontSize: '0.625rem',
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Lightning size={12} weight="fill" />
-                    <span>{isFlashlightOn ? 'Flash ON' : 'Flash'}</span>
-                  </button>
-
-                  {/* Bottom Status Text */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '8px',
-                      fontSize: '0.6875rem',
-                      color: '#94A3B8',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                    }}
-                  >
-                    <CheckCircle size={12} weight="fill" color="#22C55E" />
-                    <span>{language === 'id' ? 'QR Code Terdeteksi • Siap Validasi' : 'QR Code Detected • Ready'}</span>
-                  </div>
-                </div>
-
-                {/* Verification Info Box */}
-                <div
-                  style={{
-                    backgroundColor: '#EFF6FF',
-                    border: '1px solid #DBEAFE',
-                    borderRadius: '12px',
-                    padding: '10px 12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    fontSize: '0.75rem',
-                    color: '#1E40AF',
-                  }}
-                >
-                  <CheckCircle size={18} weight="fill" color="#2563EB" />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700 }}>{language === 'id' ? 'Pos QR Resmi Terverifikasi' : 'Official QR Post Verified'}</div>
-                    <div style={{ fontSize: '0.6875rem', color: '#1E3A8A' }}>{activeLocationTitle}</div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsActionModalOpen(false);
-                      setAttendanceMethod('PHOTO');
-                      setIsSelfieFullscreenOpen(true);
-                    }}
-                    style={{
-                      border: 'none',
-                      background: '#FFFFFF',
-                      color: '#2563EB',
-                      borderRadius: '6px',
-                      padding: '4px 8px',
-                      fontSize: '0.625rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {language === 'id' ? 'Ganti Foto' : 'Switch Photo'}
-                  </button>
-                </div>
+                <div style={{ width: '32px' }} />
               </div>
 
-              {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsActionModalOpen(false)}
-                  style={{
-                    flex: 1,
-                    height: '42px',
-                    backgroundColor: '#FFFFFF',
-                    color: '#475569',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: '12px',
-                    fontSize: '0.8125rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  {language === 'id' ? 'Batal' : 'Cancel'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmClock}
-                  style={{
-                    flex: 2,
-                    height: '42px',
-                    backgroundColor: actionType === 'CLOCK_IN' ? '#16A34A' : '#D97706',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontSize: '0.8125rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  {actionType === 'CLOCK_IN' ? (
-                    <>
-                      <SignIn size={18} weight="bold" />
-                      <span>{language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock In'}</span>
-                    </>
-                  ) : (
-                    <>
-                      <SignOut size={18} weight="bold" />
-                      <span>{language === 'id' ? 'Konfirmasi Presensi QR' : 'Confirm QR Clock Out'}</span>
-                    </>
-                  )}
-                </button>
+              {/* Instruction Subtitle */}
+              <p
+                style={{
+                  fontSize: '0.8125rem',
+                  color: '#94A3B8',
+                  textAlign: 'center',
+                  lineHeight: 1.45,
+                  maxWidth: '300px',
+                  margin: '4px 0 0 0',
+                }}
+              >
+                {language === 'id'
+                  ? 'Arahkan kamera Anda ke QR code untuk melakukan pencatatan presensi.'
+                  : 'Point your camera at the QR code to instantly record attendance.'}
+              </p>
+            </div>
+
+            {/* Center Section: Viewfinder Window with ProApps Plaque & Red Laser (Fills available vertical space) */}
+            <div
+              onClick={handleConfirmClock}
+              title="Ketuk untuk konfirmasi presensi scan QR"
+              style={{
+                position: 'relative',
+                width: '100%',
+                flex: 1,
+                minHeight: 0,
+                margin: '14px 0 18px 0',
+                borderRadius: '24px',
+                cursor: 'pointer',
+                userSelect: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {/* Inner Clipped Container for Video / Plaque Image */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  backgroundColor: '#1E293B',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+                }}
+              >
+                {!qrCameraError ? (
+                  <video
+                    ref={qrVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transform: cameraZoom === '3x' ? 'scale(1.85)' : cameraZoom === '2x' ? 'scale(1.4)' : 'scale(1)',
+                      transition: 'transform 0.25s ease',
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={attendanceQrPlaqueCropped}
+                    alt="ProApps QR Plaque"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transform: cameraZoom === '3x' ? 'scale(1.8)' : cameraZoom === '2x' ? 'scale(1.35)' : 'scale(1)',
+                      transition: 'transform 0.25s ease',
+                      display: 'block',
+                    }}
+                  />
+                )}
               </div>
+
+              {/* Horizontal Red Laser Line - Extends past the left & right borders */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: '-16px',
+                  right: '-16px',
+                  height: '3.5px',
+                  borderRadius: '2px',
+                  backgroundColor: '#EF4444',
+                  boxShadow: '0 0 12px rgba(239, 68, 68, 0.9), 0 0 4px #FFFFFF',
+                  animation: 'qrRedLaserSweep 2.2s infinite ease-in-out',
+                  zIndex: 25,
+                  pointerEvents: 'none',
+                }}
+              />
+            </div>
+
+            {/* Bottom Section: 1x / 2x / 3x Zoom Button & Flashlight Button */}
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 10px 6px 10px',
+                boxSizing: 'border-box',
+              }}
+            >
+              {/* 1x / 2x / 3x Zoom Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setCameraZoom(cameraZoom === '1x' ? '2x' : cameraZoom === '2x' ? '3x' : '1x')}
+                style={{
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.18)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.4)',
+                  color: '#FFFFFF',
+                  fontSize: '0.875rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(6px)',
+                  transition: 'background-color 0.15s ease',
+                }}
+              >
+                {cameraZoom}
+              </button>
+
+              {/* Flashlight Button */}
+              <button
+                type="button"
+                onClick={() => setIsFlashlightOn(!isFlashlightOn)}
+                style={{
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '50%',
+                  backgroundColor: isFlashlightOn ? '#FBBF24' : 'rgba(255, 255, 255, 0.18)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.4)',
+                  color: isFlashlightOn ? '#0F172A' : '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(6px)',
+                  transition: 'background-color 0.15s ease',
+                }}
+              >
+                <Lightning size={22} weight="fill" />
+              </button>
             </div>
           </div>
         );
@@ -3538,7 +3556,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <CalendarCheck size={20} color="#2563EB" weight="fill" />
                   <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
-                    {language === 'id' ? 'Jadwal Shift Minggu Ini' : 'This Week Shift Schedule'}
+                    {language === 'id' ? 'Jadwal Kerja Minggu Ini' : 'This Week Work Schedule'}
                   </h3>
                 </div>
                 <button
@@ -3642,12 +3660,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
       })()}
 
       {/* =========================================================================
-          MODAL 4: EMPLOYEE PERMISSION (IZIN / CUTI) MODAL
+          MODAL 4: EMPLOYEE PERMISSION SELECTION MODAL (Request vs Approve)
           ========================================================================= */}
       {isPermissionModalOpen && (() => {
         const modalTarget = getModalTarget();
         const modalElement = (
           <div
+            onClick={() => setIsPermissionModalOpen(false)}
             style={{
               position: 'absolute',
               top: 0,
@@ -3663,163 +3682,199 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
             }}
           >
             <div
+              onClick={(e) => e.stopPropagation()}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderTopLeftRadius: '24px',
                 borderTopRightRadius: '24px',
-                padding: '20px',
+                padding: '20px 20px 32px 20px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '14px',
-                maxHeight: '85%',
-                overflowY: 'auto',
+                gap: '16px',
+                animation: 'slideUp 0.25s ease-out',
+                boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.12)',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FileText size={20} color="#059669" weight="fill" />
-                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#334155', margin: 0 }}>
-                    {language === 'id' ? 'Pengajuan Izin / Cuti' : 'Submit Permission / Leave'}
+              {/* Drag Handle Bar */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-4px' }}>
+                <div
+                  style={{
+                    width: '36px',
+                    height: '4px',
+                    backgroundColor: '#E2E8F0',
+                    borderRadius: '9999px',
+                  }}
+                />
+              </div>
+
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: '#334155', margin: 0 }}>
+                    {language === 'id' ? 'Pilih Menu Permohonan' : 'Select Permission Option'}
                   </h3>
+                  <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '4px 0 0 0' }}>
+                    {language === 'id'
+                      ? 'Pilih untuk mengajukan permohonan baru atau persetujuan tim'
+                      : 'Choose to submit a new request or review team approvals'}
+                  </p>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPermissionModalOpen(false)}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    padding: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                    flexShrink: 0,
+                  }}
+                >
+                  <X size={20} weight="bold" />
+                </button>
+              </div>
+
+              {/* 2 Option Cards */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {/* Option 1: Request Permission */}
                 <button
                   type="button"
                   onClick={() => {
                     setIsPermissionModalOpen(false);
-                    setPermSuccess(false);
+                    if (onNavigateMenu) {
+                      onNavigateMenu('employee-permission', 'REQUEST');
+                    }
                   }}
-                  style={{ border: 'none', background: 'transparent', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B' }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#FFFFFF',
+                    border: '1.5px solid #E2E8F0',
+                    borderRadius: '16px',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
                 >
-                  <X size={18} weight="bold" />
-                </button>
-              </div>
-
-              {permSuccess ? (
-                <div style={{ textAlign: 'center', padding: '20px 10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                  <img src={clipboardChecklist} alt="Success" style={{ width: '100px', height: 'auto' }} />
-                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#15803D', margin: 0 }}>
-                    {language === 'id' ? 'Pengajuan Berhasil Dikirim!' : 'Request Submitted!'}
-                  </h4>
-                  <p style={{ fontSize: '0.75rem', color: '#64748B', margin: 0 }}>
-                    {language === 'id' ? 'Formulir izin Anda telah diteruskan ke Manager untuk persetujuan.' : 'Your leave request has been sent to Manager for approval.'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsPermissionModalOpen(false);
-                      setPermSuccess(false);
-                    }}
+                  <div
                     style={{
-                      marginTop: '8px',
-                      width: '100%',
-                      padding: '10px',
-                      backgroundColor: '#02388A',
-                      color: '#FFFFFF',
-                      borderRadius: '10px',
-                      border: 'none',
-                      fontWeight: 700,
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      backgroundColor: '#EAF7FF',
+                      border: '1px solid #BAE6FD',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--color-secondary, #09B2FF)',
+                      flexShrink: 0,
                     }}
                   >
-                    {language === 'id' ? 'Kembali' : 'Done'}
-                  </button>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {/* Select Type */}
-                  <div>
-                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>
-                      {language === 'id' ? 'Jenis Pengajuan' : 'Type'}
-                    </label>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginTop: '6px' }}>
-                      {[
-                        { id: 'LEAVE', label: language === 'id' ? 'Cuti Tahunan' : 'Annual Leave' },
-                        { id: 'SICK', label: language === 'id' ? 'Sakit' : 'Sick' },
-                        { id: 'PERMIT', label: language === 'id' ? 'Izin Khusus' : 'Permission' },
-                      ].map((t) => (
-                        <button
-                          key={t.id}
-                          type="button"
-                          onClick={() => setPermType(t.id)}
-                          style={{
-                            padding: '8px 4px',
-                            borderRadius: '8px',
-                            fontSize: '0.6875rem',
-                            fontWeight: 700,
-                            border: permType === t.id ? '1.5px solid #059669' : '1px solid #E2E8F0',
-                            backgroundColor: permType === t.id ? '#ECFDF5' : '#FFFFFF',
-                            color: permType === t.id ? '#059669' : '#64748B',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {t.label}
-                        </button>
-                      ))}
+                    <FileText size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155', marginBottom: '2px' }}>
+                      {language === 'id' ? 'Request Permission' : 'Request Permission'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
+                      {language === 'id'
+                        ? 'Ajukan cuti, presensi manual, lembur, dan riwayat status pengajuan'
+                        : 'Submit leave, manual clock, overtime, and view request history'}
                     </div>
                   </div>
+                  <CaretRight size={18} weight="bold" color="#94A3B8" />
+                </button>
 
-                  {/* Date Input */}
-                  <div>
-                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>
-                      {language === 'id' ? 'Tanggal Pelaksanaan' : 'Date Range'}
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="29 Sep 2026 - 30 Sep 2026 (2 Hari)"
-                      style={{
-                        width: '100%',
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        border: '1px solid #E2E8F0',
-                        fontSize: '0.8125rem',
-                        marginTop: '4px',
-                        boxSizing: 'border-box',
-                      }}
-                    />
-                  </div>
-
-                  {/* Reason Textarea */}
-                  <div>
-                    <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155' }}>
-                      {language === 'id' ? 'Alasan / Keterangan' : 'Reason / Note'}
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={permReason}
-                      onChange={(e) => setPermReason(e.target.value)}
-                      placeholder={language === 'id' ? 'Tuliskan alasan pengajuan izin/cuti...' : 'Write reason for permission...'}
-                      style={{
-                        width: '100%',
-                        padding: '10px 12px',
-                        borderRadius: '10px',
-                        border: '1px solid #E2E8F0',
-                        fontSize: '0.8125rem',
-                        marginTop: '4px',
-                        boxSizing: 'border-box',
-                        fontFamily: 'inherit',
-                      }}
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setPermSuccess(true)}
+                {/* Option 2: Approve Permission */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsPermissionModalOpen(false);
+                    if (onNavigateMenu) {
+                      onNavigateMenu('employee-permission', 'APPROVAL');
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#FFFFFF',
+                    border: '1.5px solid #E2E8F0',
+                    borderRadius: '16px',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  <div
                     style={{
-                      marginTop: '6px',
-                      width: '100%',
-                      height: '42px',
-                      backgroundColor: '#059669',
-                      color: '#FFFFFF',
-                      borderRadius: '12px',
-                      border: 'none',
-                      fontSize: '0.8125rem',
-                      fontWeight: 700,
-                      cursor: 'pointer',
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      backgroundColor: '#EAF7FF',
+                      border: '1px solid #BAE6FD',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--color-secondary, #09B2FF)',
+                      flexShrink: 0,
+                      position: 'relative',
                     }}
                   >
-                    {language === 'id' ? 'Kirim Pengajuan' : 'Submit Request'}
-                  </button>
-                </div>
-              )}
+                    <CheckCircle size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '-4px',
+                        right: '-4px',
+                        backgroundColor: '#EF4444',
+                        color: '#FFFFFF',
+                        fontSize: '0.625rem',
+                        fontWeight: 800,
+                        padding: '1px 5px',
+                        borderRadius: '8px',
+                        border: '2px solid #FFFFFF',
+                      }}
+                    >
+                      3
+                    </span>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                      <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
+                        {language === 'id' ? 'Request Approval' : 'Request Approval'}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: '0.625rem',
+                          fontWeight: 700,
+                          padding: '2px 6px',
+                          borderRadius: '6px',
+                          backgroundColor: '#FEF3C7',
+                          color: '#B45309',
+                        }}
+                      >
+                        3 {language === 'id' ? 'Menunggu' : 'Pending'}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
+                      {language === 'id'
+                        ? 'Tinjau, setujui, atau tolak permohonan izin dari anggota tim Anda'
+                        : 'Review, approve, or reject permission requests from your team'}
+                    </div>
+                  </div>
+                  <CaretRight size={18} weight="bold" color="#94A3B8" />
+                </button>
+              </div>
             </div>
           </div>
         );

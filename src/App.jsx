@@ -34,6 +34,7 @@ import {
   ProfileView,
   AttendanceRecordDetailView,
   AttendanceRecordDetailHeader,
+  EmployeePermissionView,
 } from './views';
 
 function App() {
@@ -83,6 +84,7 @@ function App() {
   const [homeServiceMonth, setHomeServiceMonth] = useState(8); // 8 = September
   const [homeServiceYear, setHomeServiceYear] = useState(2026);
   const [isHomeServicePickerOpen, setIsHomeServicePickerOpen] = useState(false);
+  const [employeePermissionMode, setEmployeePermissionMode] = useState('REQUEST'); // 'REQUEST' | 'APPROVAL'
 
   const handleSplashFinish = () => {
     setCurrentScreen('login');
@@ -565,7 +567,7 @@ function App() {
             setAttendanceRecordPreviousScreen('work-attendance');
             setCurrentScreen('attendance-record-detail');
           }}
-          onNavigateMenu={(menuId) => {
+          onNavigateMenu={(menuId, extraData) => {
             if (menuId === 'tenant-unit') {
               setCurrentScreen('tenant-unit');
             } else if (menuId === 'work-order') {
@@ -575,6 +577,13 @@ function App() {
             } else if (menuId === 'report-attendance' || menuId === 'monthly-attendance') {
               setMonthlyAttendancePreviousScreen('work-attendance');
               setCurrentScreen('monthly-attendance');
+            } else if (menuId === 'employee-permission') {
+              if (extraData) {
+                setEmployeePermissionMode(extraData);
+              } else {
+                setEmployeePermissionMode('REQUEST');
+              }
+              setCurrentScreen('employee-permission');
             }
           }}
         />
@@ -582,6 +591,14 @@ function App() {
 
       {currentScreen === 'attendance-record-detail' && (
         <AttendanceRecordDetailView data={selectedAttendanceRecord} />
+      )}
+
+      {currentScreen === 'employee-permission' && (
+        <EmployeePermissionView
+          user={userSession}
+          initialMode={employeePermissionMode}
+          onBack={() => setCurrentScreen('work-attendance')}
+        />
       )}
     </AndroidMobileFrame>
   );
