@@ -19,3 +19,5 @@ export * from './AttendanceRecordDetailView';
 export * from './EmployeePermissionView';
 export * from './RequestPermissionView';
 export * from './RequestApprovalView';
+export * from './RequestPermissionDetailView';
+export * from './ChangeShiftView';

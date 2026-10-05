@@ -6,6 +6,8 @@ export * from './MaterialSelection';
 export * from './MaterialNavigation';
 export * from './MaterialDialog';
 export * from './Logo';
+export * from './CustomDatePickerModal';
+export * from './CustomDatePickerPopover';
 
 // Re-export common aliases
 export { MaterialButton as Button } from './MaterialButton';

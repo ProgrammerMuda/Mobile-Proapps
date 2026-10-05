@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { MULTI_SITE_ATTENDANCE_DEMO } from '../models/attendanceLocations';
 import { useLanguage } from '../context/LanguageContext';
 import {
@@ -154,6 +156,188 @@ export const WorkAttendanceHeader = ({ onBack, currentDate = new Date(2026, 8, 2
       </h1>
 
       <div style={{ width: '32px' }} />
+    </div>
+  );
+};
+
+/**
+ * Confirm Attendance Mini Map (Leaflet + OpenStreetMap)
+ * Matches the map in Attendance Record Detail with workplace radius & green check-in pin
+ */
+const ConfirmAttendanceMap = ({
+  actionType = 'CLOCK_IN',
+  language = 'id',
+  isOutOfRadius = false,
+  snapshot,
+}) => {
+  const mapContainerRef = useRef(null);
+  const mapInstanceRef = useRef(null);
+
+  const isClockIn = actionType === 'CLOCK_IN';
+  const siteCoords = isClockIn
+    ? [MULTI_SITE_ATTENDANCE_DEMO.clockInSiteLat, MULTI_SITE_ATTENDANCE_DEMO.clockInSiteLng]
+    : [MULTI_SITE_ATTENDANCE_DEMO.clockOutSiteLat, MULTI_SITE_ATTENDANCE_DEMO.clockOutSiteLng];
+
+  // User position: inside the 140m radius (~75m away from site) if valid, or ~350m outside if isOutOfRadius
+  const userCoords = isOutOfRadius
+    ? [siteCoords[0] + 0.0028, siteCoords[1] + 0.0024]
+    : (isClockIn
+        ? [MULTI_SITE_ATTENDANCE_DEMO.clockInLat, MULTI_SITE_ATTENDANCE_DEMO.clockInLng]
+        : [MULTI_SITE_ATTENDANCE_DEMO.clockOutLat, MULTI_SITE_ATTENDANCE_DEMO.clockOutLng]);
+
+  const siteName = isClockIn
+    ? MULTI_SITE_ATTENDANCE_DEMO.clockInSiteName
+    : MULTI_SITE_ATTENDANCE_DEMO.clockOutSiteName;
+
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    const map = L.map(mapContainerRef.current, {
+      center: siteCoords,
+      zoom: 16.5,
+      zoomSnap: 0.5,
+      minZoom: 3,
+      maxZoom: 19,
+      zoomControl: false,
+      attributionControl: false,
+    });
+    mapInstanceRef.current = map;
+
+    // 1. OpenStreetMap TileLayer (Exact match with Attendance Detail View)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(map);
+
+    // 2. Workplace Geofence Radius Circle (140m)
+    L.circle(siteCoords, {
+      radius: 140,
+      color: '#09B2FF',
+      fillColor: '#09B2FF',
+      fillOpacity: 0.18,
+      weight: 2.5,
+    }).addTo(map);
+
+    // 3. Building Icon at Site Center (Blue circle badge with white building icon)
+    const buildingSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#FFFFFF" viewBox="0 0 256 256" style="display: block; margin: auto;"><g transform="translate(0, 7)"><path d="M240,204H228V96a20,20,0,0,0-20-20H172V32a20,20,0,0,0-28.45-18.12l-104,48.54A20.06,20.06,0,0,0,28,80.55V204H16a12,12,0,0,0,0,24H240a12,12,0,0,0,0-24ZM204,100V204H172V100ZM52,83.09,148,38.3V204H52ZM132,112v12a12,12,0,0,1-24,0V112a12,12,0,0,1,24,0Zm-40,0v12a12,12,0,0,1-24,0V112a12,12,0,0,1,24,0Zm0,52v12a12,12,0,0,1-24,0V164a12,12,0,0,1,24,0Zm40,0v12a12,12,0,0,1-24,0V164a12,12,0,0,1,24,0Z"/></g></svg>`;
+
+    const buildingIcon = L.divIcon({
+      className: 'real-map-building-icon',
+      html: `
+        <div style="
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background-color: #053079;
+          border: 3px solid #FFFFFF;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          box-shadow: 0 3px 10px rgba(5, 48, 121, 0.45);
+          cursor: pointer;
+        ">
+          ${buildingSvgString}
+        </div>
+      `,
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
+    });
+
+    const siteMarker = L.marker(siteCoords, {
+      icon: buildingIcon,
+      zIndexOffset: 100,
+      title: siteName,
+    }).addTo(map);
+
+    const siteLabel = document.createElement('strong');
+    siteLabel.textContent = siteName;
+    siteLabel.style.cssText = 'font: 700 12px var(--font-sans); color: #053079;';
+    siteMarker.bindPopup(siteLabel, { offset: [0, -18], closeButton: false, autoPan: false });
+
+    // 4. User Clock In Green Pin (Exact same as Detail Attendance) inside radius
+    const userFillSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M230.93,220a8,8,0,0,1-6.93,4H32a8,8,0,0,1-6.92-12c15.23-26.33,38.7-45.21,66.09-54.16a72,72,0,1,1,73.66,0c27.39,8.95,50.86,27.83,66.09,54.16A8,8,0,0,1,230.93,220Z"/></svg>`;
+
+    const pinColor = isOutOfRadius ? '#DC2626' : (isClockIn ? '#16A34A' : '#DC2626');
+    const pinBg = isOutOfRadius ? '#FEE2E2' : (isClockIn ? '#DCFCE7' : '#FEE2E2');
+    const pinStroke = isOutOfRadius ? '#EF4444' : (isClockIn ? '#22C55E' : '#EF4444');
+
+    const checkInIcon = L.divIcon({
+      className: isClockIn ? 'real-map-checkin-icon' : 'real-map-checkout-icon',
+      html: `
+        <div style="filter: drop-shadow(0px 2.5px 3px rgba(15, 23, 42, 0.28)); width: 44px; height: 56px; position: relative; cursor: pointer;">
+          <svg width="44" height="56" viewBox="0 0 44 56" fill="none" style="display: block;">
+            <path d="M 22,56 C 10,44 0,32 0,22 C 0,10 10,0 22,0 C 34,0 44,10 44,22 C 44,32 34,44 22,56 Z" fill="${pinBg}" stroke="${pinStroke}" stroke-width="2"/>
+            <circle cx="22" cy="22" r="15" fill="${pinColor}"/>
+          </svg>
+          <div style="position: absolute; top: 0; left: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+            ${userFillSvgString}
+          </div>
+        </div>
+      `,
+      iconSize: [44, 56],
+      iconAnchor: [22, 56],
+      popupAnchor: [0, -44],
+    });
+
+    const userMarker = L.marker(userCoords, {
+      icon: checkInIcon,
+      zIndexOffset: 200,
+      title: isClockIn ? 'Lokasi Clock In' : 'Lokasi Clock Out',
+    }).addTo(map);
+
+    // Popup text for user pin
+    const popupContent = document.createElement('div');
+    popupContent.style.cssText = 'font: 12px var(--font-sans, Inter, sans-serif); line-height: 1.4; color: #1E293B;';
+    const strongTitle = document.createElement('strong');
+    strongTitle.style.color = pinColor;
+    strongTitle.textContent = isClockIn ? 'Lokasi Clock In' : 'Lokasi Clock Out';
+    const subText = document.createElement('div');
+    subText.style.fontSize = '11px';
+    subText.style.color = '#64748B';
+    subText.textContent = isOutOfRadius ? (language === 'id' ? 'Di luar radius kantor' : 'Outside office radius') : (language === 'id' ? 'Dalam radius kantor (Valid)' : 'Within office radius (Valid)');
+    popupContent.append(strongTitle, subText);
+    userMarker.bindPopup(popupContent, { autoPan: false, closeButton: false });
+
+    // If out of radius, connect with dashed line
+    if (isOutOfRadius) {
+      L.polyline([siteCoords, userCoords], {
+        color: '#EF4444',
+        weight: 2,
+        dashArray: '5, 5',
+      }).addTo(map);
+    }
+
+    const centerMap = () => {
+      if (!mapInstanceRef.current) return;
+      map.invalidateSize();
+      if (isOutOfRadius) {
+        map.fitBounds(L.latLngBounds([siteCoords, userCoords]), {
+          padding: [30, 30],
+          maxZoom: 16,
+          animate: false,
+        });
+      } else {
+        map.setView(siteCoords, 16.5, { animate: false });
+      }
+    };
+
+    centerMap();
+    const timer = setTimeout(centerMap, 150);
+    const observer = new ResizeObserver(centerMap);
+    observer.observe(mapContainerRef.current);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+      map.remove();
+      mapInstanceRef.current = null;
+    };
+  }, [actionType, isOutOfRadius, isClockIn]);
+
+  return (
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <div ref={mapContainerRef} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }} />
     </div>
   );
 };
@@ -343,13 +527,20 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
 
   const handleUsePhoto = () => {
     const photoToUse = capturedSelfie || 'simulated_photo';
+    const isClockIn = actionType === 'CLOCK_IN';
+    const activeLat = isClockIn ? MULTI_SITE_ATTENDANCE_DEMO.clockInLat : MULTI_SITE_ATTENDANCE_DEMO.clockOutLat;
+    const activeLng = isClockIn ? MULTI_SITE_ATTENDANCE_DEMO.clockInLng : MULTI_SITE_ATTENDANCE_DEMO.clockOutLng;
+    const activeLocation = isClockIn
+      ? (MULTI_SITE_ATTENDANCE_DEMO.clockInLocation || baseLocationName)
+      : (MULTI_SITE_ATTENDANCE_DEMO.clockOutLocation || baseLocationName);
+
     setCheckInSnapshot({
       photo: photoToUse,
-      time: currentTime || '08:14:00 WIB',
-      timeShort: currentTime ? currentTime.substring(0, 5) : '08:14',
+      time: currentTime || (isClockIn ? '08:14:00 WIB' : '17:05:00 WIB'),
+      timeShort: currentTime ? currentTime.substring(0, 5) : (isClockIn ? '08:14' : '17:05'),
       date: '28 Sep 2026',
-      location: baseLocationName,
-      coords: userCoords,
+      location: activeLocation,
+      coords: { lat: activeLat, lng: activeLng },
       actionType: actionType,
     });
     if (streamRef.current) {
@@ -1211,7 +1402,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                 type="button"
                 onClick={() => {
                   setActionType(isClockedIn ? 'CLOCK_OUT' : 'CLOCK_IN');
-                  setIsMethodSheetOpen(true);
+                  setAttendanceMethod('PHOTO');
+                  setCapturedSelfie(null);
+                  setIsSelfieFullscreenOpen(true);
                 }}
                 style={{
                   width: '100%',
@@ -2485,19 +2678,19 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   {/* Lokasi (Tanpa Radius) */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 700, color: '#38BDF8' }}>
                     <MapPin size={13} weight="fill" color="#38BDF8" />
-                    <span>{baseLocationName}</span>
+                    <span>{actionType === 'CLOCK_IN' ? MULTI_SITE_ATTENDANCE_DEMO.clockInSiteName : MULTI_SITE_ATTENDANCE_DEMO.clockOutSiteName}</span>
                   </div>
 
                   {/* Tanggal dan Jam */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#F1F5F9', fontWeight: 600 }}>
                     <Clock size={12} weight="bold" color="#94A3B8" />
-                    <span>28 Sep 2026 • {currentTime || '08:14:00 WIB'}</span>
+                    <span>28 Sep 2026 • {currentTime || (actionType === 'CLOCK_IN' ? '08:14:00 WIB' : '17:05:00 WIB')}</span>
                   </div>
 
                   {/* Lat dan Long */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#94A3B8', fontSize: '0.625rem', fontFamily: 'monospace' }}>
                     <NavigationArrow size={11} weight="fill" color="#94A3B8" />
-                    <span>Lat: {userCoords.lat}, Long: {userCoords.lng}</span>
+                    <span>Lat: {actionType === 'CLOCK_IN' ? MULTI_SITE_ATTENDANCE_DEMO.clockInLat : MULTI_SITE_ATTENDANCE_DEMO.clockOutLat}, Long: {actionType === 'CLOCK_IN' ? MULTI_SITE_ATTENDANCE_DEMO.clockInLng : MULTI_SITE_ATTENDANCE_DEMO.clockOutLng}</span>
                   </div>
                 </div>
               </div>
@@ -2690,7 +2883,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                 </button>
               </div>
 
-              {/* Mini Map Preview Card (Matching Screenshot Reference) */}
+              {/* Mini Map Preview Card with OpenStreetMap & Green Check-in Pin */}
               <div
                 style={{
                   height: '185px',
@@ -2702,64 +2895,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.02)',
                 }}
               >
-                {/* SVG Vector Map */}
-                <svg
-                  width="100%"
-                  height="100%"
-                  viewBox="0 0 400 200"
-                  preserveAspectRatio="xMidYMid slice"
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                >
-                  <rect width="400" height="200" fill="#F8FAFC" />
-                  <path d="M0,0 L140,0 L110,80 L0,65 Z" fill="#DCFCE7" opacity="0.8" />
-                  <path d="M260,0 L400,0 L400,90 L280,65 Z" fill="#F0FDF4" opacity="0.9" />
-                  <path d="M0,150 L120,130 L100,200 L0,200 Z" fill="#F0FDF4" opacity="0.75" />
-                  <path d="M280,140 L400,160 L400,200 L260,200 Z" fill="#DCFCE7" opacity="0.75" />
-                  <path d="M-20,75 Q180,100 420,85" stroke="#FFFFFF" strokeWidth="24" fill="none" />
-                  <path d="M-20,75 Q180,100 420,85" stroke="#E2E8F0" strokeWidth="26" fill="none" style={{ zIndex: -1 }} />
-                  <path d="M200,-20 Q210,100 190,220" stroke="#FFFFFF" strokeWidth="26" fill="none" />
-                  <path d="M200,-20 Q210,100 190,220" stroke="#E2E8F0" strokeWidth="28" fill="none" />
-                  <path d="M40,140 Q180,130 360,140" stroke="#FFFFFF" strokeWidth="18" fill="none" />
-                  <circle
-                    cx="200"
-                    cy="100"
-                    r="80"
-                    fill="rgba(9, 178, 255, 0.16)"
-                    stroke="#09B2FF"
-                    strokeWidth="2"
-                    strokeDasharray="4 2"
-                  />
-                </svg>
-
-                {/* Center User Pin inside Radius */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    top: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    zIndex: 4,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--color-primary, #053079)',
-                      border: '3px solid #FFFFFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 3px 10px rgba(5, 48, 121, 0.45)',
-                    }}
-                  >
-                    <UserCheck size={18} weight="bold" color="#FFFFFF" />
-                  </div>
-                </div>
+                <ConfirmAttendanceMap
+                  actionType={actionType}
+                  language={language}
+                  isOutOfRadius={false}
+                  snapshot={checkInSnapshot}
+                />
               </div>
 
               {/* Grid Cards (Waktu Masuk & Foto Selfie) */}
@@ -3051,108 +3192,12 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.02)',
                 }}
               >
-                {/* SVG Vector Map */}
-                <svg
-                  width="100%"
-                  height="100%"
-                  viewBox="0 0 400 200"
-                  preserveAspectRatio="xMidYMid slice"
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                >
-                  <rect width="400" height="200" fill="#F8FAFC" />
-                  <path d="M0,0 L140,0 L110,80 L0,65 Z" fill="#DCFCE7" opacity="0.8" />
-                  <path d="M260,0 L400,0 L400,90 L280,65 Z" fill="#F0FDF4" opacity="0.9" />
-                  <path d="M0,150 L120,130 L100,200 L0,200 Z" fill="#F0FDF4" opacity="0.75" />
-                  <path d="M280,140 L400,160 L400,200 L260,200 Z" fill="#DCFCE7" opacity="0.75" />
-                  <path d="M-20,75 Q180,100 420,85" stroke="#FFFFFF" strokeWidth="24" fill="none" />
-                  <path d="M-20,75 Q180,100 420,85" stroke="#E2E8F0" strokeWidth="26" fill="none" />
-                  <path d="M200,-20 Q210,100 190,220" stroke="#FFFFFF" strokeWidth="26" fill="none" />
-                  <path d="M200,-20 Q210,100 190,220" stroke="#E2E8F0" strokeWidth="28" fill="none" />
-                  <path d="M40,140 Q180,130 360,140" stroke="#FFFFFF" strokeWidth="18" fill="none" />
-
-                  {/* Workplace Radius Circle (15m radius widened & centered) */}
-                  <circle
-                    cx="185"
-                    cy="105"
-                    r="76"
-                    fill="rgba(9, 178, 255, 0.16)"
-                    stroke="#09B2FF"
-                    strokeWidth="2"
-                    strokeDasharray="4 2"
-                  />
-
-                  {/* Dotted Connection Line between office and user */}
-                  <line
-                    x1="185"
-                    y1="105"
-                    x2="340"
-                    y2="38"
-                    stroke="#EF4444"
-                    strokeWidth="2"
-                    strokeDasharray="4 3"
-                  />
-                </svg>
-
-                {/* Office / Apartment Pin at Center of Radius */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: '46.25%',
-                    top: '52.5%',
-                    transform: 'translate(-50%, -50%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    zIndex: 3,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--color-primary, #053079)',
-                      border: '3px solid #FFFFFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 3px 10px rgba(5, 48, 121, 0.45)',
-                    }}
-                  >
-                    <Buildings size={18} weight="bold" color="#FFFFFF" />
-                  </div>
-                </div>
-
-                {/* User Pin Outside Radius (Red / Warning) */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: '83.75%',
-                    top: '22.5%',
-                    transform: 'translate(-50%, -50%)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    zIndex: 4,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      backgroundColor: '#DC2626',
-                      border: '3px solid #FFFFFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 3px 10px rgba(220, 38, 38, 0.55)',
-                      position: 'relative',
-                    }}
-                  >
-                    <UserCheck size={18} weight="bold" color="#FFFFFF" />
-                  </div>
-                </div>
+                <ConfirmAttendanceMap
+                  actionType={actionType}
+                  language={language}
+                  isOutOfRadius={true}
+                  snapshot={checkInSnapshot}
+                />
               </div>
 
 

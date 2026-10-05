@@ -1,6 +1,7 @@
 @import './styles/theme.css';
 
-input::placeholder {
+input::placeholder,
+textarea::placeholder {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;

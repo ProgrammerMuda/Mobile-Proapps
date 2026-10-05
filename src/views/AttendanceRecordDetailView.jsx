@@ -111,6 +111,15 @@ const AttendanceMapFull = ({ data, language }) => {
   const locations = getAttendanceLocations(data);
   const isId = language === 'id';
 
+  const isOff = data?.status === 'LIBUR' || data?.status === 'off' || data?.status === 'off_day'
+    || data?.status === 'OFF' || data?.status === 'LEAVE' || data?.status === 'IZIN'
+    || String(data?.shift || '').toLowerCase().includes('off')
+    || String(data?.shift || '').toLowerCase().includes('libur')
+    || String(data?.shift || '').toLowerCase().includes('tidak ada jadwal');
+
+  const availableLocations = locations.filter((entry) => entry.available);
+  const hasAvailableLocations = availableLocations.length > 0;
+
   useEffect(() => {
     const entries = getAttendanceLocations(data).filter((entry) => entry.available);
     const map = L.map(mapContainerRef.current, {
@@ -128,28 +137,29 @@ const AttendanceMapFull = ({ data, language }) => {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    const buildingSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#FFFFFF" viewBox="0 0 256 256"><path d="M240,208h-8V72a8,8,0,0,0-8-8H184V40a8,8,0,0,0-8-8H80a8,8,0,0,0-8,8V96H32a8,8,0,0,0-8,8V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM80,176H64a8,8,0,0,1,0-16H80a8,8,0,0,1,0,16Zm0-32H64a8,8,0,0,1,0-16H80a8,8,0,0,1,0,16Zm64,64H112V168h32Zm-8-64H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H120a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm56,96H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Zm0-32H176a8,8,0,0,1,0-16h16a8,8,0,0,1,0,16Z"/></svg>`;
+    const buildingSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#FFFFFF" viewBox="0 0 256 256" style="display: block; margin: auto;"><g transform="translate(0, 7)"><path d="M240,204H228V96a20,20,0,0,0-20-20H172V32a20,20,0,0,0-28.45-18.12l-104,48.54A20.06,20.06,0,0,0,28,80.55V204H16a12,12,0,0,0,0,24H240a12,12,0,0,0,0-24ZM204,100V204H172V100ZM52,83.09,148,38.3V204H52ZM132,112v12a12,12,0,0,1-24,0V112a12,12,0,0,1,24,0Zm-40,0v12a12,12,0,0,1-24,0V112a12,12,0,0,1,24,0Zm0,52v12a12,12,0,0,1-24,0V164a12,12,0,0,1,24,0Zm40,0v12a12,12,0,0,1-24,0V164a12,12,0,0,1,24,0Z"/></g></svg>`;
 
     const buildingIcon = L.divIcon({
       className: 'real-map-building-icon',
       html: `
         <div style="
-          width: 44px;
-          height: 44px;
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
           background-color: #053079;
+          border: 3px solid #FFFFFF;
           display: flex;
           align-items: center;
           justify-content: center;
           box-sizing: border-box;
-          box-shadow: 0 4px 12px rgba(5, 48, 121, 0.4);
+          box-shadow: 0 3px 10px rgba(5, 48, 121, 0.45);
           cursor: pointer;
         ">
           ${buildingSvgString}
         </div>
       `,
-      iconSize: [44, 44],
-      iconAnchor: [22, 22],
+      iconSize: [38, 38],
+      iconAnchor: [19, 19],
     });
 
     const renderedSites = new Set();
@@ -268,35 +278,43 @@ const AttendanceMapFull = ({ data, language }) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <div style={{ height: '260px', position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '1px solid #E2E8F0', background: '#EAF0F5' }}>
         <div ref={mapContainerRef} aria-label={isId ? 'Peta lokasi clock in dan clock out' : 'Clock in and clock out locations'} style={{ height: '100%', width: '100%', zIndex: 1 }} />
-        <button type="button" onClick={showAll} disabled={!locations.some((entry) => entry.available)} style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 500, display: 'flex', alignItems: 'center', gap: '6px', minHeight: '36px', padding: '8px 10px', border: '1px solid #E2E8F0', borderRadius: '10px', background: '#FFFFFF', color: '#053079', fontFamily: 'inherit', fontSize: '11px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px #0F172A14' }}>
-          <ArrowsInCardinal size={16} weight="bold" />{isId ? 'Semua lokasi' : 'Show all locations'}
-        </button>
+        {hasAvailableLocations && (
+          <button type="button" onClick={showAll} style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 500, display: 'flex', alignItems: 'center', gap: '6px', minHeight: '36px', padding: '8px 10px', border: '1px solid #E2E8F0', borderRadius: '10px', background: '#FFFFFF', color: '#053079', fontFamily: 'inherit', fontSize: '11px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 8px #0F172A14' }}>
+            <ArrowsInCardinal size={16} weight="bold" />{isId ? 'Semua lokasi' : 'Show all locations'}
+          </button>
+        )}
         <div style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 500, display: 'flex', flexDirection: 'column', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 8px #0F172A14' }}>
           {[1, -1].map((direction) => (
             <button key={direction} type="button" aria-label={direction === 1 ? 'Zoom in' : 'Zoom out'} onClick={() => mapInstanceRef.current?.setZoom(mapInstanceRef.current.getZoom() + direction)} style={{ width: '36px', height: '36px', border: '1px solid #E2E8F0', background: '#FFFFFF', color: '#334155', fontSize: '20px', cursor: 'pointer' }}>{direction === 1 ? '+' : '−'}</button>
           ))}
         </div>
-        {!locations.some((entry) => entry.available) && (
+        {!hasAvailableLocations && (
           <div style={{ position: 'absolute', inset: 0, zIndex: 450, display: 'grid', placeItems: 'center', pointerEvents: 'none', background: '#FFFFFF70' }}>
-            <span style={{ background: '#FFFFFF', padding: '12px', borderRadius: '12px', color: '#64748B', fontSize: '12px', fontWeight: 600 }}>{isId ? 'Tidak ada lokasi presensi' : 'No attendance locations'}</span>
+            <span style={{ background: '#FFFFFF', padding: '12px 16px', borderRadius: '12px', color: '#64748B', fontSize: '12px', fontWeight: 600, boxShadow: '0 2px 8px rgba(15, 23, 42, 0.08)' }}>
+              {isOff
+                ? (isId ? 'Jadwal Libur (Tidak ada presensi)' : 'Scheduled Off (No attendance)')
+                : (isId ? 'Tidak ada lokasi presensi' : 'No attendance locations')}
+            </span>
           </div>
         )}
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-        {locations.map((entry) => {
-          const selected = focusedClock === entry.key;
-          const isIn = entry.key === 'in';
-          const color = isIn ? '#15803D' : '#DC2626';
-          const Icon = isIn ? SignIn : SignOut;
-          return (
-            <button key={entry.key} type="button" disabled={!entry.available} aria-pressed={selected} onClick={() => focusLocation(entry)} style={{ minWidth: 0, textAlign: 'left', padding: '12px', borderRadius: '12px', border: `1px solid ${selected ? color : '#E2E8F0'}`, background: selected ? (isIn ? '#F0FDF4' : '#FEF2F2') : '#FFFFFF', fontFamily: 'inherit', cursor: entry.available ? 'pointer' : 'default', opacity: entry.available ? 1 : 0.55, display: 'flex', flexDirection: 'column', gap: '6px', boxShadow: selected ? `0 0 0 1px ${color}` : 'none' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color, fontSize: '11px', fontWeight: 800 }}><Icon size={16} weight="bold" />{isId ? 'Lihat' : 'Show'} {isIn ? 'Clock In' : 'Clock Out'}</span>
-              <span style={{ fontSize: '11px', fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>{entry.siteName}</span>
-              <span style={{ fontSize: '10px', color: '#64748B', lineHeight: 1.4 }}>{entry.available ? `${cleanTime(entry.time)} WIB` : (isId ? 'Lokasi belum tersedia' : 'Location unavailable')}</span>
-            </button>
-          );
-        })}
-      </div>
+      {!isOff && hasAvailableLocations && (
+        <div style={{ display: 'grid', gridTemplateColumns: availableLocations.length === 1 ? '1fr' : '1fr 1fr', gap: '8px' }}>
+          {availableLocations.map((entry) => {
+            const selected = focusedClock === entry.key;
+            const isIn = entry.key === 'in';
+            const color = isIn ? '#15803D' : '#DC2626';
+            const Icon = isIn ? SignIn : SignOut;
+            return (
+              <button key={entry.key} type="button" disabled={!entry.available} aria-pressed={selected} onClick={() => focusLocation(entry)} style={{ minWidth: 0, textAlign: 'left', padding: '12px', borderRadius: '12px', border: `1px solid ${selected ? color : '#E2E8F0'}`, background: selected ? (isIn ? '#F0FDF4' : '#FEF2F2') : '#FFFFFF', fontFamily: 'inherit', cursor: entry.available ? 'pointer' : 'default', opacity: entry.available ? 1 : 0.55, display: 'flex', flexDirection: 'column', gap: '6px', boxShadow: selected ? `0 0 0 1px ${color}` : 'none' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color, fontSize: '11px', fontWeight: 800 }}><Icon size={16} weight="bold" />{isId ? 'Lihat' : 'Show'} {isIn ? 'Clock In' : 'Clock Out'}</span>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>{entry.siteName}</span>
+                <span style={{ fontSize: '10px', color: '#64748B', lineHeight: 1.4 }}>{entry.available ? `${cleanTime(entry.time)} WIB` : (isId ? 'Lokasi belum tersedia' : 'Location unavailable')}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
@@ -374,7 +392,7 @@ export const AttendanceRecordDetailView = ({ data }) => {
           >
             {language === 'id' ? 'Peta Lokasi Presensi' : 'Attendance Location Map'}
           </h2>
-          <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: '#0284C7' }}>
+          <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--color-secondary, #09B2FF)' }}>
             {language === 'id' ? 'GPS & Geofencing' : 'GPS & Geofencing'}
           </span>
         </div>
@@ -416,12 +434,12 @@ export const AttendanceRecordDetailView = ({ data }) => {
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                backgroundColor: '#F0F9FF',
+                backgroundColor: '#EAF7FF',
                 border: '1px solid #BAE6FD',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#0284C7',
+                color: 'var(--color-secondary, #09B2FF)',
                 flexShrink: 0,
               }}
             >
@@ -446,12 +464,12 @@ export const AttendanceRecordDetailView = ({ data }) => {
                 width: '36px',
                 height: '36px',
                 borderRadius: '10px',
-                backgroundColor: '#F0F9FF',
+                backgroundColor: '#EAF7FF',
                 border: '1px solid #BAE6FD',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#0284C7',
+                color: 'var(--color-secondary, #09B2FF)',
                 flexShrink: 0,
               }}
             >

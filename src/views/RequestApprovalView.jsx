@@ -200,7 +200,7 @@ export const RequestApprovalView = ({ onBack, user }) => {
         flexDirection: 'column',
         minHeight: '100%',
         backgroundColor: '#F8FAFC',
-        color: '#1E293B',
+        color: '#334155',
         fontFamily: 'Inter, -apple-system, sans-serif',
       }}
     >
@@ -375,7 +375,7 @@ export const RequestApprovalView = ({ onBack, user }) => {
               borderRadius: '10px',
               border: '1px solid #E2E8F0',
               backgroundColor: '#F8FAFC',
-              color: '#1E293B',
+              color: '#334155',
               outline: 'none',
               boxSizing: 'border-box',
             }}
@@ -482,7 +482,7 @@ export const RequestApprovalView = ({ onBack, user }) => {
                       }}
                     />
                     <div>
-                      <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#0F172A' }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: 800, color: '#334155' }}>
                         {item.employeeName}
                       </div>
                       <div style={{ fontSize: '0.6875rem', color: '#64748B', marginTop: '1px' }}>
@@ -498,8 +498,8 @@ export const RequestApprovalView = ({ onBack, user }) => {
                       fontWeight: 700,
                       padding: '3px 8px',
                       borderRadius: '8px',
-                      backgroundColor: isApproved ? '#DCFCE7' : isPending ? '#FEF3C7' : '#FEE2E2',
-                      color: isApproved ? '#15803D' : isPending ? '#B45309' : '#B91C1C',
+                      backgroundColor: isApproved ? '#DCFCE7' : isPending ? '#FFEDD5' : '#FEE2E2',
+                      color: isApproved ? '#15803D' : isPending ? '#C2410C' : '#B91C1C',
                     }}
                   >
                     {isApproved
@@ -533,7 +533,7 @@ export const RequestApprovalView = ({ onBack, user }) => {
                     <span style={{ fontSize: '0.6875rem', color: '#94A3B8' }}>{item.id}</span>
                   </div>
 
-                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1E293B' }}>
+                  <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#334155' }}>
                     {item.title}
                   </div>
                 </div>
@@ -713,7 +713,7 @@ export const RequestApprovalView = ({ onBack, user }) => {
                 >
                   <XCircle size={20} weight="fill" />
                 </div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: '#0F172A' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: '#334155' }}>
                   {language === 'id' ? 'Tolak Permohonan' : 'Reject Request'}
                 </h3>
               </div>
