@@ -1,6 +1,23 @@
-export const getRequestDisplayTitle = (request, language) => request.type === 'PERMIT'
-  ? getCategoryOptions(request.type, language).find((option) => option.value === request.subType)?.title || request.subType || request.title
-  : request.title;
+export const getRequestDisplayTitle = (request, language) => {
+  if (!request) return '';
+  if (request.type === 'PERMIT') {
+    return (
+      getCategoryOptions(request.type, language).find(
+        (option) => option.value === request.subType || option.title === request.subType
+      )?.title ||
+      request.subType ||
+      request.title
+    );
+  }
+  if (request.type === 'OVERTIME') {
+    const isBko =
+      request.overtimeMode === 'OVERTIME_BKO' ||
+      (request.subType && request.subType.toLowerCase().includes('bko')) ||
+      (request.title && request.title.toLowerCase().includes('bko'));
+    return isBko ? 'BKO Overtime' : 'Staff Overtime';
+  }
+  return request.title;
+};
 
 export const getCategoryOptions = (type, lang) => {
   const isId = lang === 'id';
@@ -63,13 +80,18 @@ export const getCategoryOptions = (type, lang) => {
     ],
     CHANGE_SHIFT: [
       {
+        value: 'Ganti Shift',
+        title: isId ? 'Ganti Shift Mandiri' : 'Shift Change',
+        badge: isId ? 'Sisa 2x / Bln' : '2x / Month',
+      },
+      {
         value: 'Tukar Shift',
         title: isId ? 'Tukar Shift Rekan Kerja' : 'Shift Swap',
         badge: isId ? 'Sisa 2x / Bln' : '2x / Month',
       },
       {
-        value: 'Ganti Hari Kerja',
-        title: isId ? 'Ganti Hari Kerja' : 'Off-Day Swap',
+        value: 'Transfer Shift',
+        title: isId ? 'Transfer Shift ke Rekan Off' : 'Shift Transfer',
         badge: isId ? 'Sisa 2x / Bln' : '2x / Month',
       },
     ],

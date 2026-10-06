@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CaretLeft, CalendarBlank, Check, X, Clock, CalendarCheck } from '@phosphor-icons/react';
+import { CaretLeft, CalendarBlank, Check, X, Clock, CalendarCheck, SignIn, SignOut } from '@phosphor-icons/react';
 import { CustomDatePickerPopover } from '../components/common';
 
 export default function ManualAttendanceView({
@@ -736,6 +736,32 @@ export default function ManualAttendanceView({
                   </div>
                 </div>
 
+                {/* Check In & Check Out */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
+                      Check In
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                      <SignIn size={16} color={checkIn ? '#16A34A' : '#94A3B8'} weight="bold" />
+                      <span style={{ fontSize: '12.5px', fontWeight: 600, color: checkIn ? '#1E293B' : '#94A3B8' }}>
+                        {checkIn || '-'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
+                      Check Out
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                      <SignOut size={16} color={checkOut ? '#DC2626' : '#94A3B8'} weight="bold" />
+                      <span style={{ fontSize: '12.5px', fontWeight: 600, color: checkOut ? '#1E293B' : '#94A3B8' }}>
+                        {checkOut || '-'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Reason / Notes */}
                 <div>

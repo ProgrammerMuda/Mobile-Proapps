@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { INITIAL_TEAM_APPROVALS } from './data/teamApprovals';
 import { useLanguage } from './context/LanguageContext';
 import { AndroidMobileFrame, Header, BottomNavigation } from './components/layout';
 import {
@@ -41,6 +42,8 @@ import {
 
 function App() {
   const { t } = useLanguage();
+  const [teamApprovals, setTeamApprovals] = useState(INITIAL_TEAM_APPROVALS);
+  const pendingApprovalCount = teamApprovals.filter((item) => item.status === 'PENDING').length;
   const [currentScreen, setCurrentScreen] = useState('splash'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail'
   const [activeTab, setActiveTab] = useState('home');
   const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState(null);
@@ -562,6 +565,7 @@ function App() {
 
       {currentScreen === 'work-attendance' && (
         <WorkAttendanceView
+          pendingApprovalCount={pendingApprovalCount}
           user={userSession}
           onBack={() => setCurrentScreen('home')}
           onSelectAttendanceRecord={(item) => {
@@ -608,6 +612,8 @@ function App() {
 
       {currentScreen === 'request-approval' && (
         <RequestApprovalView
+          teamApprovals={teamApprovals}
+          setTeamApprovals={setTeamApprovals}
           user={userSession}
           onBack={() => setCurrentScreen('work-attendance')}
         />

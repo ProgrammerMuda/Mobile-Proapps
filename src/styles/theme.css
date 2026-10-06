@@ -215,9 +215,11 @@ input:focus, textarea:focus, select:focus {
 }
 
 input:disabled, textarea:disabled, select:disabled {
-  background-color: var(--color-disabled-bg) !important;
-  color: var(--color-disabled-text) !important;
-  border-color: var(--color-disabled-border) !important;
+  background-color: #F8FAFC !important;
+  color: #94A3B8 !important;
+  -webkit-text-fill-color: #94A3B8 !important;
+  border-color: #E2E8F0 !important;
+  opacity: 1 !important;
   cursor: not-allowed;
 }
 
@@ -358,3 +360,34 @@ input:disabled, textarea:disabled, select:disabled {
   }
 }
 
+
+/* Match rejection notes to the permission request forms. */
+textarea.approval-rejection-reason {
+  width: 100%;
+  min-height: 110px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #CBD5E1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  background-color: #FFFFFF;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: none;
+  line-height: 1.5;
+}
+
+textarea.approval-rejection-reason::placeholder {
+  color: #94A3B8 !important;
+  opacity: 1 !important;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: inherit;
+}
+
+textarea.approval-rejection-reason:focus {
+  border-color: #09B2FF;
+  box-shadow: 0 0 0 3px rgba(9, 178, 255, 0.16);
+  outline: none;
+}

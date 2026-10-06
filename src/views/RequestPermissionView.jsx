@@ -63,8 +63,9 @@ const INITIAL_REQUESTS = [
   {
     id: 'REQ-OVT-2026-0039',
     type: 'OVERTIME',
-    subType: 'Lembur Hari Kerja',
-    title: 'Perbaikan Darurat Pipa Basement 2',
+    subType: 'Staff Overtime',
+    title: 'Staff Overtime',
+    overtimeMode: 'OVERTIME_STAFF',
     dateDisplay: '26 Sep 2026 • 17:00 - 20:30',
     duration: '3.5 Jam',
     submittedAt: '26 Sep 2026 • 16:30',
@@ -73,6 +74,22 @@ const INITIAL_REQUESTS = [
     approver: 'Bambang Sudirgo (Chief Engineering)',
     approvedAt: '26 Sep 2026 • 21:00',
     attachment: 'laporan_pekerjaan_pipa.pdf',
+  },
+  {
+    id: 'REQ-OVT-2026-0032',
+    type: 'OVERTIME',
+    subType: 'BKO Overtime',
+    title: 'BKO Overtime',
+    overtimeMode: 'OVERTIME_BKO',
+    shift: 'Shift Malam (20:00 - 05:00)',
+    dateDisplay: '22 Sep 2026',
+    duration: '1 Shift',
+    submittedAt: '21 Sep 2026 • 11:20',
+    status: 'APPROVED',
+    reason: 'Penugasan BKO pengamanan tambahan area loading dock dan basement saat kunjungan VIP tenant.',
+    approver: 'Bambang Sudirgo (Chief Engineering)',
+    approvedAt: '21 Sep 2026 • 14:00',
+    attachment: null,
   },
   {
     id: 'REQ-CSH-2026-0041',
@@ -336,7 +353,7 @@ export const RequestPermissionView = ({ onBack, user }) => {
     if (dateFilter && !matchesRequestDate(item.dateDisplay, dateFilter)) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchTitle = getRequestDisplayTitle(item, 'en').toLowerCase().includes(q);
+      const matchTitle = getRequestDisplayTitle(item, language).toLowerCase().includes(q);
       const matchSubType = item.subType.toLowerCase().includes(q);
       const matchReason = item.reason.toLowerCase().includes(q);
       const matchId = item.id.toLowerCase().includes(q);
@@ -1713,7 +1730,10 @@ export const RequestPermissionView = ({ onBack, user }) => {
         onSubmit={(shiftData) => {
           const newId = `REQ-CSH-2026-00${Math.floor(Math.random() * 90) + 10}`;
           const isSwap = shiftData.mode === 'CHANGE_SHIFT_SWAP';
-          const subTypeLabel = isSwap
+          const isTransfer = shiftData.mode === 'CHANGE_SHIFT_TRANSFER';
+          const subTypeLabel = isTransfer
+            ? (language === 'id' ? 'Transfer Shift' : 'Shift Transfer')
+            : isSwap
             ? (language === 'id' ? 'Tukar Shift' : 'Shift Swap')
             : (language === 'id' ? 'Ganti Shift' : 'Shift Change');
 
@@ -1721,12 +1741,12 @@ export const RequestPermissionView = ({ onBack, user }) => {
             id: newId,
             type: 'CHANGE_SHIFT',
             subType: subTypeLabel,
-            title: isSwap ? 'Shift Swap' : 'Shift Change',
+            title: isTransfer ? 'Shift Transfer' : isSwap ? 'Shift Swap' : 'Shift Change',
             shift: shiftData.fromShift,
             fromShift: shiftData.fromShift,
             toShift: shiftData.toShift,
-            swapWith: isSwap ? shiftData.partnerName : null,
-            partnerShift: isSwap ? shiftData.partnerShift : null,
+            swapWith: (isSwap || isTransfer) ? shiftData.partnerName : null,
+            partnerShift: shiftData.partnerShift,
             dateDisplay: shiftData.formattedDate,
             scheduleDate: shiftData.scheduleDate,
             duration: '1 Shift',
@@ -2078,7 +2098,7 @@ export const RequestPermissionView = ({ onBack, user }) => {
           </div>
         ) : (
           filteredRequests.map((item) => {
-            const displayTitle = getRequestDisplayTitle(item, 'en');
+            const displayTitle = getRequestDisplayTitle(item, language);
             const config = TYPE_CONFIG[item.type] || TYPE_CONFIG.PERMIT;
             const IconComponent = config.icon;
             const isApproved = item.status === 'APPROVED';

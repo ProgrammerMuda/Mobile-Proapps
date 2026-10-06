@@ -20,6 +20,7 @@ import {
   ArrowClockwise,
   CaretDown,
   Calendar,
+  WarningCircle,
 } from '@phosphor-icons/react';
 import { CustomDatePickerPopover } from '../components/common';
 
@@ -71,7 +72,6 @@ export default function OvertimeView({
 
   // Staff Overtime Form State
   const [staffShift, setStaffShift] = useState('');
-  const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
   // Common Form State
@@ -121,6 +121,7 @@ export default function OvertimeView({
       const day = d.getDay();
       if (day === 0 || day === 6) {
         setStaffShift('Libur Reguler (Day Off)');
+        setEndTime('');
       } else {
         setStaffShift('Shift Normal (08:30 - 17:30)');
       }
@@ -132,6 +133,15 @@ export default function OvertimeView({
   const handleModeChange = (mode) => {
     setOvertimeMode(mode);
   };
+
+  // Helper to extract shift end time (used as automatic start time for staff overtime)
+  const getShiftEndTime = (shiftStr) => {
+    if (!shiftStr || shiftStr === 'Libur Reguler (Day Off)') return '';
+    const match = shiftStr.match(/-\s*(\d{2}:\d{2})/);
+    return match ? match[1] : '17:30';
+  };
+
+  const autoStartTime = getShiftEndTime(staffShift);
 
   // Calculate Overtime Duration for Staff
   const calculateDuration = (start, end) => {
@@ -149,30 +159,31 @@ export default function OvertimeView({
     }
 
     const diffMinutes = endMinutes - startMinutes;
-    if (diffMinutes <= 0) return { hours: 0, text: '0 Jam', badgeText: '0 Jam' };
+    if (diffMinutes <= 0) return { hours: 0, text: '0h', badgeText: '0h' };
 
     const hours = Math.floor(diffMinutes / 60);
     const mins = diffMinutes % 60;
-    const decimalHours = (diffMinutes / 60).toFixed(1).replace('.0', '');
 
     let text = '';
-    if (mins === 0) {
-      text = isId ? `${hours} Jam` : `${hours} Hours`;
-    } else if (mins === 30) {
-      text = isId ? `${decimalHours} Jam (${hours} Jam 30 Menit)` : `${decimalHours} Hours (${hours}h 30m)`;
+    if (hours > 0 && mins > 0) {
+      text = `${hours}h ${mins}m`;
+    } else if (hours > 0) {
+      text = `${hours}h`;
+    } else if (mins > 0) {
+      text = `${mins}m`;
     } else {
-      text = isId ? `${hours} Jam ${mins} Menit` : `${hours}h ${mins}m`;
+      text = '0h';
     }
 
     return {
       diffMinutes,
       hours: diffMinutes / 60,
       text,
-      badgeText: isId ? `${decimalHours} Jam` : `${decimalHours} Hours`,
+      badgeText: text,
     };
   };
 
-  const durationInfo = calculateDuration(startTime, endTime);
+  const durationInfo = calculateDuration(autoStartTime, endTime);
 
   // Time mask helper (HH:mm)
   const handleTimeInput = (setter) => (e) => {
@@ -253,12 +264,17 @@ export default function OvertimeView({
     if (fileInput) fileInput.value = '';
   };
 
+  // Day off detection for staff overtime
+  const isStaffDayOff = overtimeMode === 'OVERTIME_STAFF' && Boolean(scheduleDate && staffShift === 'Libur Reguler (Day Off)');
+
   // Form Validity
   const isFormValid = overtimeMode === 'OVERTIME_BKO'
-    ? Boolean(scheduleDate && bkoShift && detailedReason.trim().length > 0)
+    ? Boolean(scheduleDate && bkoShift && bkoShift !== 'Libur Reguler (Day Off)' && detailedReason.trim().length > 0)
     : Boolean(
         scheduleDate &&
-        startTime.length === 5 &&
+        staffShift &&
+        staffShift !== 'Libur Reguler (Day Off)' &&
+        !isStaffDayOff &&
         endTime.length === 5 &&
         durationInfo.hours > 0 &&
         detailedReason.trim().length > 0
@@ -279,7 +295,7 @@ export default function OvertimeView({
         scheduleDate,
         formattedDate: formatDisplayDate(scheduleDate),
         shift: overtimeMode === 'OVERTIME_BKO' ? bkoShift : staffShift,
-        startTime: overtimeMode === 'OVERTIME_STAFF' ? startTime : null,
+        startTime: overtimeMode === 'OVERTIME_STAFF' ? autoStartTime : null,
         endTime: overtimeMode === 'OVERTIME_STAFF' ? endTime : null,
         duration: overtimeMode === 'OVERTIME_BKO' ? '1 Shift' : durationInfo.badgeText,
         title: overtimeMode === 'OVERTIME_BKO' ? 'BKO Overtime' : 'Staff Overtime',
@@ -296,10 +312,10 @@ export default function OvertimeView({
   };
 
   // Reusable Attachment Section (identical to Permit Permission)
-  const renderAttachmentSection = () => (
+  const renderAttachmentSection = (disabled = false) => (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-        <label htmlFor="overtime-attachment-file" style={{ fontSize: '14px', fontWeight: 600, color: '#334155', margin: 0 }}>
+        <label htmlFor={disabled ? undefined : "overtime-attachment-file"} style={{ fontSize: '14px', fontWeight: 600, color: disabled ? '#94A3B8' : '#334155', margin: 0 }}>
           Attachment
           <span style={{ fontSize: '12px', fontWeight: 400, color: '#94A3B8', marginLeft: '6px' }}>
             {isId ? '(Opsional)' : '(Optional)'}
@@ -316,9 +332,10 @@ export default function OvertimeView({
         id="overtime-attachment-file"
         type="file"
         multiple
+        disabled={disabled}
         accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
         onChange={(e) => {
-          if (e.target.files && e.target.files.length > 0) {
+          if (!disabled && e.target.files && e.target.files.length > 0) {
             handleFilesSelected(e.target.files);
           }
         }}
@@ -327,16 +344,19 @@ export default function OvertimeView({
 
       {/* Dropzone Card */}
       <label
-        htmlFor="overtime-attachment-file"
+        htmlFor={disabled ? undefined : "overtime-attachment-file"}
         onDragOver={(e) => {
+          if (disabled) return;
           e.preventDefault();
           setIsDragging(true);
         }}
         onDragLeave={(e) => {
+          if (disabled) return;
           e.preventDefault();
           setIsDragging(false);
         }}
         onDrop={(e) => {
+          if (disabled) return;
           e.preventDefault();
           setIsDragging(false);
           if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
@@ -344,12 +364,13 @@ export default function OvertimeView({
           }
         }}
         style={{
-          border: `1.5px dashed ${isDragging ? '#09B2FF' : '#CBD5E1'}`,
+          border: `1.5px dashed ${disabled ? '#E2E8F0' : (isDragging ? '#09B2FF' : '#CBD5E1')}`,
           borderRadius: '16px',
           padding: '24px 20px',
           textAlign: 'center',
-          backgroundColor: isDragging ? '#F0F9FF' : '#FFFFFF',
-          cursor: 'pointer',
+          backgroundColor: disabled ? '#F8FAFC' : (isDragging ? '#F0F9FF' : '#FFFFFF'),
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.7 : 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -359,13 +380,13 @@ export default function OvertimeView({
           transition: 'all 0.15s ease',
         }}
         onMouseEnter={(e) => {
-          if (!isDragging) {
+          if (!disabled && !isDragging) {
             e.currentTarget.style.borderColor = '#09B2FF';
             e.currentTarget.style.backgroundColor = '#F8FAFC';
           }
         }}
         onMouseLeave={(e) => {
-          if (!isDragging) {
+          if (!disabled && !isDragging) {
             e.currentTarget.style.borderColor = '#CBD5E1';
             e.currentTarget.style.backgroundColor = '#FFFFFF';
           }
@@ -800,7 +821,7 @@ export default function OvertimeView({
                     <option value="" disabled hidden>
                       {isId ? 'Pilih shift lembur' : 'Select overtime shift'}
                     </option>
-                    {SHIFT_OPTIONS.map((shift) => (
+                    {SHIFT_OPTIONS.filter((shift) => shift !== 'Libur Reguler (Day Off)').map((shift) => (
                       <option key={shift} value={shift} style={{ color: '#1E293B' }}>
                         {shift}
                       </option>
@@ -940,11 +961,11 @@ export default function OvertimeView({
                     width: '100%',
                     minHeight: '44px',
                     padding: '10px 14px',
-                    backgroundColor: '#F8FAFC',
-                    border: '1px solid #E2E8F0',
+                    backgroundColor: isStaffDayOff ? '#FEF2F2' : '#F8FAFC',
+                    border: isStaffDayOff ? '1px solid #FECACA' : '1px solid #E2E8F0',
                     borderRadius: '10px',
                     fontSize: '14px',
-                    color: staffShift ? '#334155' : '#94A3B8',
+                    color: isStaffDayOff ? '#DC2626' : (staffShift ? '#334155' : '#94A3B8'),
                     fontWeight: staffShift ? 500 : 400,
                     display: 'flex',
                     alignItems: 'center',
@@ -953,7 +974,7 @@ export default function OvertimeView({
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Clock size={17} color={staffShift ? 'var(--color-secondary, #09B2FF)' : '#94A3B8'} weight="bold" />
+                    <Clock size={17} color={isStaffDayOff ? '#DC2626' : (staffShift ? 'var(--color-secondary, #09B2FF)' : '#94A3B8')} weight="bold" />
                     <span>{staffShift || (isId ? 'Otomatis terisi setelah memilih tanggal' : 'Auto-filled after selecting date')}</span>
                   </div>
                   {staffShift && (
@@ -961,88 +982,100 @@ export default function OvertimeView({
                       style={{
                         fontSize: '11px',
                         fontWeight: 600,
-                        color: '#0284C7',
-                        backgroundColor: '#EAF7FF',
+                        color: isStaffDayOff ? '#DC2626' : '#0284C7',
+                        backgroundColor: isStaffDayOff ? '#FEE2E2' : '#EAF7FF',
                         padding: '2px 8px',
                         borderRadius: '6px',
-                        border: '1px solid #BAE6FD',
+                        border: isStaffDayOff ? '1px solid #FCA5A5' : '1px solid #BAE6FD',
                       }}
                     >
-                      Auto
+                      {isStaffDayOff ? (isId ? 'Hari Libur' : 'Day Off') : 'Auto'}
                     </span>
                   )}
                 </div>
+
+                {isStaffDayOff && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      backgroundColor: '#FEF2F2',
+                      border: '1px solid #FECACA',
+                      borderRadius: '8px',
+                      padding: '10px 12px',
+                      marginTop: '8px',
+                      color: '#DC2626',
+                      fontSize: '13px',
+                      lineHeight: '1.4',
+                    }}
+                  >
+                    <WarningCircle size={18} color="#DC2626" weight="fill" style={{ flexShrink: 0 }} />
+                    <span>
+                      {isId
+                        ? 'Anda berstatus Libur Reguler (Day Off) pada tanggal ini. Lembur staff hanya dapat diajukan pada hari kerja aktif.'
+                        : 'You are on Day Off on this date. Staff overtime can only be requested on an active working day.'}
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* FIELD 3 & 4: Start Time* & End Time* */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: '#334155',
-                      marginBottom: '6px',
-                    }}
-                  >
-                    Start Time <span style={{ color: '#EF4444' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="17:30"
-                    value={startTime}
-                    onChange={handleTimeInput(setStartTime)}
-                    maxLength={5}
-                    style={{
-                      width: '100%',
-                      minHeight: '44px',
-                      padding: '10px 12px',
-                      border: '1px solid #CBD5E1',
-                      borderRadius: '10px',
-                      fontSize: '14px',
-                      color: '#1E293B',
-                      fontWeight: 600,
-                      fontFamily: 'inherit',
-                      backgroundColor: '#FFFFFF',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <label
-                    style={{
-                      display: 'block',
-                      fontSize: '14px',
-                      fontWeight: 600,
-                      color: '#334155',
-                      marginBottom: '6px',
-                    }}
-                  >
-                    End Time <span style={{ color: '#EF4444' }}>*</span>
-                  </label>
+              {/* FIELD 3: End Time* */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#334155',
+                    marginBottom: '6px',
+                  }}
+                >
+                  End Time <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+                <div style={{ position: 'relative' }}>
                   <input
                     type="text"
                     placeholder="21:00"
                     value={endTime}
+                    disabled={!scheduleDate || isStaffDayOff}
                     onChange={handleTimeInput(setEndTime)}
                     maxLength={5}
                     style={{
                       width: '100%',
                       minHeight: '44px',
-                      padding: '10px 12px',
-                      border: '1px solid #CBD5E1',
+                      padding: '10px 38px 10px 14px',
+                      border: (!scheduleDate || isStaffDayOff) ? '1px solid #E2E8F0' : '1px solid #CBD5E1',
                       borderRadius: '10px',
                       fontSize: '14px',
-                      color: '#1E293B',
+                      color: (!scheduleDate || isStaffDayOff) ? '#94A3B8' : '#1E293B',
                       fontWeight: 600,
                       fontFamily: 'inherit',
-                      backgroundColor: '#FFFFFF',
+                      backgroundColor: (!scheduleDate || isStaffDayOff) ? '#F8FAFC' : '#FFFFFF',
+                      cursor: (!scheduleDate || isStaffDayOff) ? 'not-allowed' : 'text',
                       boxSizing: 'border-box',
                     }}
                   />
+                  <Clock
+                    size={17}
+                    color={(!scheduleDate || isStaffDayOff) ? '#94A3B8' : 'var(--color-secondary, #09B2FF)'}
+                    weight="bold"
+                    style={{
+                      position: 'absolute',
+                      right: '14px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      pointerEvents: 'none',
+                    }}
+                  />
                 </div>
+                {autoStartTime && !isStaffDayOff && (
+                  <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '5px' }}>
+                    {isId
+                      ? `* Jam lembur otomatis terhitung sejak akhir shift (${autoStartTime})`
+                      : `* Overtime starts automatically from shift end time (${autoStartTime})`}
+                  </div>
+                )}
               </div>
 
               {/* FIELD 5: Overtime Duration (auto) */}
@@ -1070,19 +1103,21 @@ export default function OvertimeView({
                     border: '1px solid #E2E8F0',
                     borderRadius: '10px',
                     fontSize: '14px',
-                    color: durationInfo.hours > 0 ? '#1E293B' : '#94A3B8',
-                    fontWeight: durationInfo.hours > 0 ? 600 : 400,
+                    color: !isStaffDayOff && durationInfo.hours > 0 ? '#1E293B' : '#94A3B8',
+                    fontWeight: !isStaffDayOff && durationInfo.hours > 0 ? 600 : 400,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
                     boxSizing: 'border-box',
                   }}
                 >
-                  <Clock size={18} color={durationInfo.hours > 0 ? 'var(--color-secondary, #09B2FF)' : '#94A3B8'} weight="bold" />
+                  <Clock size={18} color={!isStaffDayOff && durationInfo.hours > 0 ? 'var(--color-secondary, #09B2FF)' : '#94A3B8'} weight="bold" />
                   <span>
-                    {durationInfo.hours > 0
-                      ? durationInfo.text
-                      : (isId ? 'Otomatis terhitung dari jam lembur' : 'Auto-calculated from overtime hours')}
+                    {isStaffDayOff
+                      ? '-'
+                      : (durationInfo.hours > 0
+                        ? durationInfo.text
+                        : (isId ? 'Otomatis terhitung dari jam lembur' : 'Auto-calculated from overtime hours'))}
                   </span>
                 </div>
               </div>
@@ -1102,26 +1137,33 @@ export default function OvertimeView({
                 </label>
                 <textarea
                   rows={3}
-                  placeholder={isId ? 'Tuliskan alasan rinci lembur staff...' : 'Enter detailed reason for staff overtime...'}
+                  disabled={!scheduleDate || isStaffDayOff}
+                  placeholder={
+                    isStaffDayOff
+                      ? (isId ? 'Tidak dapat mengajukan lembur pada hari libur' : 'Cannot request overtime on a day off')
+                      : (isId ? 'Tuliskan alasan rinci lembur staff...' : 'Enter detailed reason for staff overtime...')
+                  }
                   value={detailedReason}
                   onChange={(e) => setDetailedReason(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '10px 14px',
-                    border: '1px solid #CBD5E1',
+                    border: (!scheduleDate || isStaffDayOff) ? '1px solid #E2E8F0' : '1px solid #CBD5E1',
                     borderRadius: '10px',
                     fontSize: '14px',
-                    color: '#1E293B',
+                    color: (!scheduleDate || isStaffDayOff) ? '#94A3B8' : '#1E293B',
                     fontFamily: 'inherit',
                     lineHeight: 1.5,
                     resize: 'none',
                     boxSizing: 'border-box',
+                    backgroundColor: (!scheduleDate || isStaffDayOff) ? '#F8FAFC' : '#FFFFFF',
+                    cursor: (!scheduleDate || isStaffDayOff) ? 'not-allowed' : 'text',
                   }}
                 />
               </div>
 
               {/* FIELD 7: Attachment (identical to Permit Permission) */}
-              {renderAttachmentSection()}
+              {renderAttachmentSection(isStaffDayOff)}
             </>
           )}
         </form>
@@ -1331,33 +1373,28 @@ export default function OvertimeView({
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                      <div>
-                        <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
-                          Start Time
-                        </div>
-                        <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B', marginTop: '3px' }}>
-                          {startTime}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
-                          End Time
-                        </div>
-                        <div style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B', marginTop: '3px' }}>
-                          {endTime}
-                        </div>
-                      </div>
-                    </div>
-
                     <div>
                       <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
-                        Overtime Duration (auto)
+                        End Time & Duration
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
-                        <Clock size={16} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                        <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginTop: '3px', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <Clock size={16} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                          <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B' }}>
+                            {endTime}
+                          </span>
+                        </div>
+                        <span
+                          style={{
+                            backgroundColor: '#EAF7FF',
+                            color: '#0284C7',
+                            border: '1px solid #BAE6FD',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            fontWeight: 600,
+                            fontSize: '11.5px',
+                          }}
+                        >
                           {durationInfo.text}
                         </span>
                       </div>

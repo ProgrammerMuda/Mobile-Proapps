@@ -22,6 +22,8 @@ import {
   Eye,
   SignIn,
   SignOut,
+  UserSwitch,
+  X,
 } from '@phosphor-icons/react';
 
 export default function RequestPermissionDetailView({
@@ -31,6 +33,8 @@ export default function RequestPermissionDetailView({
   onBack,
   onCancelRequest,
   _onReapply,
+  onApprove,
+  onReject,
 }) {
   const pageRef = useRef(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
@@ -87,6 +91,10 @@ export default function RequestPermissionDetailView({
     ? request.approver.replace(/\s*\(.*?\)/, '').trim()
     : (isPending ? (isId ? 'Menunggu Building Service' : 'Waiting for Building Service') : 'Hendra Wijaya');
 
+  const rejectedByName = request.rejectedByName || approverName;
+  const rejectedByRole = request.rejectedByRole || request.approverRole
+    || request.approver?.match(/\((.*?)\)/)?.[1] || 'Building Service';
+
   // Manual Attendance Specific Helpers
   const isManualAttendance = request.type === 'MANUAL_ATTENDANCE';
 
@@ -140,13 +148,14 @@ export default function RequestPermissionDetailView({
   };
 
   const isChangeShift = request.type === 'CHANGE_SHIFT';
-  const isShiftSwap = isChangeShift && Boolean(request.swapWith);
-  const isShiftChange = isChangeShift && !request.swapWith;
+  const isShiftTransfer = isChangeShift && (request.title === 'Shift Transfer' || request.subType?.includes('Transfer'));
+  const isShiftSwap = isChangeShift && !isShiftTransfer && Boolean(request.swapWith);
+  const isShiftChange = isChangeShift && !request.swapWith && !isShiftTransfer;
   const subtypeLabel = getCategoryOptions(request.type, language)
     .find((option) => option.value === request.subType)?.title || request.subType;
   const heroTitle = isManualAttendance
     ? getManualAttendanceTitle()
-    : isShiftChange
+    : isShiftChange || isShiftTransfer || isShiftSwap
     ? request.title
     : subtypeLabel || request.title;
   const showRequestTitle = request.type !== 'PERMIT' && !isManualAttendance && !isChangeShift && request.title && request.title !== heroTitle;
@@ -430,6 +439,20 @@ export default function RequestPermissionDetailView({
               <span>{isId ? 'Diajukan' : 'Submitted'} {request.submittedAt || '-'}</span>
             </div>
           </div>
+          {isRejected && (
+            <div style={{ marginTop: '16px', backgroundColor: '#FFFFFF', padding: '12px 14px', borderRadius: '12px', border: '1px solid #FECACA' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#B91C1C', fontWeight: 700, fontSize: '12.5px', marginBottom: '4px' }}>
+                <WarningCircle size={16} weight="fill" style={{ flexShrink: 0 }} />
+                <span>{isId ? 'Alasan Penolakan' : 'Rejection Reason'}</span>
+              </div>
+              <div style={{ fontSize: '12.5px', color: '#64748B', lineHeight: 1.5, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                {request.rejectReason || (isId ? 'Tidak ada alasan yang diberikan.' : 'No reason provided.')}
+              </div>
+              <div style={{ marginTop: '8px', fontSize: '12px', fontWeight: 700, color: '#0F172A', lineHeight: 1.5, overflowWrap: 'anywhere' }}>
+                {isId ? 'Ditolak oleh' : 'Rejected by'} {rejectedByName} · {rejectedByRole}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* WORKFLOW / APPROVAL PROGRESS TRACKER */}
@@ -782,37 +805,6 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* Rejection Alert if rejected */}
-              {request.rejectReason && (
-                <div>
-                  <div
-                    style={{
-                      backgroundColor: '#FEF2F2',
-                      padding: '12px 14px',
-                      borderRadius: '12px',
-                      border: '1px solid #FECACA',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#B91C1C',
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      <WarningCircle size={16} weight="fill" />
-                      <span>{isId ? 'Alasan Penolakan dari Building Service' : 'Building Service Rejection Reason'}</span>
-                    </div>
-                    <div style={{ fontSize: '12.5px', color: '#991B1B', lineHeight: 1.5 }}>
-                      {request.rejectReason}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ) : isShiftChange ? (
             /* =========================================================================
@@ -908,37 +900,6 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* Rejection Alert if rejected */}
-              {request.rejectReason && (
-                <div>
-                  <div
-                    style={{
-                      backgroundColor: '#FEF2F2',
-                      padding: '12px 14px',
-                      borderRadius: '12px',
-                      border: '1px solid #FECACA',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#B91C1C',
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      <WarningCircle size={16} weight="fill" />
-                      <span>{isId ? 'Alasan Penolakan dari Building Service' : 'Building Service Rejection Reason'}</span>
-                    </div>
-                    <div style={{ fontSize: '12.5px', color: '#991B1B', lineHeight: 1.5 }}>
-                      {request.rejectReason}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ) : isShiftSwap ? (
             /* =========================================================================
@@ -968,10 +929,10 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* 2. Previous Shift (Shift Sebelumnya) - SEBELUM Swap Shift With */}
+              {/* 2. Previous Shift / Transferred Shift */}
               <div>
                 <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
-                  {isId ? 'Shift Sebelumnya' : 'Previous Shift'}
+                  {isShiftTransfer ? (isId ? 'Shift yang Ditransfer' : 'Transferred Shift') : (isId ? 'Shift Sebelumnya' : 'Previous Shift')}
                 </div>
                 <div
                   style={{
@@ -991,51 +952,59 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* 3. Swap Shift With (Tukar Shift Dengan) */}
-              <div>
-                <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
-                  {isId ? 'Tukar Shift Dengan' : 'Swap Shift With'}
+              {/* 3. Swap Shift With or Transfer To */}
+              {(isShiftSwap || isShiftTransfer) && request.swapWith && (
+                <div>
+                  <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                    {isShiftTransfer ? 'Transfer To' : (isId ? 'Tukar Shift Dengan' : 'Swap Shift With')}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 12px',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    {isShiftTransfer ? (
+                      <UserSwitch size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                    ) : (
+                      <ArrowsLeftRight size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                    )}
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                      {request.swapWith}
+                    </span>
+                  </div>
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '10px 12px',
-                    backgroundColor: '#F8FAFC',
-                    borderRadius: '10px',
-                    border: '1px solid #E2E8F0',
-                  }}
-                >
-                  <ArrowsLeftRight size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
-                    {request.swapWith}
-                  </span>
-                </div>
-              </div>
+              )}
 
-              {/* 4. Next Shift (Shift Selanjutnya) - diubah dari Shift Information */}
-              <div>
-                <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
-                  {isId ? 'Shift Selanjutnya' : 'Next Shift'}
+              {/* 4. Next Shift (Only for Shift Change and Shift Swap) */}
+              {!isShiftTransfer && (
+                <div>
+                  <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                    {isId ? 'Shift Selanjutnya' : 'Next Shift'}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 12px',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    <Clock size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                      {toShiftDisplay}
+                    </span>
+                  </div>
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '10px 12px',
-                    backgroundColor: '#F8FAFC',
-                    borderRadius: '10px',
-                    border: '1px solid #E2E8F0',
-                  }}
-                >
-                  <Clock size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
-                    {toShiftDisplay}
-                  </span>
-                </div>
-              </div>
+              )}
 
               {/* 5. Reason / Notes */}
               <div>
@@ -1057,37 +1026,6 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* Rejection Alert if rejected */}
-              {request.rejectReason && (
-                <div>
-                  <div
-                    style={{
-                      backgroundColor: '#FEF2F2',
-                      padding: '12px 14px',
-                      borderRadius: '12px',
-                      border: '1px solid #FECACA',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#B91C1C',
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      <WarningCircle size={16} weight="fill" />
-                      <span>{isId ? 'Alasan Penolakan dari Building Service' : 'Building Service Rejection Reason'}</span>
-                    </div>
-                    <div style={{ fontSize: '12.5px', color: '#991B1B', lineHeight: 1.5 }}>
-                      {request.rejectReason}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ) : request.type === 'OVERTIME' ? (
             /* =========================================================================
@@ -1217,37 +1155,6 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* Rejection Alert if rejected */}
-              {request.rejectReason && (
-                <div>
-                  <div
-                    style={{
-                      backgroundColor: '#FEF2F2',
-                      padding: '12px 14px',
-                      borderRadius: '10px',
-                      border: '1px solid #FECACA',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#B91C1C',
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      <WarningCircle size={16} weight="fill" />
-                      <span>{isId ? 'Alasan Penolakan dari Building Service' : 'Building Service Rejection Reason'}</span>
-                    </div>
-                    <div style={{ fontSize: '12.5px', color: '#991B1B', lineHeight: 1.5 }}>
-                      {request.rejectReason}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             /* =========================================================================
@@ -1370,37 +1277,6 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* Rejection Alert if rejected */}
-              {request.rejectReason && (
-                <div>
-                  <div
-                    style={{
-                      backgroundColor: '#FEF2F2',
-                      padding: '12px 14px',
-                      borderRadius: '10px',
-                      border: '1px solid #FECACA',
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        color: '#B91C1C',
-                        fontWeight: 700,
-                        fontSize: '12.5px',
-                        marginBottom: '4px',
-                      }}
-                    >
-                      <WarningCircle size={16} weight="fill" />
-                      <span>{isId ? 'Alasan Penolakan dari Building Service' : 'Building Service Rejection Reason'}</span>
-                    </div>
-                    <div style={{ fontSize: '12.5px', color: '#991B1B', lineHeight: 1.5 }}>
-                      {request.rejectReason}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>
@@ -1578,7 +1454,72 @@ export default function RequestPermissionDetailView({
         </div>
       </div>
 
-
+      {/* Sticky Bottom Action Bar for Approval Mode */}
+      {onApprove && onReject && isPending && (
+        <div
+          style={{
+            position: 'sticky',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#FFFFFF',
+            padding: '12px 16px 14px',
+            borderTop: '1px solid #E2E8F0',
+            boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.05)',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1.6fr',
+            gap: '10px',
+            zIndex: 40,
+            boxSizing: 'border-box',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => onReject(request)}
+            style={{
+              height: '46px',
+              borderRadius: '12px',
+              border: '1px solid #E2E8F0',
+              backgroundColor: '#FFFFFF',
+              color: '#DC2626',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <X size={18} weight="bold" />
+            <span>{isId ? 'Tolak' : 'Reject'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onApprove(request.id)}
+            style={{
+              height: '46px',
+              borderRadius: '12px',
+              border: 'none',
+              backgroundColor: '#16A34A',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              boxShadow: '0 4px 12px rgba(22, 163, 74, 0.2)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <Check size={18} weight="bold" />
+            <span>{isId ? 'Setujui' : 'Approve'}</span>
+          </button>
+        </div>
+      )}
 
       {/* =========================================================================
           CONFIRMATION MODAL: BATALKAN PERMOHONAN

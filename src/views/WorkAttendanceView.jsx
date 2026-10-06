@@ -345,7 +345,7 @@ const ConfirmAttendanceMap = ({
 /**
  * Main Work Attendance View
  */
-export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAttendanceRecord }) => {
+export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAttendanceRecord, pendingApprovalCount = 0 }) => {
   const { language } = useLanguage();
 
   // State: Clock In / Out status
@@ -1557,6 +1557,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
             >
               <div
                 style={{
+                  position: 'relative',
                   width: '54px',
                   height: '54px',
                   display: 'flex',
@@ -1575,6 +1576,33 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                     filter: 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.07))',
                   }}
                 />
+                {pendingApprovalCount > 0 && (
+                  <span
+                    role="status"
+                    aria-label={language === 'id' ? `${pendingApprovalCount} permintaan perlu ditindaklanjuti` : `${pendingApprovalCount} requests need action`}
+                    style={{
+                      position: 'absolute',
+                      top: '-3px',
+                      right: '-6px',
+                      minWidth: '20px',
+                      height: '20px',
+                      padding: '0 4px',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '999px',
+                      backgroundColor: '#EF4444',
+                      border: '2px solid #FFFFFF',
+                      color: '#FFFFFF',
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {pendingApprovalCount > 99 ? '99+' : pendingApprovalCount}
+                  </span>
+                )}
               </div>
               <span
                 style={{
@@ -3878,7 +3906,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                     }}
                   >
                     <CheckCircle size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
-                    <span
+                    {pendingApprovalCount > 0 && <span
                       style={{
                         position: 'absolute',
                         top: '-4px',
@@ -3892,26 +3920,26 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                         border: '2px solid #FFFFFF',
                       }}
                     >
-                      3
-                    </span>
+                      {pendingApprovalCount > 99 ? '99+' : pendingApprovalCount}
+                    </span>}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
                       <span style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155' }}>
-                        {language === 'id' ? 'Request Approval' : 'Request Approval'}
+                        {language === 'id' ? 'Approval Request' : 'Approval Request'}
                       </span>
-                      <span
+                      {pendingApprovalCount > 0 && <span
                         style={{
                           fontSize: '0.625rem',
                           fontWeight: 700,
                           padding: '2px 6px',
                           borderRadius: '6px',
-                          backgroundColor: '#FEF3C7',
-                          color: '#B45309',
+                          backgroundColor: '#FFF7ED',
+                          color: '#C2410C',
                         }}
                       >
-                        3 {language === 'id' ? 'Menunggu' : 'Pending'}
-                      </span>
+                        {pendingApprovalCount} {language === 'id' ? 'Menunggu' : 'Pending'}
+                      </span>}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
                       {language === 'id'
