@@ -618,8 +618,8 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
             const renderCard = (item) => {
             const isApproved = item.status === 'APPROVED';
             const isPending = item.status === 'PENDING';
-            const isShiftSwap = item.type === 'CHANGE_SHIFT' && Boolean(item.swapWith);
-            const isShiftTransfer = item.type === 'CHANGE_SHIFT' && Boolean(item.transferTo);
+            const isShiftTransfer = item.type === 'CHANGE_SHIFT' && (item.title === 'Shift Transfer' || item.subType?.toLowerCase().includes('transfer') || Boolean(item.transferTo));
+            const isShiftSwap = item.type === 'CHANGE_SHIFT' && !isShiftTransfer && Boolean(item.swapWith);
             const isShiftRequest = item.type === 'CHANGE_SHIFT' && Boolean(item.toShift);
             const displayTitle = getRequestDisplayTitle(item, language);
             const typeOption = REQUEST_TYPE_OPTIONS.find((opt) => opt.id === item.type) || REQUEST_TYPE_OPTIONS[0];
@@ -737,9 +737,9 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
                       Swap with {item.swapWith}
                     </p>
                   )}
-                  {isShiftTransfer && (
+                  {isShiftTransfer && (item.transferTo || item.swapWith) && (
                     <p style={{ margin: '0 0 4px', fontSize: REQUEST_FONT.caption, fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>
-                      Transfer to {item.transferTo}
+                      Transfer to {item.transferTo || item.swapWith}
                     </p>
                   )}
                   <p

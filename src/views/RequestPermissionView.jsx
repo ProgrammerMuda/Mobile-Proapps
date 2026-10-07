@@ -119,12 +119,13 @@ const INITIAL_REQUESTS = [
     scheduleDate: '2026-10-07',
     duration: '1 Shift',
     submittedAt: '07 Oct 2026 • 15:58',
-    status: 'PENDING',
+    status: 'APPROVED',
     reason: 'Saya mau bertukar shift dengan Budi Santoso karena saya tidak bisa shift pagi',
     requesterName: 'Dedi Kurniawan',
     requesterRole: 'Engineering',
-    approver: 'Waiting for Building Service',
+    approver: 'Arman sukajang',
     approvalRole: 'Building Service',
+    approvedAt: '07 Oct 2026 • 16:15',
     approvers: [
       {
         name: 'Arman sukajang',
@@ -134,7 +135,7 @@ const INITIAL_REQUESTS = [
       {
         name: 'Jajang susanto',
         role: 'Building Management',
-        status: 'PENDING',
+        status: 'APPROVED',
       },
     ],
     attachment: null,
@@ -2317,7 +2318,8 @@ export const RequestPermissionView = ({ onBack, user }) => {
             const IconComponent = config.icon;
             const isApproved = item.status === 'APPROVED';
             const isPending = item.status === 'PENDING';
-            const isShiftSwap = item.type === 'CHANGE_SHIFT' && Boolean(item.swapWith);
+            const isShiftTransfer = item.type === 'CHANGE_SHIFT' && (item.title === 'Shift Transfer' || item.subType?.toLowerCase().includes('transfer') || Boolean(item.transferTo));
+            const isShiftSwap = item.type === 'CHANGE_SHIFT' && !isShiftTransfer && Boolean(item.swapWith);
             const isShiftRequest = item.type === 'CHANGE_SHIFT' && Boolean(item.toShift);
             const requestType = REQUEST_TYPE_OPTIONS.find((option) => option.id === item.type)?.label || 'Permit Permission';
 
@@ -2356,7 +2358,12 @@ export const RequestPermissionView = ({ onBack, user }) => {
                   <h4 style={{ margin: '0 0 5px', fontSize: REQUEST_FONT.body, fontWeight: 700, color: '#334155', lineHeight: 1.45 }}>
                     {displayTitle}
                   </h4>
-                  {isShiftSwap && (
+                  {isShiftTransfer && (item.transferTo || item.swapWith) && (
+                    <p style={{ margin: '0 0 4px', fontSize: REQUEST_FONT.caption, fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>
+                      Transfer to {item.transferTo || item.swapWith}
+                    </p>
+                  )}
+                  {isShiftSwap && item.swapWith && (
                     <p style={{ margin: '0 0 4px', fontSize: REQUEST_FONT.caption, fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>
                       Swap with {item.swapWith}
                     </p>
