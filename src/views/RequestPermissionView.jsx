@@ -43,6 +43,23 @@ import { CustomDatePickerPopover } from '../components/common';
 
 const INITIAL_REQUESTS = [
   {
+    id: 'REQ-PRM-2026-0048',
+    type: 'PERMIT',
+    subType: 'Sakit Rawat Inap',
+    title: 'Sakit Rawat Inap',
+    dateDisplay: '07 Okt 2026 - 11 Okt 2026',
+    scheduleDate: '2026-10-07',
+    duration: '5 Hari',
+    submittedAt: '07 Okt 2026 • 08:00',
+    status: 'APPROVED',
+    reason: 'Demam Berdarah',
+    approver: 'Hendra Wijaya (Building Manager)',
+    approvedAt: '07 Okt 2026 • 09:30',
+    attachment: 'Surat_Keterangan_Rawat_Inap_DBD.pdf',
+    attachmentName: 'Surat_Keterangan_Rawat_Inap_DBD.pdf',
+    attachmentSize: '1.2 MB',
+  },
+  {
     id: 'REQ-MAT-2026-0045',
     type: 'MANUAL_ATTENDANCE',
     subType: 'Manual Attendance',
