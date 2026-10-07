@@ -43,6 +43,39 @@ import { CustomDatePickerPopover } from '../components/common';
 
 const INITIAL_REQUESTS = [
   {
+    id: 'REQ-CSH-2026-0054',
+    type: 'CHANGE_SHIFT',
+    subType: 'Transfer Shift',
+    title: 'Shift Transfer',
+    fromShift: 'Shift Pagi (08:00 - 17:00)',
+    transferTo: 'Dedi Suryadi (Engineering)',
+    swapWith: 'Dedi Suryadi (Engineering)',
+    dateDisplay: '7 Oct 2026',
+    scheduleDate: '2026-10-07',
+    duration: '1 Shift',
+    submittedAt: '07 Oct 2026 • 16:52',
+    status: 'APPROVED',
+    reason: 'Saya tidak bisa shift pagi karna ada keperluan. Saya akan digantikan Pak Dedi',
+    requesterName: 'Ahmad Pratama',
+    requesterRole: 'Maintenance Staff • Operations',
+    approver: 'Arman sukajang',
+    approvalRole: 'Building Service',
+    approvedAt: '07 Oct 2026 • 17:05',
+    approvers: [
+      {
+        name: 'Arman sukajang',
+        role: 'Building Service',
+        status: 'APPROVED',
+      },
+      {
+        name: 'Jajang susanto',
+        role: 'Building Management',
+        status: 'APPROVED',
+      },
+    ],
+    attachment: null,
+  },
+  {
     id: 'REQ-CSH-2026-0053',
     type: 'CHANGE_SHIFT',
     subType: 'Transfer Shift',
