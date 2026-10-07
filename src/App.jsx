@@ -44,7 +44,7 @@ function App() {
   const { t } = useLanguage();
   const [teamApprovals, setTeamApprovals] = useState(INITIAL_TEAM_APPROVALS);
   const pendingApprovalCount = teamApprovals.filter((item) => item.status === 'PENDING').length;
-  const [currentScreen, setCurrentScreen] = useState('splash'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail'
+  const [currentScreen, setCurrentScreen] = useState('employee-permission'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail'
   const [activeTab, setActiveTab] = useState('home');
   const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState(null);
   const [attendanceRecordPreviousScreen, setAttendanceRecordPreviousScreen] = useState('work-attendance');

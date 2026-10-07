@@ -265,6 +265,9 @@ export default function RequestPermissionDetailView({
       };
   const fromShiftDisplay = request.fromShift || request.shift || (isId ? 'Shift Pagi (08:00 - 17:00)' : 'Morning Shift (08:00 - 17:00)');
   const toShiftDisplay = request.toShift || (isId ? 'Shift Siang (13:00 - 21:00)' : 'Afternoon Shift (13:00 - 21:00)');
+  const transferShift1Display = request.shift1 || request.fromShift || (isId ? 'Shift Pagi (08:00 - 17:00)' : 'Morning Shift (08:00 - 17:00)');
+  const transferShift2Display = request.shift2 || request.toShift || (isId ? 'Shift Siang (13:00 - 21:00)' : 'Afternoon Shift (13:00 - 21:00)');
+  const transferTargetDisplay = request.transferTo || request.swapWith || 'Dedi Suryadi (Engineering)';
 
   // File icon helper
   const getFileIcon = (fileName = '') => {
@@ -1252,6 +1255,100 @@ export default function RequestPermissionDetailView({
               </div>
 
             </div>
+          ) : isShiftTransfer ? (
+            /* =========================================================================
+               SHIFT TRANSFER INFORMATION (2 SHIFTS TO TRANSFER + TRANSFER TO)
+               ========================================================================= */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* 1. Schedule Date */}
+              <div>
+                <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                  {isId ? 'Tanggal Jadwal' : 'Schedule Date'}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 12px',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  <CalendarBlank size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                    {scheduleDateDisplay}
+                  </span>
+                </div>
+              </div>
+
+              {/* 2. Transferred Shift */}
+              <div>
+                <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                  {isId ? 'Shift yang Ditransfer' : 'Transferred Shift'}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 12px',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  <Clock size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                    {fromShiftDisplay}
+                  </span>
+                </div>
+              </div>
+
+              {/* 3. Orang yang Ditransfer Shift (Transfer To) */}
+              <div>
+                <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                  {isId ? 'Ditransfer Kepada' : 'Transferred To'}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 12px',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  <UserSwitch size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                    {transferTargetDisplay}
+                  </span>
+                </div>
+              </div>
+
+              {/* 5. Reason / Notes */}
+              <div>
+                <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                  {isId ? 'Alasan / Keterangan Pengajuan' : 'Notes / Reason'}
+                </div>
+                <div
+                  style={{
+                    backgroundColor: '#F8FAFC',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                    fontSize: '13px',
+                    color: '#334155',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {notesDisplay}
+                </div>
+              </div>
+            </div>
           ) : isShiftSwap ? (
             /* =========================================================================
                REDESIGNED SHIFT SWAP INFORMATION (PREVIOUS SHIFT -> SWAP WITH -> NEXT SHIFT)
@@ -1280,10 +1377,10 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* 2. Previous Shift / Transferred Shift */}
+              {/* 2. Previous Shift */}
               <div>
                 <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
-                  {isShiftTransfer ? (isId ? 'Shift yang Ditransfer' : 'Transferred Shift') : (isId ? 'Shift Sebelumnya' : 'Previous Shift')}
+                  {isId ? 'Shift Sebelumnya' : 'Previous Shift'}
                 </div>
                 <div
                   style={{
@@ -1303,11 +1400,11 @@ export default function RequestPermissionDetailView({
                 </div>
               </div>
 
-              {/* 3. Swap Shift With or Transfer To */}
-              {(isShiftSwap || isShiftTransfer) && request.swapWith && (
+              {/* 3. Swap Shift With */}
+              {request.swapWith && (
                 <div>
                   <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
-                    {isShiftTransfer ? 'Transfer To' : (isId ? 'Tukar Shift Dengan' : 'Swap Shift With')}
+                    {isId ? 'Tukar Shift Dengan' : 'Swap Shift With'}
                   </div>
                   <div
                     style={{
@@ -1320,11 +1417,7 @@ export default function RequestPermissionDetailView({
                       border: '1px solid #E2E8F0',
                     }}
                   >
-                    {isShiftTransfer ? (
-                      <UserSwitch size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                    ) : (
-                      <ArrowsLeftRight size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                    )}
+                    <ArrowsLeftRight size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
                     <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
                       {request.swapWith}
                     </span>
@@ -1332,30 +1425,28 @@ export default function RequestPermissionDetailView({
                 </div>
               )}
 
-              {/* 4. Next Shift (Only for Shift Change and Shift Swap) */}
-              {!isShiftTransfer && (
-                <div>
-                  <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
-                    {isId ? 'Shift Selanjutnya' : 'Next Shift'}
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '10px 12px',
-                      backgroundColor: '#F8FAFC',
-                      borderRadius: '10px',
-                      border: '1px solid #E2E8F0',
-                    }}
-                  >
-                    <Clock size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
-                      {toShiftDisplay}
-                    </span>
-                  </div>
+              {/* 4. Next Shift */}
+              <div>
+                <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                  {isId ? 'Shift Selanjutnya' : 'Next Shift'}
                 </div>
-              )}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 12px',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '10px',
+                    border: '1px solid #E2E8F0',
+                  }}
+                >
+                  <Clock size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                    {toShiftDisplay}
+                  </span>
+                </div>
+              </div>
 
               {/* 5. Reason / Notes */}
               <div>
@@ -1376,7 +1467,6 @@ export default function RequestPermissionDetailView({
                   {notesDisplay}
                 </div>
               </div>
-
             </div>
           ) : request.type === 'OVERTIME' ? (
             /* =========================================================================
@@ -1762,10 +1852,10 @@ export default function RequestPermissionDetailView({
                   Employee Requester
                 </div>
                 <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
-                  {user?.name || 'Ahmad Pratama'}
+                  {request.requesterName || user?.name || 'Ahmad Pratama'}
                 </div>
                 <div style={{ fontSize: '11px', color: '#64748B' }}>
-                  {user?.role || (isId ? 'Staff Maintenance • Divisi Operasional' : 'Maintenance Staff • Operations')}
+                  {request.requesterRole || user?.role || (isId ? 'Staff Maintenance • Divisi Operasional' : 'Maintenance Staff • Operations')}
                 </div>
               </div>
             </div>
