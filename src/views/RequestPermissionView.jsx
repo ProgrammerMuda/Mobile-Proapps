@@ -43,6 +43,37 @@ import { CustomDatePickerPopover } from '../components/common';
 
 const INITIAL_REQUESTS = [
   {
+    id: 'REQ-PRM-2026-0049',
+    type: 'PERMIT',
+    subType: 'Cuti Tahunan',
+    title: 'Cuti Tahunan',
+    dateDisplay: '12 Okt 2026 - 14 Okt 2026',
+    scheduleDate: '2026-10-12',
+    duration: '3 Hari',
+    submittedAt: '07 Okt 2026 • 15:00',
+    status: 'PENDING',
+    reason: 'Keperluan keluarga di luar kota.',
+    approver: 'Menunggu Building Management',
+    approvers: [
+      {
+        name: 'Arman sukajang',
+        role: 'Building Service',
+        status: 'APPROVED',
+      },
+      {
+        name: 'Jajang susanto',
+        role: 'Building Management',
+        status: 'PENDING',
+      },
+      {
+        name: 'Bambang Sudirgo',
+        role: 'Chief Engineering',
+        status: 'PENDING',
+      },
+    ],
+    attachment: null,
+  },
+  {
     id: 'REQ-PRM-2026-0048',
     type: 'PERMIT',
     subType: 'Sakit Rawat Inap',

@@ -95,6 +95,48 @@ export default function RequestPermissionDetailView({
   const rejectedByRole = request.rejectedByRole || request.approverRole
     || request.approver?.match(/\((.*?)\)/)?.[1] || 'Building Service';
 
+  // Multi-level Approvers List (Arman sukajang & Jajang susanto or custom request.approvers)
+  const defaultApprovers = isApproved
+    ? [
+        {
+          name: 'Arman sukajang',
+          role: 'Building Service',
+          status: 'APPROVED',
+        },
+        {
+          name: 'Jajang susanto',
+          role: 'Building Management',
+          status: 'APPROVED',
+        },
+      ]
+    : isPending
+    ? [
+        {
+          name: 'Arman sukajang',
+          role: 'Building Service',
+          status: 'APPROVED',
+        },
+        {
+          name: 'Jajang susanto',
+          role: 'Building Management',
+          status: 'PENDING',
+        },
+      ]
+    : [
+        {
+          name: 'Arman sukajang',
+          role: 'Building Service',
+          status: 'APPROVED',
+        },
+        {
+          name: 'Jajang susanto',
+          role: 'Building Management',
+          status: 'REJECTED',
+        },
+      ];
+
+  const approversList = request.approvers || defaultApprovers;
+
   // Manual Attendance Specific Helpers
   const isManualAttendance = request.type === 'MANUAL_ATTENDANCE';
 
@@ -458,7 +500,7 @@ export default function RequestPermissionDetailView({
         {/* WORKFLOW / APPROVAL PROGRESS TRACKER */}
         <div className="detail-card" style={{ padding: '16px' }}>
           <div style={{ marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#0F172A' }}>
+            <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#334155' }}>
               Approval Workflow Tracker
             </h3>
           </div>
@@ -473,7 +515,7 @@ export default function RequestPermissionDetailView({
                     width: '24px',
                     height: '24px',
                     borderRadius: '50%',
-                    backgroundColor: '#10B981',
+                    backgroundColor: '#16A34A',
                     color: '#FFFFFF',
                     display: 'grid',
                     placeItems: 'center',
@@ -488,14 +530,14 @@ export default function RequestPermissionDetailView({
                     width: '2px',
                     flex: 1,
                     minHeight: '36px',
-                    backgroundColor: isApproved ? '#10B981' : isRejected ? '#E2E8F0' : '#CBD5E1',
+                    backgroundColor: isApproved ? '#16A34A' : isRejected ? '#E2E8F0' : '#CBD5E1',
                     margin: '3px 0',
                   }}
                 />
               </div>
 
               <div style={{ paddingBottom: '16px', flex: 1 }}>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: '#0F172A' }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
                   {isId ? 'Permohonan Terkirim' : 'Request Submitted'}
                 </div>
                 <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>
@@ -504,7 +546,7 @@ export default function RequestPermissionDetailView({
               </div>
             </div>
 
-            {/* Step 2: Supervisor Review */}
+            {/* Step 2: Multi-level Approver Review */}
             <div style={{ display: 'flex', gap: '12px', position: 'relative' }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div
@@ -512,7 +554,7 @@ export default function RequestPermissionDetailView({
                     width: '24px',
                     height: '24px',
                     borderRadius: '50%',
-                    backgroundColor: isPending ? '#FFF7ED' : isApproved ? '#10B981' : '#EF4444',
+                    backgroundColor: isPending ? '#FFF7ED' : isApproved ? '#16A34A' : '#EF4444',
                     border: isPending ? '2px solid #F97316' : 'none',
                     color: isPending ? '#EA580C' : '#FFFFFF',
                     display: 'grid',
@@ -530,49 +572,141 @@ export default function RequestPermissionDetailView({
                     width: '2px',
                     flex: 1,
                     minHeight: '36px',
-                    backgroundColor: isApproved ? '#10B981' : '#E2E8F0',
+                    backgroundColor: isApproved ? '#16A34A' : '#E2E8F0',
                     margin: '3px 0',
                   }}
                 />
               </div>
 
-              <div style={{ paddingBottom: '16px', flex: 1 }}>
+              <div style={{ paddingBottom: '16px', flex: 1, minWidth: 0 }}>
                 <div
                   style={{
                     fontSize: '13px',
                     fontWeight: 700,
-                    color: isPending ? '#EA580C' : isApproved ? '#047857' : '#B91C1C',
+                    color: '#334155',
+                    marginBottom: '8px',
                   }}
                 >
-                  {isPending
-                    ? (isId ? 'Menunggu Peninjauan Building Service' : 'Waiting for Building Service Review')
-                    : isApproved
-                    ? (isId ? 'Disetujui oleh Building Service' : 'Approved by Building Service')
-                    : (isId ? 'Ditolak oleh Building Service' : 'Rejected by Building Service')}
+                  {isId ? 'Persetujuan Bertingkat' : 'Approval Reviewers'}
                 </div>
-                <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px' }}>
-                  <span>{approverName}</span>
-                  {request.approvedAt && <span> • {request.approvedAt}</span>}
+
+                {/* List of Approver Cards */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {approversList.map((appr, idx) => {
+                    const isApprApproved = appr.status === 'APPROVED';
+                    const isApprPending = appr.status === 'PENDING';
+
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '10px 12px',
+                          backgroundColor: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          borderRadius: '12px',
+                          gap: '10px',
+                          userSelect: 'none',
+                          cursor: 'default',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                          {isApprApproved ? (
+                            <div
+                              style={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '6px',
+                                backgroundColor: '#16A34A',
+                                color: '#FFFFFF',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                pointerEvents: 'none',
+                              }}
+                            >
+                              <Check size={14} weight="bold" />
+                            </div>
+                          ) : isApprPending ? (
+                            <div
+                              style={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '6px',
+                                backgroundColor: '#F1F5F9',
+                                border: '1.5px solid #CBD5E1',
+                                flexShrink: 0,
+                                pointerEvents: 'none',
+                              }}
+                            />
+                          ) : (
+                            <div
+                              style={{
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '6px',
+                                backgroundColor: '#DC2626',
+                                color: '#FFFFFF',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                pointerEvents: 'none',
+                              }}
+                            >
+                              <X size={14} weight="bold" />
+                            </div>
+                          )}
+
+                          <div style={{ minWidth: 0 }}>
+                            <div
+                              style={{
+                                fontSize: '13.5px',
+                                fontWeight: 700,
+                                color: '#334155',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {appr.name}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: '11.5px',
+                                color: '#94A3B8',
+                                marginTop: '1px',
+                              }}
+                            >
+                              {appr.role}
+                            </div>
+                          </div>
+                        </div>
+
+                        <span
+                          style={{
+                            padding: '4px 14px',
+                            borderRadius: '999px',
+                            fontSize: '11.5px',
+                            fontWeight: 700,
+                            backgroundColor: isApprApproved
+                              ? '#16A34A'
+                              : isApprPending
+                              ? '#F97316'
+                              : '#DC2626',
+                            color: '#FFFFFF',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {isApprApproved ? 'Approved' : isApprPending ? 'Pending' : 'Rejected'}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-                {isPending && (
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      marginTop: '6px',
-                      padding: '4px 8px',
-                      backgroundColor: '#FFF7ED',
-                      border: '1px solid #FED7AA',
-                      borderRadius: '6px',
-                      fontSize: '11px',
-                      color: '#C2410C',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {isId
-                      ? 'Dokumen sedang ditinjau oleh atasan langsung.'
-                      : 'Request is currently in reviewer queue.'}
-                  </div>
-                )}
               </div>
             </div>
 
@@ -584,7 +718,7 @@ export default function RequestPermissionDetailView({
                     width: '24px',
                     height: '24px',
                     borderRadius: '50%',
-                    backgroundColor: isApproved ? '#10B981' : '#F1F5F9',
+                    backgroundColor: isApproved ? '#16A34A' : '#F1F5F9',
                     border: isApproved ? 'none' : '2px solid #E2E8F0',
                     color: isApproved ? '#FFFFFF' : '#94A3B8',
                     display: 'grid',
@@ -602,7 +736,7 @@ export default function RequestPermissionDetailView({
                   style={{
                     fontSize: '13px',
                     fontWeight: 700,
-                    color: isApproved ? '#0F172A' : '#64748B',
+                    color: isApproved ? '#334155' : '#64748B',
                   }}
                 >
                   {isApproved
