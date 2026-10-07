@@ -3,6 +3,9 @@ import { createPortal } from 'react-dom';
 import { getCategoryOptions } from '../utils/requestCategories';
 import {
   CaretLeft,
+  CaretRight,
+  CaretDown,
+  CaretUp,
   FileText,
   Clock,
   ClockCountdown,
@@ -38,6 +41,7 @@ export default function RequestPermissionDetailView({
 }) {
   const pageRef = useRef(null);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isApproverAccordionOpen, setIsApproverAccordionOpen] = useState(true);
 
   // Scroll to top inside mobile simulator container when opened
   useLayoutEffect(() => {
@@ -135,7 +139,11 @@ export default function RequestPermissionDetailView({
         },
       ];
 
-  const approversList = request.approvers || defaultApprovers;
+  const isRoleAnyApproval = request.approvalMode === 'ANY' || request.approvalType === 'ROLE_ANY';
+  const approversList = request.approvers || (isRoleAnyApproval ? [] : defaultApprovers);
+  const approvalRoleName = request.approvalRole || (approversList.length > 0 ? approversList[0].role : 'Building Service');
+  const approvedCount = approversList.filter((a) => a.status === 'APPROVED').length;
+  const totalCount = approversList.length;
 
   // Manual Attendance Specific Helpers
   const isManualAttendance = request.type === 'MANUAL_ATTENDANCE';
@@ -587,126 +595,335 @@ export default function RequestPermissionDetailView({
                     marginBottom: '8px',
                   }}
                 >
-                  {isId ? 'Persetujuan Bertingkat' : 'Approval Reviewers'}
+                  {isRoleAnyApproval
+                    ? (isId ? 'Persetujuan' : 'Approval Review')
+                    : (isId ? 'Persetujuan Bertingkat' : 'Approval Reviewers')}
                 </div>
 
-                {/* List of Approver Cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {approversList.map((appr, idx) => {
-                    const isApprApproved = appr.status === 'APPROVED';
-                    const isApprPending = appr.status === 'PENDING';
-
-                    return (
+                {isRoleAnyApproval ? (
+                  /* Single Role Approval Card (NO Accordion) */
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '12px',
+                      padding: '12px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '12px',
+                    }}
+                  >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#334155' }}>
+                        {approvalRoleName}
+                      </div>
                       <div
-                        key={idx}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '10px 12px',
-                          backgroundColor: '#F8FAFC',
-                          border: '1px solid #E2E8F0',
-                          borderRadius: '12px',
-                          gap: '10px',
-                          userSelect: 'none',
-                          cursor: 'default',
+                          fontSize: '11.5px',
+                          color: '#64748B',
+                          marginTop: '3px',
+                          fontWeight: 500,
+                          lineHeight: 1.4,
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-                          {isApprApproved ? (
-                            <div
-                              style={{
-                                width: '22px',
-                                height: '22px',
-                                borderRadius: '6px',
-                                backgroundColor: '#16A34A',
-                                color: '#FFFFFF',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                                pointerEvents: 'none',
-                              }}
-                            >
-                              <Check size={14} weight="bold" />
-                            </div>
-                          ) : isApprPending ? (
-                            <div
-                              style={{
-                                width: '22px',
-                                height: '22px',
-                                borderRadius: '6px',
-                                backgroundColor: '#F1F5F9',
-                                border: '1.5px solid #CBD5E1',
-                                flexShrink: 0,
-                                pointerEvents: 'none',
-                              }}
-                            />
-                          ) : (
-                            <div
-                              style={{
-                                width: '22px',
-                                height: '22px',
-                                borderRadius: '6px',
-                                backgroundColor: '#DC2626',
-                                color: '#FFFFFF',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                                pointerEvents: 'none',
-                              }}
-                            >
-                              <X size={14} weight="bold" />
-                            </div>
-                          )}
+                        {isApproved
+                          ? (isId
+                              ? (request.approvedBy ? `Disetujui oleh ${request.approvedBy}` : `Telah disetujui oleh ${approvalRoleName}`)
+                              : (request.approvedBy ? `Approved by ${request.approvedBy}` : `Approved by ${approvalRoleName}`))
+                          : isRejected
+                          ? (isId
+                              ? (request.rejectedByName ? `Ditolak oleh ${request.rejectedByName}` : `Ditolak oleh ${approvalRoleName}`)
+                              : (request.rejectedByName ? `Rejected by ${request.rejectedByName}` : `Rejected by ${approvalRoleName}`))
+                          : (isId
+                              ? `Menunggu persetujuan dari salah satu staf ${approvalRoleName}`
+                              : `Awaiting approval from any ${approvalRoleName} officer`)}
+                      </div>
+                    </div>
 
-                          <div style={{ minWidth: 0 }}>
-                            <div
-                              style={{
-                                fontSize: '13.5px',
-                                fontWeight: 700,
-                                color: '#334155',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                              }}
-                            >
-                              {appr.name}
-                            </div>
-                            <div
-                              style={{
-                                fontSize: '11.5px',
-                                color: '#94A3B8',
-                                marginTop: '1px',
-                              }}
-                            >
-                              {appr.role}
-                            </div>
-                          </div>
-                        </div>
-
-                        <span
+                    <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                      {isApproved ? (
+                        <div
                           style={{
-                            padding: '4px 14px',
-                            borderRadius: '999px',
-                            fontSize: '11.5px',
-                            fontWeight: 700,
-                            backgroundColor: isApprApproved
-                              ? '#16A34A'
-                              : isApprPending
-                              ? '#F97316'
-                              : '#DC2626',
+                            width: '24px',
+                            height: '24px',
+                            minWidth: '24px',
+                            minHeight: '24px',
+                            boxSizing: 'border-box',
+                            borderRadius: '6px',
+                            backgroundColor: '#16A34A',
                             color: '#FFFFFF',
-                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            pointerEvents: 'none',
                           }}
                         >
-                          {isApprApproved ? 'Approved' : isApprPending ? 'Pending' : 'Rejected'}
-                        </span>
+                          <Check size={14} weight="bold" />
+                        </div>
+                      ) : isPending ? (
+                        <div
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            minWidth: '24px',
+                            minHeight: '24px',
+                            boxSizing: 'border-box',
+                            borderRadius: '6px',
+                            backgroundColor: '#FFF7ED',
+                            border: '1px solid #FED7AA',
+                            color: '#EA580C',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            pointerEvents: 'none',
+                          }}
+                        >
+                          <HourglassHigh size={14} weight="bold" />
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            minWidth: '24px',
+                            minHeight: '24px',
+                            boxSizing: 'border-box',
+                            borderRadius: '6px',
+                            backgroundColor: '#FEF2F2',
+                            border: '1px solid #FECACA',
+                            color: '#DC2626',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            pointerEvents: 'none',
+                          }}
+                        >
+                          <X size={14} weight="bold" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* Accordion Container for Approver Group */
+                  <div
+                    style={{
+                      backgroundColor: '#F8FAFC',
+                      border: '1px solid #E2E8F0',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {/* Accordion Header */}
+                    <button
+                      type="button"
+                      onClick={() => setIsApproverAccordionOpen((prev) => !prev)}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '11px 14px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        gap: '10px',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#334155' }}>
+                          {approvalRoleName}
+                        </div>
+                        <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '2px', fontWeight: 500 }}>
+                          {approvedCount}/{totalCount} {isId ? 'Disetujui' : 'Approved'}
+                          {approvedCount < totalCount && (
+                            <span style={{ color: '#F97316', fontWeight: 600 }}>
+                              {' '}• {totalCount - approvedCount} {isId ? 'menunggu' : 'pending'}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    );
-                  })}
-                </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {approvedCount === totalCount ? (
+                          <div
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              minWidth: '24px',
+                              minHeight: '24px',
+                              boxSizing: 'border-box',
+                              borderRadius: '6px',
+                              backgroundColor: '#16A34A',
+                              color: '#FFFFFF',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            <Check size={14} weight="bold" />
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              width: '24px',
+                              height: '24px',
+                              minWidth: '24px',
+                              minHeight: '24px',
+                              boxSizing: 'border-box',
+                              borderRadius: '6px',
+                              backgroundColor: '#FFF7ED',
+                              border: '1px solid #FED7AA',
+                              color: '#EA580C',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            <HourglassHigh size={14} weight="bold" />
+                          </div>
+                        )}
+
+                        <CaretDown
+                          size={16}
+                          weight="bold"
+                          style={{
+                            color: '#64748B',
+                            transform: isApproverAccordionOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.2s ease',
+                            flexShrink: 0,
+                          }}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Accordion Expanded Approver List */}
+                    {isApproverAccordionOpen && (
+                      <div
+                        style={{
+                          padding: '0 12px 12px 12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px',
+                        }}
+                      >
+                        <div style={{ height: '1px', backgroundColor: '#E2E8F0', marginBottom: '4px' }} />
+                        {approversList.map((appr, idx) => {
+                          const isApprApproved = appr.status === 'APPROVED';
+                          const isApprPending = appr.status === 'PENDING';
+
+                          return (
+                            <div
+                              key={idx}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                padding: '8px 10px',
+                                backgroundColor: '#FFFFFF',
+                                border: '1px solid #E2E8F0',
+                                borderRadius: '8px',
+                                gap: '10px',
+                                userSelect: 'none',
+                              }}
+                            >
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div
+                                  style={{
+                                    fontSize: '12.5px',
+                                    fontWeight: 600,
+                                    color: '#334155',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                  }}
+                                >
+                                  {appr.name}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: '11px',
+                                    color: '#94A3B8',
+                                  }}
+                                >
+                                  {appr.role}
+                                </div>
+                              </div>
+
+                              {isApprApproved ? (
+                                <div
+                                  style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    minWidth: '20px',
+                                    minHeight: '20px',
+                                    boxSizing: 'border-box',
+                                    borderRadius: '5px',
+                                    backgroundColor: '#16A34A',
+                                    color: '#FFFFFF',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                    pointerEvents: 'none',
+                                  }}
+                                >
+                                  <Check size={12} weight="bold" />
+                                </div>
+                              ) : isApprPending ? (
+                                <div
+                                  style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    minWidth: '20px',
+                                    minHeight: '20px',
+                                    boxSizing: 'border-box',
+                                    borderRadius: '5px',
+                                    backgroundColor: '#FFF7ED',
+                                    border: '1px solid #FED7AA',
+                                    color: '#EA580C',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                    pointerEvents: 'none',
+                                  }}
+                                >
+                                  <HourglassHigh size={12} weight="bold" />
+                                </div>
+                              ) : (
+                                <div
+                                  style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    minWidth: '20px',
+                                    minHeight: '20px',
+                                    boxSizing: 'border-box',
+                                    borderRadius: '5px',
+                                    backgroundColor: '#FEF2F2',
+                                    border: '1px solid #FECACA',
+                                    color: '#DC2626',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0,
+                                    pointerEvents: 'none',
+                                  }}
+                                >
+                                  <X size={12} weight="bold" />
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

@@ -43,6 +43,22 @@ import { CustomDatePickerPopover } from '../components/common';
 
 const INITIAL_REQUESTS = [
   {
+    id: 'REQ-PRM-2026-0050',
+    type: 'PERMIT',
+    subType: 'Cuti Khusus',
+    title: 'Special Leave',
+    dateDisplay: '16 Oct 2026',
+    scheduleDate: '2026-10-16',
+    duration: '1 Day',
+    submittedAt: '07 Oct 2026 • 15:30',
+    status: 'PENDING',
+    reason: 'Family event',
+    approver: 'Building Service',
+    approvalRole: 'Building Service',
+    approvalMode: 'ANY',
+    attachment: null,
+  },
+  {
     id: 'REQ-PRM-2026-0049',
     type: 'PERMIT',
     subType: 'Cuti Tahunan',
@@ -53,7 +69,8 @@ const INITIAL_REQUESTS = [
     submittedAt: '07 Okt 2026 • 15:00',
     status: 'PENDING',
     reason: 'Keperluan keluarga di luar kota.',
-    approver: 'Menunggu Building Management',
+    approver: 'Menunggu Building Service',
+    approvalRole: 'Building Service',
     approvers: [
       {
         name: 'Arman sukajang',
@@ -62,12 +79,12 @@ const INITIAL_REQUESTS = [
       },
       {
         name: 'Jajang susanto',
-        role: 'Building Management',
+        role: 'Building Service',
         status: 'PENDING',
       },
       {
         name: 'Bambang Sudirgo',
-        role: 'Chief Engineering',
+        role: 'Building Service',
         status: 'PENDING',
       },
     ],
