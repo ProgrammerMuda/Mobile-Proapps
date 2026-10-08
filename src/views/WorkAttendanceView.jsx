@@ -1478,7 +1478,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
             {/* 1. Work Schedule */}
             <button
               type="button"
-              onClick={() => setIsShiftModalOpen(true)}
+              onClick={() => {
+                if (onNavigateMenu) {
+                  onNavigateMenu('work-schedule');
+                } else {
+                  setIsShiftModalOpen(true);
+                }
+              }}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px',
