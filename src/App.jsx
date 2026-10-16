@@ -39,13 +39,15 @@ import {
   RequestPermissionView,
   RequestApprovalView,
   WorkScheduleView,
+  PayslipView,
+  OvertimeView,
 } from './views';
 
 function App() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [teamApprovals, setTeamApprovals] = useState(INITIAL_TEAM_APPROVALS);
   const pendingApprovalCount = teamApprovals.filter((item) => item.status === 'PENDING').length;
-  const [currentScreen, setCurrentScreen] = useState('work-schedule'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail' | 'work-schedule'
+  const [currentScreen, setCurrentScreen] = useState('overtime'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail' | 'work-schedule' | 'payslip' | 'overtime'
   const [activeTab, setActiveTab] = useState('home');
   const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState(null);
   const [attendanceRecordPreviousScreen, setAttendanceRecordPreviousScreen] = useState('work-attendance');
@@ -590,6 +592,10 @@ function App() {
               setCurrentScreen('request-approval');
             } else if (menuId === 'work-schedule' || menuId === 'shift-schedule') {
               setCurrentScreen('work-schedule');
+            } else if (menuId === 'payslip') {
+              setCurrentScreen('payslip');
+            } else if (menuId === 'overtime') {
+              setCurrentScreen('overtime');
             } else if (menuId === 'employee-permission') {
               if (extraData) {
                 setEmployeePermissionMode(extraData);
@@ -599,6 +605,23 @@ function App() {
               setCurrentScreen('employee-permission');
             }
           }}
+        />
+      )}
+
+      {currentScreen === 'overtime' && (
+        <OvertimeView
+          language={language || 'id'}
+          onBack={() => setCurrentScreen('request-permission')}
+          onSubmit={(overtimeData) => {
+            setCurrentScreen('request-permission');
+          }}
+        />
+      )}
+
+      {currentScreen === 'payslip' && (
+        <PayslipView
+          user={userSession}
+          onBack={() => setCurrentScreen('work-attendance')}
         />
       )}
 

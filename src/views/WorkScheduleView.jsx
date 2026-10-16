@@ -858,7 +858,7 @@ export const WorkScheduleView = ({ onBack, user, onNavigateChangeShift }) => {
                   {isId ? 'Ringkasan Roster Shift' : 'Shift Roster Summary'}
                 </div>
                 <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>
-                  {monthLabel} {selectedYear} • {monthlySchedules.length} {isId ? 'Hari Roster' : 'Days Total'}
+                  {monthLabel} {selectedYear} • {monthlySchedules.length} Days Total
                 </div>
               </div>
             </div>
@@ -903,7 +903,7 @@ export const WorkScheduleView = ({ onBack, user, onNavigateChangeShift }) => {
 
               <div>
                 <div style={{ fontSize: '18px', fontWeight: 800, color: '#1E293B', lineHeight: 1.1 }}>
-                  {workShiftCount} <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>Hari</span>
+                  {workShiftCount} <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>Days</span>
                 </div>
                 <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, marginTop: '2px' }}>
                   {isId ? 'Hari Kerja' : 'Working Days'}
@@ -942,7 +942,7 @@ export const WorkScheduleView = ({ onBack, user, onNavigateChangeShift }) => {
 
               <div>
                 <div style={{ fontSize: '18px', fontWeight: 800, color: '#1E293B', lineHeight: 1.1 }}>
-                  {dayOffCount} <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>Hari</span>
+                  {dayOffCount} <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748B' }}>Days</span>
                 </div>
                 <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 700, marginTop: '2px' }}>
                   {isId ? 'Hari Libur' : 'Off Days'}
@@ -1031,7 +1031,7 @@ export const WorkScheduleView = ({ onBack, user, onNavigateChangeShift }) => {
               gap: '6px',
               cursor: 'pointer',
               outline: 'none',
-              boxShadow: '0 2px 6px rgba(2, 56, 138, 0.22)',
+              boxShadow: 'none',
               transition: 'all 0.15s ease',
               flexShrink: 0,
             }}

@@ -21,6 +21,11 @@ import {
   CaretDown,
   Calendar,
   WarningCircle,
+  UserSwitch,
+  Buildings,
+  MagnifyingGlass,
+  User,
+  Info,
 } from '@phosphor-icons/react';
 import { CustomDatePickerPopover } from '../components/common';
 
@@ -30,6 +35,45 @@ const SHIFT_OPTIONS = [
   'Shift Malam (20:00 - 05:00)',
   'Shift Normal (08:30 - 17:30)',
   'Libur Reguler (Day Off)',
+];
+
+const EMPLOYEE_OPTIONS = [
+  // Shift Siang (13:00 - 21:00)
+  { id: 'emp-1', name: 'Dimas Prasetyo', role: 'Engineering', shift: 'Shift Siang (13:00 - 21:00)' },
+  { id: 'emp-2', name: 'Agus Setiawan', role: 'Security', shift: 'Shift Siang (13:00 - 21:00)' },
+  { id: 'emp-3', name: 'Siti Rahma', role: 'Housekeeping', shift: 'Shift Siang (13:00 - 21:00)' },
+  { id: 'emp-4', name: 'Bayu Pratama', role: 'BM', shift: 'Shift Siang (13:00 - 21:00)' },
+  { id: 'emp-1a', name: 'Yusuf Maulana', role: 'Engineering', shift: 'Shift Siang (13:00 - 21:00)' },
+  { id: 'emp-2a', name: 'Taufik Hidayat', role: 'Security', shift: 'Shift Siang (13:00 - 21:00)' },
+  { id: 'emp-3a', name: 'Ratna Sari', role: 'Housekeeping', shift: 'Shift Siang (13:00 - 21:00)' },
+
+  // Shift Malam (20:00 - 05:00)
+  { id: 'emp-5', name: 'Budi Santoso', role: 'Engineering', shift: 'Shift Malam (20:00 - 05:00)' },
+  { id: 'emp-6', name: 'Rudi Hartono', role: 'Security', shift: 'Shift Malam (20:00 - 05:00)' },
+  { id: 'emp-7', name: 'Farhan Maulana', role: 'Housekeeping', shift: 'Shift Malam (20:00 - 05:00)' },
+  { id: 'emp-8', name: 'Hendra Wijaya', role: 'BM', shift: 'Shift Malam (20:00 - 05:00)' },
+  { id: 'emp-5a', name: 'Rahmat Dani', role: 'Engineering', shift: 'Shift Malam (20:00 - 05:00)' },
+  { id: 'emp-6a', name: 'Ilham Saputra', role: 'Security', shift: 'Shift Malam (20:00 - 05:00)' },
+
+  // Shift Pagi (08:00 - 17:00)
+  { id: 'emp-9', name: 'Dewi Lestari', role: 'Engineering', shift: 'Shift Pagi (08:00 - 17:00)' },
+  { id: 'emp-10', name: 'Joko Susilo', role: 'Security', shift: 'Shift Pagi (08:00 - 17:00)' },
+  { id: 'emp-11', name: 'Sri Wahyuni', role: 'Housekeeping', shift: 'Shift Pagi (08:00 - 17:00)' },
+  { id: 'emp-12', name: 'Anisa Putri', role: 'BM', shift: 'Shift Pagi (08:00 - 17:00)' },
+  { id: 'emp-9a', name: 'Panji Gumilang', role: 'BM', shift: 'Shift Pagi (08:00 - 17:00)' },
+  { id: 'emp-10a', name: 'Nadia Salsabila', role: 'Customer Service', shift: 'Shift Pagi (08:00 - 17:00)' },
+
+  // Shift Normal (08:30 - 17:30)
+  { id: 'emp-13', name: 'Rizky Ramadhan', role: 'Engineering', shift: 'Shift Normal (08:30 - 17:30)' },
+  { id: 'emp-14', name: 'Eko Prasetya', role: 'Security', shift: 'Shift Normal (08:30 - 17:30)' },
+  { id: 'emp-15', name: 'Maya Indah', role: 'Housekeeping', shift: 'Shift Normal (08:30 - 17:30)' },
+  { id: 'emp-16', name: 'Citra Kirana', role: 'BM', shift: 'Shift Normal (08:30 - 17:30)' },
+
+  // Libur Reguler (Day Off)
+  { id: 'emp-17', name: 'Dedi Suryadi', role: 'Engineering', shift: 'Libur Reguler (Day Off)' },
+  { id: 'emp-18', name: 'Ahmad Fauzi', role: 'Security', shift: 'Libur Reguler (Day Off)' },
+  { id: 'emp-19', name: 'Rina Melati', role: 'Housekeeping', shift: 'Libur Reguler (Day Off)' },
+  { id: 'emp-20', name: 'Doni Irawan', role: 'BM', shift: 'Libur Reguler (Day Off)' },
 ];
 
 const getFileIconInfo = (fileName) => {
@@ -69,6 +113,10 @@ export default function OvertimeView({
 
   // BKO Form State
   const [bkoShift, setBkoShift] = useState('');
+  const [bkoType, setBkoType] = useState('REPLACEMENT'); // 'REPLACEMENT' | 'OPERATIONAL'
+  const [replacedEmployee, setReplacedEmployee] = useState(null);
+  const [isEmployeePickerOpen, setIsEmployeePickerOpen] = useState(false);
+  const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
 
   // Staff Overtime Form State
   const [staffShift, setStaffShift] = useState('');
@@ -267,9 +315,30 @@ export default function OvertimeView({
   // Day off detection for staff overtime
   const isStaffDayOff = overtimeMode === 'OVERTIME_STAFF' && Boolean(scheduleDate && staffShift === 'Libur Reguler (Day Off)');
 
+  // Available employees for the selected BKO shift
+  const availableBkoEmployees = bkoShift
+    ? EMPLOYEE_OPTIONS.filter((emp) => emp.shift === bkoShift)
+    : [];
+
+  // Filtered employees for colleague replacement search
+  const filteredEmployees = availableBkoEmployees.filter((emp) => {
+    const q = employeeSearchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      emp.name.toLowerCase().includes(q) ||
+      emp.role.toLowerCase().includes(q)
+    );
+  });
+
   // Form Validity
   const isFormValid = overtimeMode === 'OVERTIME_BKO'
-    ? Boolean(scheduleDate && bkoShift && bkoShift !== 'Libur Reguler (Day Off)' && detailedReason.trim().length > 0)
+    ? Boolean(
+        scheduleDate &&
+        bkoShift &&
+        bkoShift !== 'Libur Reguler (Day Off)' &&
+        (bkoType === 'REPLACEMENT' ? Boolean(replacedEmployee) : true) &&
+        detailedReason.trim().length > 0
+      )
     : Boolean(
         scheduleDate &&
         staffShift &&
@@ -292,6 +361,8 @@ export default function OvertimeView({
       const primaryFile = formAttachments[0];
       onSubmit({
         mode: overtimeMode,
+        bkoType: overtimeMode === 'OVERTIME_BKO' ? bkoType : null,
+        replacedEmployee: overtimeMode === 'OVERTIME_BKO' && bkoType === 'REPLACEMENT' ? replacedEmployee : null,
         scheduleDate,
         formattedDate: formatDisplayDate(scheduleDate),
         shift: overtimeMode === 'OVERTIME_BKO' ? bkoShift : staffShift,
@@ -802,7 +873,10 @@ export default function OvertimeView({
                 <div style={{ position: 'relative' }}>
                   <select
                     value={bkoShift}
-                    onChange={(e) => setBkoShift(e.target.value)}
+                    onChange={(e) => {
+                      setBkoShift(e.target.value);
+                      setReplacedEmployee(null); // Reset colleague selection when shift changes
+                    }}
                     style={{
                       width: '100%',
                       minHeight: '44px',
@@ -840,6 +914,170 @@ export default function OvertimeView({
                     }}
                   />
                 </div>
+              </div>
+
+              {/* FIELD 2.5: BKO ASSIGNMENT TYPE (2 SCENARIOS) */}
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    color: '#334155',
+                    marginBottom: '8px',
+                  }}
+                >
+                  {isId ? 'Tipe Penugasan BKO' : 'BKO Assignment Type'}{' '}
+                  <span style={{ color: '#EF4444' }}>*</span>
+                </label>
+
+                {/* 2 Segmented Options */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setBkoType('REPLACEMENT')}
+                    style={{
+                      padding: '10px 8px',
+                      borderRadius: '10px',
+                      border: bkoType === 'REPLACEMENT' ? '1.5px solid #09B2FF' : '1px solid #CBD5E1',
+                      backgroundColor: bkoType === 'REPLACEMENT' ? '#EAF7FF' : '#FFFFFF',
+                      color: bkoType === 'REPLACEMENT' ? '#053079' : '#64748B',
+                      fontWeight: bkoType === 'REPLACEMENT' ? 700 : 500,
+                      fontSize: '12.5px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      boxShadow: bkoType === 'REPLACEMENT' ? '0 2px 6px rgba(9, 178, 255, 0.15)' : 'none',
+                    }}
+                  >
+                    <UserSwitch size={16} weight={bkoType === 'REPLACEMENT' ? 'bold' : 'regular'} color={bkoType === 'REPLACEMENT' ? '#09B2FF' : '#64748B'} />
+                    <span>{isId ? 'Menggantikan Rekan' : 'Replace Colleague'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setBkoType('OPERATIONAL');
+                      setReplacedEmployee(null);
+                    }}
+                    style={{
+                      padding: '10px 8px',
+                      borderRadius: '10px',
+                      border: bkoType === 'OPERATIONAL' ? '1.5px solid #09B2FF' : '1px solid #CBD5E1',
+                      backgroundColor: bkoType === 'OPERATIONAL' ? '#EAF7FF' : '#FFFFFF',
+                      color: bkoType === 'OPERATIONAL' ? '#053079' : '#64748B',
+                      fontWeight: bkoType === 'OPERATIONAL' ? 700 : 500,
+                      fontSize: '12.5px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      boxShadow: bkoType === 'OPERATIONAL' ? '0 2px 6px rgba(9, 178, 255, 0.15)' : 'none',
+                    }}
+                  >
+                    <Buildings size={16} weight={bkoType === 'OPERATIONAL' ? 'bold' : 'regular'} color={bkoType === 'OPERATIONAL' ? '#09B2FF' : '#64748B'} />
+                    <span>{isId ? 'Kebutuhan Operasional' : 'Operational Need'}</span>
+                  </button>
+                </div>
+
+                {/* Sub-field: ONLY for REPLACEMENT */}
+                {bkoType === 'REPLACEMENT' && (
+                  <div style={{ marginTop: '2px', marginBottom: '4px' }}>
+                    <label
+                      style={{
+                        display: 'block',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: '#334155',
+                        marginBottom: '6px',
+                      }}
+                    >
+                      {isId ? 'Rekan yang Digantikan' : 'Colleague to Replace'}{' '}
+                      <span style={{ color: '#EF4444' }}>*</span>
+                    </label>
+
+                    <button
+                      type="button"
+                      disabled={!bkoShift}
+                      onClick={() => {
+                        if (!bkoShift) return;
+                        setIsEmployeePickerOpen(true);
+                      }}
+                      style={{
+                        width: '100%',
+                        minHeight: '48px',
+                        padding: '10px 14px',
+                        backgroundColor: !bkoShift ? '#F8FAFC' : replacedEmployee ? '#F8FAFC' : '#FFFFFF',
+                        border: !bkoShift
+                          ? '1px dashed #CBD5E1'
+                          : replacedEmployee
+                          ? '1.5px solid #BAE6FD'
+                          : '1px solid #CBD5E1',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '10px',
+                        cursor: !bkoShift ? 'not-allowed' : 'pointer',
+                        textAlign: 'left',
+                        fontFamily: 'inherit',
+                        opacity: !bkoShift ? 0.8 : 1,
+                      }}
+                    >
+                      {replacedEmployee ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              backgroundColor: '#EAF7FF',
+                              border: '1px solid #BAE6FD',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              color: '#0284C7',
+                              flexShrink: 0,
+                            }}
+                          >
+                            {replacedEmployee.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#1E293B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {replacedEmployee.name}
+                            </div>
+                            <div style={{ fontSize: '11.5px', color: '#64748B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {replacedEmployee.role} • {replacedEmployee.shift}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94A3B8' }}>
+                          <User size={18} color="#94A3B8" />
+                          <span style={{ fontSize: '13.5px' }}>
+                            {!bkoShift
+                              ? (isId ? 'Pilih shift lembur terlebih dahulu' : 'Select overtime shift first')
+                              : (isId ? `Pilih rekan pada ${bkoShift.split(' (')[0]}...` : `Select colleague on ${bkoShift.split(' (')[0]}...`)}
+                          </span>
+                        </div>
+                      )}
+                      <CaretDown size={16} color="#64748B" weight="bold" style={{ flexShrink: 0 }} />
+                    </button>
+                    {!bkoShift && (
+                      <div style={{ fontSize: '11.5px', color: '#64748B', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Info size={14} color="#09B2FF" weight="fill" style={{ flexShrink: 0 }} />
+                        <span>{isId ? 'Pilih shift lembur di atas untuk memfilter rekan yang bertugas.' : 'Select the Overtime Shift above to filter on-duty colleagues.'}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* FIELD 3: Detailed Reason* */}
@@ -1345,19 +1583,51 @@ export default function OvertimeView({
                   </div>
                 </div>
 
-                {/* BKO Specific: Shift */}
+                {/* BKO Specific: Shift & BKO Type Details */}
                 {overtimeMode === 'OVERTIME_BKO' ? (
-                  <div>
-                    <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
-                      Shift
+                  <>
+                    <div>
+                      <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
+                        {isId ? 'Tipe BKO' : 'BKO Assignment Type'}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                        {bkoType === 'REPLACEMENT' ? (
+                          <UserSwitch size={16} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                        ) : (
+                          <Buildings size={16} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                        )}
+                        <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B' }}>
+                          {bkoType === 'REPLACEMENT' ? (isId ? 'Menggantikan Rekan' : 'Replace Colleague') : (isId ? 'Kebutuhan Operasional' : 'Operational Need')}
+                        </span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
-                      <Clock size={16} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                      <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B' }}>
-                        {bkoShift}
-                      </span>
+
+                    {bkoType === 'REPLACEMENT' && replacedEmployee && (
+                      <div>
+                        <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
+                          {isId ? 'Rekan yang Digantikan' : 'Colleague to Replace'}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                          <User size={16} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                          <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B' }}>
+                            {replacedEmployee.name} ({replacedEmployee.role})
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <div style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B', marginBottom: '3px' }}>
+                        Shift
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
+                        <Clock size={16} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                        <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#1E293B' }}>
+                          {bkoShift}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 ) : (
                   /* Staff Overtime Specific: Shift (auto), Start/End Time, Duration (auto) */
                   <>
@@ -1546,6 +1816,315 @@ export default function OvertimeView({
                   <Check size={18} weight="bold" />
                   <span>Confirm</span>
                 </button>
+              </div>
+            </div>
+          </div>,
+          document.getElementById('phone-screen-container') || document.body
+        )}
+
+      {/* SEARCHABLE EMPLOYEE PICKER BOTTOM SHEET (FOR BKO REPLACEMENT) */}
+      {isEmployeePickerOpen &&
+        createPortal(
+          <div
+            role="presentation"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsEmployeePickerOpen(false);
+            }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundColor: 'rgba(15, 23, 42, 0.55)',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-end',
+              backdropFilter: 'blur(3px)',
+            }}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="employee-picker-title"
+              style={{
+                boxSizing: 'border-box',
+                backgroundColor: '#FFFFFF',
+                borderTopLeftRadius: '24px',
+                borderTopRightRadius: '24px',
+                padding: '16px 20px 24px',
+                maxHeight: '86%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.15)',
+              }}
+            >
+              {/* Handle Bar */}
+              <div
+                aria-hidden="true"
+                style={{
+                  width: '48px',
+                  height: '4px',
+                  borderRadius: '999px',
+                  backgroundColor: '#E2E8F0',
+                  alignSelf: 'center',
+                  flexShrink: 0,
+                }}
+              />
+
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                <div>
+                  <h3
+                    id="employee-picker-title"
+                    style={{
+                      margin: 0,
+                      fontSize: '16px',
+                      fontWeight: 800,
+                      color: '#334155',
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    {isId ? 'Pilih Rekan yang Digantikan' : 'Select Colleague to Replace'}
+                  </h3>
+                  <p style={{ margin: '3px 0 0', fontSize: '12px', color: '#64748B', lineHeight: 1.4 }}>
+                    {isId
+                      ? `Daftar rekan kerja yang bertugas pada ${bkoShift || 'shift lembur'}`
+                      : `Colleagues currently scheduled on ${bkoShift || 'overtime shift'}`}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label={isId ? 'Tutup' : 'Close'}
+                  onClick={() => setIsEmployeePickerOpen(false)}
+                  style={{
+                    border: 'none',
+                    background: '#F1F5F9',
+                    borderRadius: '50%',
+                    width: '32px',
+                    height: '32px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#64748B',
+                    flexShrink: 0,
+                  }}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Search Bar Input */}
+              <div
+                style={{
+                  height: '44px',
+                  backgroundColor: '#F1F5F9',
+                  borderRadius: '12px',
+                  border: '1.5px solid #E2E8F0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0 12px',
+                  gap: '8px',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <MagnifyingGlass size={18} weight="bold" color="#64748B" style={{ flexShrink: 0 }} />
+                <input
+                  type="text"
+                  autoFocus
+                  value={employeeSearchQuery}
+                  onChange={(e) => setEmployeeSearchQuery(e.target.value)}
+                  placeholder={isId ? 'Cari nama atau divisi rekan...' : 'Search colleague by name or role...'}
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    border: 'none',
+                    outline: 'none',
+                    backgroundColor: 'transparent',
+                    fontSize: '13.5px',
+                    color: '#1E293B',
+                    fontFamily: 'inherit',
+                  }}
+                />
+                {employeeSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setEmployeeSearchQuery('')}
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      padding: '4px',
+                      color: '#94A3B8',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <X size={15} weight="bold" />
+                  </button>
+                )}
+              </div>
+
+              {/* Counter & Clear option */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748B' }}>
+                  {isId
+                    ? `${filteredEmployees.length} Rekan pada ${bkoShift?.split(' (')[0] || 'Shift Ini'}`
+                    : `${filteredEmployees.length} Colleagues on this shift`}
+                </span>
+                {replacedEmployee && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReplacedEmployee(null);
+                      setIsEmployeePickerOpen(false);
+                    }}
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      color: '#EF4444',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isId ? 'Hapus Pilihan' : 'Clear Selection'}
+                  </button>
+                )}
+              </div>
+
+              {/* Scrollable Employees List */}
+              <div
+                style={{
+                  maxHeight: '320px',
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  paddingRight: '2px',
+                }}
+              >
+                {filteredEmployees.length === 0 ? (
+                  <div
+                    style={{
+                      padding: '36px 16px',
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#94A3B8',
+                    }}
+                  >
+                    <MagnifyingGlass size={36} weight="light" color="#CBD5E1" />
+                    <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#475569' }}>
+                      {isId
+                        ? `Tidak ada rekan yang terdaftar pada ${bkoShift || 'shift ini'}`
+                        : `No colleagues found on ${bkoShift || 'this shift'}`}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#94A3B8' }}>
+                      {isId ? 'Coba cari dengan nama atau divisi lain' : 'Try searching with another name or role'}
+                    </div>
+                  </div>
+                ) : (
+                  filteredEmployees.map((emp) => {
+                    const isSelected = replacedEmployee?.id === emp.id;
+
+                    return (
+                      <button
+                        key={emp.id}
+                        type="button"
+                        onClick={() => {
+                          setReplacedEmployee(emp);
+                          setIsEmployeePickerOpen(false);
+                          setEmployeeSearchQuery('');
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          padding: '10px 14px',
+                          borderRadius: '12px',
+                          border: isSelected ? '1.5px solid #09B2FF' : '1px solid #E2E8F0',
+                          backgroundColor: isSelected ? '#F0F9FF' : '#FFFFFF',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'all 0.15s ease',
+                          boxShadow: 'none',
+                          fontFamily: 'inherit',
+                          boxSizing: 'border-box',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '38px',
+                            height: '38px',
+                            borderRadius: '50%',
+                            backgroundColor: isSelected ? '#09B2FF' : '#EAF7FF',
+                            color: isSelected ? '#FFFFFF' : '#0284C7',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '13px',
+                            fontWeight: 700,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {emp.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                        </div>
+
+                        {/* Info: Name & Role subtext */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: '13.5px',
+                              fontWeight: 700,
+                              color: '#1E293B',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {emp.name}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              color: '#64748B',
+                              marginTop: '2px',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {emp.role} • {emp.shift}
+                          </div>
+                        </div>
+
+                        {isSelected && (
+                          <div
+                            style={{
+                              width: '22px',
+                              height: '22px',
+                              borderRadius: '50%',
+                              backgroundColor: '#09B2FF',
+                              color: '#FFFFFF',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Check size={14} weight="bold" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>,

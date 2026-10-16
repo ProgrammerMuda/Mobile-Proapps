@@ -1689,7 +1689,13 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
             {/* 4. Payslip */}
             <button
               type="button"
-              onClick={() => setIsPayslipModalOpen(true)}
+              onClick={() => {
+                if (onNavigateMenu) {
+                  onNavigateMenu('payslip');
+                } else {
+                  setIsPayslipModalOpen(true);
+                }
+              }}
               style={{
                 backgroundColor: '#FFFFFF',
                 borderRadius: '16px',

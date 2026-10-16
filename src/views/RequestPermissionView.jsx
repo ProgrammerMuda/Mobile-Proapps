@@ -293,17 +293,41 @@ const INITIAL_REQUESTS = [
   {
     id: 'REQ-OVT-2026-0032',
     type: 'OVERTIME',
-    subType: 'BKO Overtime',
+    subType: 'BKO • Replace Budi Santoso',
     title: 'BKO Overtime',
     overtimeMode: 'OVERTIME_BKO',
+    bkoType: 'REPLACEMENT',
+    replacedEmployee: {
+      id: 'emp-5',
+      name: 'Budi Santoso',
+      role: 'Engineering',
+      shift: 'Shift Malam (20:00 - 05:00)',
+    },
     shift: 'Shift Malam (20:00 - 05:00)',
     dateDisplay: '22 Sep 2026',
     duration: '1 Shift',
     submittedAt: '21 Sep 2026 • 11:20',
     status: 'APPROVED',
-    reason: 'Penugasan BKO pengamanan tambahan area loading dock dan basement saat kunjungan VIP tenant.',
+    reason: 'Covering Budi Santoso who is on medical leave for genset security patrol.',
     approver: 'Bambang Sudirgo (Chief Engineering)',
     approvedAt: '21 Sep 2026 • 14:00',
+    attachment: null,
+  },
+  {
+    id: 'REQ-OVT-2026-0028',
+    type: 'OVERTIME',
+    subType: 'BKO • Operational Need',
+    title: 'BKO Overtime',
+    overtimeMode: 'OVERTIME_BKO',
+    bkoType: 'OPERATIONAL',
+    shift: 'Shift Siang (13:00 - 21:00)',
+    dateDisplay: '18 Sep 2026',
+    duration: '1 Shift',
+    submittedAt: '17 Sep 2026 • 14:10',
+    status: 'APPROVED',
+    reason: 'Additional operational shift for water tank cleaning supervision.',
+    approver: 'Bambang Sudirgo (Chief Engineering)',
+    approvedAt: '17 Sep 2026 • 16:30',
     attachment: null,
   },
   {
@@ -1989,13 +2013,20 @@ export const RequestPermissionView = ({ onBack, user }) => {
         onSubmit={(overtimeData) => {
           const newId = `REQ-OVT-2026-00${Math.floor(Math.random() * 90) + 10}`;
           const isBKO = overtimeData.mode === 'OVERTIME_BKO';
-          const subTypeLabel = isBKO ? 'BKO Overtime' : 'Staff Overtime';
+          let subTypeLabel = 'Staff Overtime';
+          if (isBKO) {
+            subTypeLabel = overtimeData.bkoType === 'REPLACEMENT' && overtimeData.replacedEmployee?.name
+              ? `BKO • Replace ${overtimeData.replacedEmployee.name}`
+              : 'BKO • Operational Need';
+          }
 
           const newEntry = {
             id: newId,
             type: 'OVERTIME',
             subType: subTypeLabel,
             title: isBKO ? 'BKO Overtime' : 'Staff Overtime',
+            bkoType: overtimeData.bkoType,
+            replacedEmployee: overtimeData.replacedEmployee,
             scheduleDate: overtimeData.scheduleDate,
             dateDisplay: isBKO
               ? overtimeData.formattedDate
@@ -2366,6 +2397,13 @@ export const RequestPermissionView = ({ onBack, user }) => {
                   {isShiftSwap && item.swapWith && (
                     <p style={{ margin: '0 0 4px', fontSize: REQUEST_FONT.caption, fontWeight: 600, color: '#334155', lineHeight: 1.5 }}>
                       Swap with {item.swapWith}
+                    </p>
+                  )}
+                  {item.type === 'OVERTIME' && (item.overtimeMode === 'OVERTIME_BKO' || item.subType?.includes('BKO')) && (
+                    <p style={{ margin: '0 0 4px', fontSize: REQUEST_FONT.caption, fontWeight: 600, color: '#0284C7', lineHeight: 1.5 }}>
+                      {item.bkoType === 'REPLACEMENT' || item.replacedEmployee || item.subType?.includes('Replace') || item.subType?.includes('Menggantikan')
+                        ? `Replace ${item.replacedEmployee?.name || item.subType?.replace(/BKO • (Menggantikan|Replace) /, '')}`
+                        : 'Operational Need'}
                     </p>
                   )}
                   <p style={{ margin: 0, fontSize: REQUEST_FONT.caption, color: '#64748B', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>

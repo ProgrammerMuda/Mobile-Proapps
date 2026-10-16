@@ -201,12 +201,14 @@ export default function RequestPermissionDetailView({
   const isShiftTransfer = isChangeShift && (request.title === 'Shift Transfer' || request.subType?.includes('Transfer'));
   const isShiftSwap = isChangeShift && !isShiftTransfer && Boolean(request.swapWith);
   const isShiftChange = isChangeShift && !request.swapWith && !isShiftTransfer;
-  const subtypeLabel = getCategoryOptions(request.type, language)
-    .find((option) => option.value === request.subType)?.title || request.subType;
+  const isOvertime = request.type === 'OVERTIME';
+  const isBkoOvertime = isOvertime && (request.overtimeMode === 'OVERTIME_BKO' || request.subType?.includes('BKO') || request.title?.includes('BKO'));
   const heroTitle = isManualAttendance
     ? getManualAttendanceTitle()
     : isShiftChange || isShiftTransfer || isShiftSwap
     ? request.title
+    : isOvertime
+    ? (isBkoOvertime ? 'BKO Overtime' : 'Staff Overtime')
     : subtypeLabel || request.title;
   const showRequestTitle = request.type !== 'PERMIT' && !isManualAttendance && !isChangeShift && request.title && request.title !== heroTitle;
   const heroStatus = isApproved ? 'Approved' : isPending ? 'Waiting Approval' : 'Rejected';
@@ -1473,6 +1475,89 @@ export default function RequestPermissionDetailView({
                OVERTIME REQUEST INFORMATION (BKO VS STAFF OVERTIME)
                ========================================================================= */
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* BKO Specific: Assignment Type */}
+              {(request.overtimeMode === 'OVERTIME_BKO' || request.subType?.includes('BKO')) && (
+                <div>
+                  <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                    {isId ? 'Tipe Penugasan BKO' : 'BKO Assignment Type'}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 12px',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    {request.bkoType === 'REPLACEMENT' || request.replacedEmployee || request.subType?.includes('Menggantikan') || request.subType?.includes('Replace') ? (
+                      <>
+                        <UserSwitch size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                          {isId ? 'Menggantikan Rekan' : 'Replace Colleague'}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Buildings size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                          {isId ? 'Kebutuhan Operasional' : 'Operational Need'}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* BKO Specific: Replaced Employee Card if Replacement */}
+              {(request.bkoType === 'REPLACEMENT' || request.replacedEmployee || request.subType?.includes('Menggantikan') || request.subType?.includes('Replace')) && (
+                <div>
+                  <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
+                    {isId ? 'Rekan yang Digantikan' : 'Colleague to Replace'}
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '10px 12px',
+                      backgroundColor: '#F8FAFC',
+                      borderRadius: '10px',
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        backgroundColor: '#EAF7FF',
+                        border: '1px solid #BAE6FD',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: '#0284C7',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {(request.replacedEmployee?.name || request.subType?.replace(/BKO • (Menggantikan|Replace) /, '') || 'Rekan').split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#1E293B' }}>
+                        {request.replacedEmployee?.name || request.subType?.replace(/BKO • (Menggantikan|Replace) /, '') || 'Budi Santoso'}
+                      </div>
+                      <div style={{ fontSize: '11px', color: '#64748B' }}>
+                        {request.replacedEmployee?.role || 'Engineering'} • {request.shift || 'Scheduled Shift'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* 1. Overtime Date */}
               <div>
                 <div style={{ fontSize: '11.5px', color: '#64748B', fontWeight: 600, marginBottom: '4px' }}>
@@ -1512,18 +1597,34 @@ export default function RequestPermissionDetailView({
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
+                    justifyContent: 'space-between',
                     padding: '10px 12px',
                     backgroundColor: '#F8FAFC',
                     borderRadius: '10px',
                     border: '1px solid #E2E8F0',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    color: '#1E293B',
                   }}
                 >
-                  <Clock size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
-                  <span>{request.shift || 'Shift Pagi (08:00 - 17:00)'}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Clock size={18} color="var(--color-secondary, #09B2FF)" weight="bold" />
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#1E293B' }}>
+                      {request.shift || 'Shift Pagi (08:00 - 17:00)'}
+                    </span>
+                  </div>
+                  {(request.overtimeMode === 'OVERTIME_BKO' || request.subType?.includes('BKO')) && (
+                    <span
+                      style={{
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        color: '#0284C7',
+                        backgroundColor: '#EAF7FF',
+                        border: '1px solid #BAE6FD',
+                        padding: '3px 8px',
+                        borderRadius: '6px',
+                      }}
+                    >
+                      {request.duration || '1 Shift'}
+                    </span>
+                  )}
                 </div>
               </div>
 

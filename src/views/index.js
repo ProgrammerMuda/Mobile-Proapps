@@ -22,3 +22,5 @@ export * from './RequestApprovalView';
 export * from './RequestPermissionDetailView';
 export * from './ChangeShiftView';
 export * from './WorkScheduleView';
+export * from './PayslipView';
+export { default as OvertimeView } from './OvertimeView';
