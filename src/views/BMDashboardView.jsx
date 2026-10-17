@@ -11,7 +11,7 @@ import tenantHeaderImg from '../assets/tenant-header.png';
  * Matching the exact full-bleed hero banner header and 32px overlapping sheet design,
  * with 16px padding/gaps and concentric radius system.
  */
-export const BMDashboardView = ({ user, onLogout, onNavigateToOverview, onNavigateMenu }) => {
+export const BMDashboardView = ({ user, onLogout, onNavigateToOverview, onNavigateMenu, onNavigateBanner }) => {
   const { t } = useLanguage();
   const bmUser = user || {
     name: 'Ahmad Pratama',
@@ -221,7 +221,7 @@ export const BMDashboardView = ({ user, onLogout, onNavigateToOverview, onNaviga
 
         {/* 5. Horizontal Promo / Information Banner Slider with 3 Indicator Dots */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px', paddingBottom: '24px' }}>
-          <PromoBannerSlider />
+          <PromoBannerSlider onBannerClick={(item) => onNavigateBanner && onNavigateBanner(item)} />
         </div>
       </div>
     </div>

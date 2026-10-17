@@ -5,8 +5,17 @@ import bannerPowerOutageImg from '../../assets/banners/banner-power-outage.png';
 import bannerTariffAdjustmentImg from '../../assets/banners/banner-tariff-adjustment.png';
 import bannerParkingRulesImg from '../../assets/banners/banner-parking-rules.png';
 import bannerBuildingRulesImg from '../../assets/banners/banner-building-rules.png';
+import bannerFinancialReportImg from '../../assets/banners/banner-financial-report.png';
 
 const DEFAULT_BANNERS = [
+  {
+    id: 'banner-financial',
+    title: 'Pengumuman: Laporan Keuangan Apartement A',
+    subtitle: 'Laporan keuangan bulanan telah tersedia di Proapps secara transparan',
+    image: bannerFinancialReportImg,
+    bgColor: '#0284C7',
+    borderColor: '#0284C7',
+  },
   {
     id: 'banner-1',
     title: 'Pengumuman: Perbaikan Lift Tower A',
@@ -114,9 +123,14 @@ export const PromoBannerSlider = ({ banners = DEFAULT_BANNERS, onBannerClick }) 
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: onBannerClick ? 'pointer' : 'default',
+              cursor: 'pointer',
               userSelect: 'none',
+              transition: 'transform 0.15s ease, box-shadow 0.15s ease',
             }}
+            onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
+            onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            onTouchStart={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
+            onTouchEnd={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           >
             {item.image ? (
               <img

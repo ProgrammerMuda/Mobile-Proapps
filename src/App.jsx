@@ -41,14 +41,17 @@ import {
   WorkScheduleView,
   PayslipView,
   OvertimeView,
+  AnnouncementDetailView,
+  AnnouncementDocumentView,
 } from './views';
 
 function App() {
   const { t, language } = useLanguage();
   const [teamApprovals, setTeamApprovals] = useState(INITIAL_TEAM_APPROVALS);
   const pendingApprovalCount = teamApprovals.filter((item) => item.status === 'PENDING').length;
-  const [currentScreen, setCurrentScreen] = useState('overtime'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail' | 'work-schedule' | 'payslip' | 'overtime'
+  const [currentScreen, setCurrentScreen] = useState('home'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail' | 'work-schedule' | 'payslip' | 'overtime' | 'announcement-detail' | 'announcement-document'
   const [activeTab, setActiveTab] = useState('home');
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState(null);
   const [attendanceRecordPreviousScreen, setAttendanceRecordPreviousScreen] = useState('work-attendance');
   const [userSession, setUserSession] = useState({
@@ -387,6 +390,10 @@ function App() {
           user={userSession}
           onLogout={handleLogout}
           onNavigateToOverview={() => setCurrentScreen('overview')}
+          onNavigateBanner={(banner) => {
+            setSelectedAnnouncement(banner);
+            setCurrentScreen('announcement-detail');
+          }}
           onNavigateMenu={(menuId) => {
             if (menuId === 'tenant-unit') {
               setCurrentScreen('tenant-unit');
@@ -658,6 +665,26 @@ function App() {
           user={userSession}
           initialMode={employeePermissionMode}
           onBack={() => setCurrentScreen('work-attendance')}
+        />
+      )}
+
+      {currentScreen === 'announcement-detail' && (
+        <AnnouncementDetailView
+          announcement={selectedAnnouncement}
+          onBack={() => setCurrentScreen('home')}
+          onViewDocument={(announcementData) => {
+            if (announcementData) {
+              setSelectedAnnouncement(announcementData);
+            }
+            setCurrentScreen('announcement-document');
+          }}
+        />
+      )}
+
+      {currentScreen === 'announcement-document' && (
+        <AnnouncementDocumentView
+          announcement={selectedAnnouncement}
+          onBack={() => setCurrentScreen('announcement-detail')}
         />
       )}
     </AndroidMobileFrame>
