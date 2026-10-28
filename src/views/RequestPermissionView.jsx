@@ -7,6 +7,7 @@ import ManualAttendanceView from './ManualAttendanceView';
 import ChangeShiftView from './ChangeShiftView';
 import OvertimeView from './OvertimeView';
 import RequestPermissionDetailView from './RequestPermissionDetailView';
+import AnnualLeaveQuotaSection from './AnnualLeaveQuota';
 import noPermissionRequests from '../assets/illustrations/no-permission-requests.png';
 import successCheck from '../assets/illustrations/success-check.png';
 import {
@@ -392,19 +393,6 @@ const REQUEST_TYPE_OPTIONS = [
   { id: 'CHANGE_SHIFT', label: 'Change Shift', defaultSubType: 'Tukar Shift', icon: ArrowsLeftRight, description: { id: 'Ajukan perubahan atau tukar jadwal shift.', en: 'Request a shift change or swap.' } },
 ];
 
-// Demo entitlement values; independent from search and request-list filters.
-const PERMIT_QUOTA = {
-  periodStart: '2026-01-01',
-  periodEnd: '2026-12-31',
-  items: [
-    { id: 'annual-leave', name: { id: 'Cuti Tahunan', en: 'Annual Leave' }, quota: 8, used: 4 },
-    { id: 'outpatient-sick-leave', name: { id: 'Izin Sakit', en: 'Sick Leave' }, quota: 11, used: 1 },
-    { id: 'personal-leave', name: { id: 'Izin Pribadi', en: 'Personal Leave' }, quota: 3, used: 1 },
-    { id: 'special-leave', name: { id: 'Cuti Khusus', en: 'Special Leave' }, quota: 5, used: 0 },
-    { id: 'compensatory-leave', name: { id: 'Cuti Pengganti', en: 'Comp Leave' }, quota: 2, used: 0 },
-  ],
-};
-
 const handleRequestSheetKeys = (event, onClose) => {
   if (event.key === 'Escape') onClose();
   if (event.key !== 'Tab') return;
@@ -441,7 +429,7 @@ const getFileIconInfo = (fileName) => {
   };
 };
 
-export const RequestPermissionView = ({ onBack, user }) => {
+export const RequestPermissionView = ({ onBack, user, leaveQuotaLedger = [], onOpenLeaveQuota }) => {
   const { language } = useLanguage();
 
   const [requests, setRequests] = useState(INITIAL_REQUESTS);
@@ -2266,32 +2254,7 @@ export const RequestPermissionView = ({ onBack, user }) => {
 
       </header>
 
-      <section aria-labelledby="permit-quota-title" style={{ padding: '12px 16px', backgroundColor: '#FFFFFF', borderBottom: '1px solid #E2E8F0' }}>
-        <div style={{ marginBottom: '10px' }}>
-          <h2 id="permit-quota-title" style={{ margin: '0 0 3px', fontSize: REQUEST_FONT.body, fontWeight: 700, color: '#334155', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CalendarCheck size={20} weight="fill" color="#09B2FF" aria-hidden="true" />
-            {language === 'id' ? 'Total Kuota' : 'Total Quota'}
-          </h2>
-          <p style={{ margin: 0, fontSize: REQUEST_FONT.caption, color: '#64748B', lineHeight: 1.4 }}>
-            {language === 'id' ? 'Periode' : 'Period'}{' '}
-            {[PERMIT_QUOTA.periodStart, PERMIT_QUOTA.periodEnd].map((date) => new Date(`${date}T00:00:00`).toLocaleDateString(language === 'id' ? 'id-ID' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })).join(' – ')}
-          </p>
-        </div>
-        <div role="region" aria-label={language === 'id' ? 'Kuota permit, geser ke samping' : 'Permit quotas, scroll horizontally'} tabIndex={0} style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px', scrollSnapType: 'x proximity', WebkitOverflowScrolling: 'touch' }}>
-          {PERMIT_QUOTA.items.map((item) => (
-            <article key={item.id} style={{ flex: '0 0 calc((100% - 8px) / 2)', minWidth: 0, boxSizing: 'border-box', padding: '10px 12px', border: '1px solid #E2E8F0', borderRadius: '10px', backgroundColor: '#FFFFFF', scrollSnapAlign: 'start', overflowWrap: 'break-word' }}>
-              <h3 style={{ margin: '0 0 4px', fontSize: REQUEST_FONT.body, fontWeight: 600, lineHeight: 1.4, color: '#334155' }}>{item.name[language] || item.name.en}</h3>
-              <p style={{ margin: '0 0 4px', display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px', color: '#09B2FF' }}>
-                <strong style={{ fontSize: REQUEST_FONT.heading, lineHeight: 1, fontWeight: 700 }}>{item.quota}</strong>
-                <span style={{ fontSize: REQUEST_FONT.caption, fontWeight: 500 }}>{language === 'id' ? 'hari kuota' : 'days quota'}</span>
-              </p>
-              <p style={{ margin: 0, fontSize: REQUEST_FONT.caption, color: '#64748B', lineHeight: 1.4 }}>
-                {item.used} {language === 'id' ? 'hari digunakan' : `${item.used === 1 ? 'day' : 'days'} used`}
-              </p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <AnnualLeaveQuotaSection ledger={leaveQuotaLedger} language={language} onOpenLeaveQuota={onOpenLeaveQuota} />
 
       <style>{`
         .permission-request-card:focus-visible {

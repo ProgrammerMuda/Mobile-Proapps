@@ -17,11 +17,14 @@ import {
   Users,
   Paperclip,
   Check,
+  Scales,
 } from '@phosphor-icons/react';
 import { useLanguage } from '../context/LanguageContext';
 import { matchesRequestDate } from '../utils/requestDates';
 import { getRequestDisplayTitle } from '../utils/requestCategories';
 import RequestPermissionDetailView from './RequestPermissionDetailView';
+import QuotaAdjustmentApprovalDetail from './QuotaAdjustmentApprovalDetail';
+import { ADJUST_APPROVERS } from '../data/leaveQuota';
 
 const REQUEST_FONT = { body: '16px', heading: '16px', caption: '12px' };
 
@@ -30,10 +33,11 @@ const REQUEST_TYPE_OPTIONS = [
   { id: 'MANUAL_ATTENDANCE', label: 'Manual Attendance', icon: Clock },
   { id: 'OVERTIME', label: 'Overtime', icon: ClockCountdown },
   { id: 'CHANGE_SHIFT', label: 'Change Shift', icon: ArrowsLeftRight },
+  { id: 'QUOTA_ADJUSTMENT', label: 'Quota Adjustment', icon: Scales },
 ];
 
 
-export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprovals }) => {
+export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprovals, onQuotaAdjustmentDecided }) => {
   const { language } = useLanguage();
 
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -46,8 +50,11 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
   const [tempDateFilter, setTempDateFilter] = useState('');
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
-  const hasActiveFilter = statusFilter !== 'ALL' || typeFilter !== 'ALL' || !!dateFilter;
-  const activeFiltersCount = (statusFilter !== 'ALL' ? 1 : 0) + (typeFilter !== 'ALL' ? 1 : 0) + (dateFilter ? 1 : 0);
+  // Permission requests and quota adjustments are listed in separate tabs; the type filter only applies to permissions.
+  const [approvalTab, setApprovalTab] = useState('PERMISSION'); // 'PERMISSION' | 'QUOTA'
+  const isTypeFilterActive = approvalTab === 'PERMISSION' && typeFilter !== 'ALL';
+  const hasActiveFilter = statusFilter !== 'ALL' || isTypeFilterActive || !!dateFilter;
+  const activeFiltersCount = (statusFilter !== 'ALL' ? 1 : 0) + (isTypeFilterActive ? 1 : 0) + (dateFilter ? 1 : 0);
 
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [rejectModalItem, setRejectModalItem] = useState(null);
@@ -86,10 +93,26 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
     },
   };
 
+  // Quota adjustments need two approvals; earlier steps only verify and forward.
+  const isQuotaVerifyStep = (item) => item?.type === 'QUOTA_ADJUSTMENT' && item.approvalStep < ADJUST_APPROVERS.length;
+
 
   const handleConfirmApprove = () => {
     if (!approveModalItem || approveModalItem.status !== 'PENDING') return;
     const id = approveModalItem.id;
+    if (isQuotaVerifyStep(approveModalItem)) {
+      const verifiedBy = `${user?.name || 'Anda'} (${user?.unitOrDept || 'HR / Building Service'})`;
+      setTeamApprovals((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, approvalStep: item.approvalStep + 1, verifiedBy, verifiedAt: 'Hari ini • Baru saja' } : item
+        )
+      );
+      setCompletedRequest({ ...approveModalItem, status: 'VERIFIED' });
+      setApproveModalItem(null);
+      if (selectedDetail && selectedDetail.id === id) setSelectedDetail(null);
+      return;
+    }
+    if (approveModalItem.ledgerId) onQuotaAdjustmentDecided?.(approveModalItem, 'APPROVED');
     setTeamApprovals((prev) =>
       prev.map((item) =>
         item.id === id
@@ -116,6 +139,7 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
 
   const handleConfirmReject = () => {
     if (!rejectModalItem) return;
+    if (rejectModalItem.ledgerId) onQuotaAdjustmentDecided?.(rejectModalItem, 'REJECTED', user?.name || 'Andi Santoso');
     setTeamApprovals((prev) =>
       prev.map((item) =>
         item.id === rejectModalItem.id
@@ -138,9 +162,13 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
     }
   };
 
+  const isInTab = (item, tab) => (item.type === 'QUOTA_ADJUSTMENT') === (tab === 'QUOTA');
+  const tabPendingCount = (tab) => teamApprovals.filter((item) => isInTab(item, tab) && item.status === 'PENDING').length;
+
   const filteredApprovals = teamApprovals.filter((item) => {
+    if (!isInTab(item, approvalTab)) return false;
     if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
-    if (typeFilter !== 'ALL' && item.type !== typeFilter) return false;
+    if (isTypeFilterActive && item.type !== typeFilter) return false;
     if (dateFilter && !((item.date && item.date === dateFilter) || matchesRequestDate(item.dateDisplay, dateFilter))) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -158,14 +186,24 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
   if (selectedDetail) {
     return (
       <>
-        <RequestPermissionDetailView
-          request={selectedDetail}
-          user={user}
-          language={language}
-          onBack={() => setSelectedDetail(null)}
-          onApprove={(id) => setApproveModalItem(teamApprovals.find((item) => item.id === id))}
-          onReject={(item) => handleOpenReject(item)}
-        />
+        {selectedDetail.type === 'QUOTA_ADJUSTMENT' ? (
+          <QuotaAdjustmentApprovalDetail
+            request={selectedDetail}
+            language={language}
+            onBack={() => setSelectedDetail(null)}
+            onApprove={(id) => setApproveModalItem(teamApprovals.find((item) => item.id === id))}
+            onReject={(item) => handleOpenReject(item)}
+          />
+        ) : (
+          <RequestPermissionDetailView
+            request={selectedDetail}
+            user={user}
+            language={language}
+            onBack={() => setSelectedDetail(null)}
+            onApprove={(id) => setApproveModalItem(teamApprovals.find((item) => item.id === id))}
+            onReject={(item) => handleOpenReject(item)}
+          />
+        )}
         {approveModalItem && createPortal(
           <div
             onClick={(event) => {
@@ -198,14 +236,18 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
               <div aria-hidden="true" style={{ width: '48px', height: '4px', borderRadius: '999px', backgroundColor: '#E2E8F0', alignSelf: 'center' }} />
               <img src={confirmation} alt="" style={{ width: '100%', height: 'auto', display: 'block', flexShrink: 0 }} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                <h3 id="confirm-approval-title" style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#334155' }}>Approve this request?</h3>
+                <h3 id="confirm-approval-title" style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#334155' }}>
+                  {isQuotaVerifyStep(approveModalItem) ? 'Verify and forward this request?' : 'Approve this request?'}
+                </h3>
                 <p id="confirm-approval-description" style={{ margin: 0, fontSize: '14px', color: '#64748B', lineHeight: 1.5, textAlign: 'center' }}>
-                  Are you sure you want to approve {approveModalItem.employeeName}’s {approveModalItem.title} request?
+                  {isQuotaVerifyStep(approveModalItem)
+                    ? `${approveModalItem.employeeName}’s ${approveModalItem.title} request will be forwarded to Building Management for final approval.`
+                    : `Are you sure you want to approve ${approveModalItem.employeeName}’s ${approveModalItem.title} request?`}
                 </p>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '10px' }}>
                 <button autoFocus type="button" onClick={() => setApproveModalItem(null)} style={{ height: '44px', borderRadius: 'var(--radius-sm)', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', color: '#475569', fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'none' }}>Cancel</button>
-                <button type="button" onClick={handleConfirmApprove} style={{ minHeight: '46px', borderRadius: '12px', border: 'none', backgroundColor: '#16A34A', color: '#FFFFFF', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: 'none' }}>Yes, Approve</button>
+                <button type="button" onClick={handleConfirmApprove} style={{ minHeight: '46px', borderRadius: '12px', border: 'none', backgroundColor: '#16A34A', color: '#FFFFFF', fontSize: '14px', fontWeight: 700, cursor: 'pointer', boxShadow: 'none' }}>{isQuotaVerifyStep(approveModalItem) ? 'Yes, Forward' : 'Yes, Approve'}</button>
               </div>
             </div>
           </div>,
@@ -542,6 +584,33 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
             )}
           </button>
         </div>
+
+        <div role="tablist" aria-label={language === 'id' ? 'Jenis approval' : 'Approval type'} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', margin: '2px -16px -14px' }}>
+          {[
+            { id: 'PERMISSION', label: language === 'id' ? 'Perizinan' : 'Permission' },
+            { id: 'QUOTA', label: language === 'id' ? 'Penyesuaian Kuota' : 'Quota Adjustment' },
+          ].map((tab) => {
+            const selected = approvalTab === tab.id;
+            const pending = tabPendingCount(tab.id);
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setApprovalTab(tab.id)}
+                style={{ minHeight: '44px', padding: '10px 8px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', border: 'none', borderBottom: `2px solid ${selected ? '#053079' : 'transparent'}`, marginBottom: '-1px', background: 'transparent', color: selected ? '#053079' : '#64748B', fontFamily: 'inherit', fontSize: '14px', fontWeight: selected ? 700 : 500, cursor: 'pointer' }}
+              >
+                {tab.label}
+                {pending > 0 && (
+                  <span style={{ minWidth: '20px', height: '20px', padding: '0 6px', boxSizing: 'border-box', borderRadius: '999px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, backgroundColor: selected ? '#FFEDD5' : '#F1F5F9', color: selected ? '#C2410C' : '#64748B' }}>
+                    {pending}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </header>
 
       {/* Approvals Cards List */}
@@ -756,6 +825,11 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
                   >
                     {item.reason}
                   </p>
+                  {item.type === 'QUOTA_ADJUSTMENT' && isPending && (
+                    <p style={{ margin: '6px 0 0', fontSize: REQUEST_FONT.caption, fontWeight: 600, color: '#C2410C', lineHeight: 1.5 }}>
+                      {ADJUST_APPROVERS[item.approvalStep - 1].step[language] || ADJUST_APPROVERS[item.approvalStep - 1].step.en} · {ADJUST_APPROVERS[item.approvalStep - 1].name[language] || ADJUST_APPROVERS[item.approvalStep - 1].name.en}
+                    </p>
+                  )}
                 </div>
 
                 {/* Row 3: Date & duration / target shift chips */}
@@ -948,7 +1022,7 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
                   letterSpacing: '-0.01em',
                 }}
               >
-                {completedRequest.status === 'APPROVED' ? 'Request approved' : language === 'id' ? 'Permohonan berhasil ditolak' : 'Request rejected'}
+                {completedRequest.status === 'VERIFIED' ? 'Request forwarded' : completedRequest.status === 'APPROVED' ? 'Request approved' : language === 'id' ? 'Permohonan berhasil ditolak' : 'Request rejected'}
               </h3>
               <p
                 style={{
@@ -959,7 +1033,9 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
                   maxWidth: '320px',
                 }}
               >
-                {completedRequest.status === 'APPROVED'
+                {completedRequest.status === 'VERIFIED'
+                  ? `${completedRequest.employeeName}’s request has been verified and forwarded to Building Management for final approval.`
+                  : completedRequest.status === 'APPROVED'
                   ? `${completedRequest.employeeName}’s request has been approved. You can review the updated status in the request details.`
                   : language === 'id'
                   ? `Permohonan ${completedRequest.employeeName} telah ditolak. Alasan penolakan tersimpan di detail permohonan.`
@@ -1257,7 +1333,7 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
                   { id: 'CHANGE_SHIFT', label: language === 'id' ? 'Tukar Shift' : 'Change Shift' },
                 ],
               },
-            ].map((group) => (
+            ].filter((group) => approvalTab === 'PERMISSION' || group.onChange !== setTempTypeFilter).map((group) => (
               <fieldset
                 key={group.title}
                 style={{

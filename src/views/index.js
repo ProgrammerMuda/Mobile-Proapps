@@ -26,3 +26,4 @@ export * from './PayslipView';
 export { default as OvertimeView } from './OvertimeView';
 export * from './AnnouncementDetailView';
 export * from './AnnouncementDocumentView';
+export * from './LeaveQuotaView';

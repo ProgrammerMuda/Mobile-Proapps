@@ -3825,7 +3825,7 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                 </button>
               </div>
 
-              {/* 2 Option Cards */}
+              {/* 3 Option Cards */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {/* Option 1: Request Permission */}
                 <button
@@ -3957,6 +3957,58 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                       {language === 'id'
                         ? 'Tinjau, setujui, atau tolak permohonan izin dari anggota tim Anda'
                         : 'Review, approve, or reject permission requests from your team'}
+                    </div>
+                  </div>
+                  <CaretRight size={18} weight="bold" color="#94A3B8" />
+                </button>
+
+                {/* Option 3: Leave Quota */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsPermissionModalOpen(false);
+                    if (onNavigateMenu) {
+                      onNavigateMenu('leave-quota');
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#FFFFFF',
+                    border: '1.5px solid #E2E8F0',
+                    borderRadius: '16px',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      backgroundColor: '#EAF7FF',
+                      border: '1px solid #BAE6FD',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--color-secondary, #09B2FF)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <CalendarCheck size={24} weight="bold" color="var(--color-secondary, #09B2FF)" />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '0.9375rem', fontWeight: 800, color: '#334155', marginBottom: '2px' }}>
+                      {language === 'id' ? 'Kuota Cuti' : 'Leave Quota'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.3 }}>
+                      {language === 'id'
+                        ? 'Lihat sisa kuota, riwayat penambahan dan pemotongan, serta ajukan penyesuaian'
+                        : 'View remaining quota, additions and deductions history, and request an adjustment'}
                     </div>
                   </div>
                   <CaretRight size={18} weight="bold" color="#94A3B8" />

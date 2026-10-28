@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { INITIAL_TEAM_APPROVALS } from './data/teamApprovals';
+import { INITIAL_LEAVE_QUOTA_LEDGER, createAdjustmentApproval, getQuotaSummary } from './data/leaveQuota';
 import { useLanguage } from './context/LanguageContext';
 import { AndroidMobileFrame, Header, BottomNavigation } from './components/layout';
 import {
@@ -43,6 +44,7 @@ import {
   OvertimeView,
   AnnouncementDetailView,
   AnnouncementDocumentView,
+  LeaveQuotaView,
 } from './views';
 
 function App() {
@@ -52,6 +54,8 @@ function App() {
   const [currentScreen, setCurrentScreen] = useState('home'); // 'splash' | 'login' | 'home' | 'overview' | 'profile' | 'building-summary' | 'financial-detail' | 'request-detail' | 'attendance-detail' | 'monthly-attendance' | 'work-order-detail' | 'tenant-unit' | 'unit-tower' | 'unit-detail' | 'attendance-record-detail' | 'work-schedule' | 'payslip' | 'overtime' | 'announcement-detail' | 'announcement-document'
   const [activeTab, setActiveTab] = useState('home');
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [leaveQuotaLedger, setLeaveQuotaLedger] = useState(INITIAL_LEAVE_QUOTA_LEDGER);
+  const [leaveQuotaPreviousScreen, setLeaveQuotaPreviousScreen] = useState('work-attendance');
   const [selectedAttendanceRecord, setSelectedAttendanceRecord] = useState(null);
   const [attendanceRecordPreviousScreen, setAttendanceRecordPreviousScreen] = useState('work-attendance');
   const [userSession, setUserSession] = useState({
@@ -597,6 +601,9 @@ function App() {
               setCurrentScreen('request-permission');
             } else if (menuId === 'request-approval') {
               setCurrentScreen('request-approval');
+            } else if (menuId === 'leave-quota') {
+              setLeaveQuotaPreviousScreen('work-attendance');
+              setCurrentScreen('leave-quota');
             } else if (menuId === 'work-schedule' || menuId === 'shift-schedule') {
               setCurrentScreen('work-schedule');
             } else if (menuId === 'payslip') {
@@ -647,7 +654,25 @@ function App() {
       {currentScreen === 'request-permission' && (
         <RequestPermissionView
           user={userSession}
+          leaveQuotaLedger={leaveQuotaLedger}
+          onOpenLeaveQuota={() => {
+            setLeaveQuotaPreviousScreen('request-permission');
+            setCurrentScreen('leave-quota');
+          }}
           onBack={() => setCurrentScreen('work-attendance')}
+        />
+      )}
+
+      {currentScreen === 'leave-quota' && (
+        <LeaveQuotaView
+          language={language || 'id'}
+          ledger={leaveQuotaLedger}
+          userName={userSession?.name}
+          onAddAdjustment={(entry) => {
+            setTeamApprovals((prev) => [createAdjustmentApproval({ entry, user: userSession, currentBalance: getQuotaSummary(leaveQuotaLedger).remaining }), ...prev]);
+            setLeaveQuotaLedger((prev) => [entry, ...prev]);
+          }}
+          onBack={() => setCurrentScreen(leaveQuotaPreviousScreen)}
         />
       )}
 
@@ -655,6 +680,21 @@ function App() {
         <RequestApprovalView
           teamApprovals={teamApprovals}
           setTeamApprovals={setTeamApprovals}
+          onQuotaAdjustmentDecided={(request, status, rejectedBy) => {
+            setLeaveQuotaLedger((prev) =>
+              prev.map((entry) =>
+                entry.id === request.ledgerId
+                  ? {
+                      ...entry,
+                      status,
+                      actor: status === 'APPROVED'
+                        ? { id: `Diajukan oleh ${request.employeeName} · Disetujui oleh Building Management`, en: `Requested by ${request.employeeName} · Approved by Building Management` }
+                        : { id: `Diajukan oleh ${request.employeeName} · Ditolak oleh ${rejectedBy}`, en: `Requested by ${request.employeeName} · Rejected by ${rejectedBy}` },
+                    }
+                  : entry
+              )
+            );
+          }}
           user={userSession}
           onBack={() => setCurrentScreen('work-attendance')}
         />

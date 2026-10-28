@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import { CaretLeft } from '@phosphor-icons/react';
 
-export default function PermitPermissionView({ onBack, language, children, footer }) {
+export default function PermitPermissionView({ onBack, language, children, footer, title = 'Permit Permission', backLabel }) {
   const pageRef = useRef(null);
 
   useLayoutEffect(() => {
@@ -55,10 +55,10 @@ export default function PermitPermissionView({ onBack, language, children, foote
         }
       `}</style>
       <header style={{ position: 'sticky', top: 0, zIndex: 40, display: 'grid', gridTemplateColumns: '36px minmax(0, 1fr) 36px', alignItems: 'center', gap: '8px', minHeight: '56px', padding: '0 16px', backgroundColor: '#FFFFFF' }}>
-        <button type="button" onClick={onBack} aria-label={language === 'id' ? 'Kembali ke daftar request' : 'Back to request list'} style={{ display: 'grid', placeItems: 'center', width: '36px', height: '36px', padding: 0, border: 'none', borderRadius: '8px', background: 'transparent', color: '#334155', cursor: 'pointer' }}>
+        <button type="button" onClick={onBack} aria-label={backLabel || (language === 'id' ? 'Kembali ke daftar request' : 'Back to request list')} style={{ display: 'grid', placeItems: 'center', width: '36px', height: '36px', padding: 0, border: 'none', borderRadius: '8px', background: 'transparent', color: '#334155', cursor: 'pointer' }}>
           <CaretLeft size={22} weight="bold" />
         </button>
-        <h1 style={{ margin: 0, fontSize: '16px', fontWeight: 700, textAlign: 'center', color: '#334155' }}>Permit Permission</h1>
+        <h1 style={{ margin: 0, fontSize: '16px', fontWeight: 700, textAlign: 'center', color: '#334155' }}>{title}</h1>
       </header>
       <div style={{ flex: 1, padding: '20px 16px 32px' }}>
         {children}
