@@ -61,7 +61,8 @@ export const HomeView = ({ activeTab = 'components', onReplaySplash, onLogout, c
   const getRoleIcon = (roleCode) => {
     switch (roleCode) {
       case 'BM': return Buildings;
-      case 'TR': return Users;
+      case 'TR':
+      case 'BS': return Users;
       case 'TENANT': return House;
       case 'ENG': return Wrench;
       case 'HK': return Broom;
@@ -83,6 +84,7 @@ export const HomeView = ({ activeTab = 'components', onReplaySplash, onLogout, c
           { title: 'Broadcast Pengumuman', icon: BellSimple, desc: 'Kirim notifikasi ke semua unit', color: 'orange' },
         ];
       case 'TR':
+      case 'BS':
         return [
           { title: 'Tiket Komplain Tenant', icon: ChatCircleDots, desc: '6 Tiket baru perlu direspon', color: 'blue' },
           { title: 'Tagihan IPL & Utilitas', icon: FileText, desc: 'Monitoring status pembayaran', color: 'green' },

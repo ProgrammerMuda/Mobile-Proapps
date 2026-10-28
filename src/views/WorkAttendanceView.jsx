@@ -345,7 +345,7 @@ const ConfirmAttendanceMap = ({
 /**
  * Main Work Attendance View
  */
-export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAttendanceRecord, pendingApprovalCount = 0 }) => {
+export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAttendanceRecord, pendingApprovalCount: rawPendingApprovalCount = 0 }) => {
   const { language } = useLanguage();
 
   // State: Clock In / Out status
@@ -598,6 +598,9 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
   }, []);
 
   const roleCode = user?.roleCode || 'BM';
+  // Only Building Management and Building Service review team requests.
+  const canApprove = roleCode === 'BM' || roleCode === 'BS';
+  const pendingApprovalCount = canApprove ? rawPendingApprovalCount : 0;
   const isEng = roleCode === 'ENG';
   const isHk = roleCode === 'HK';
   const isSec = roleCode === 'SEC';
@@ -3802,8 +3805,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   </h3>
                   <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '4px 0 0 0' }}>
                     {language === 'id'
-                      ? 'Pilih untuk mengajukan permohonan baru atau persetujuan tim'
-                      : 'Choose to submit a new request or review team approvals'}
+                      ? (canApprove ? 'Pilih untuk mengajukan permohonan baru atau persetujuan tim' : 'Pilih untuk mengajukan permohonan baru atau melihat kuota cuti')
+                      : (canApprove ? 'Choose to submit a new request or review team approvals' : 'Choose to submit a new request or view your leave quota')}
                   </p>
                 </div>
                 <button
@@ -3879,6 +3882,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   <CaretRight size={18} weight="bold" color="#94A3B8" />
                 </button>
 
+                {canApprove && (
+                <>
                 {/* Option 2: Approve Permission */}
                 <button
                   type="button"
@@ -3961,6 +3966,8 @@ export const WorkAttendanceView = ({ user, onBack, onNavigateMenu, onSelectAtten
                   </div>
                   <CaretRight size={18} weight="bold" color="#94A3B8" />
                 </button>
+                </>
+                )}
 
                 {/* Option 3: Leave Quota */}
                 <button

@@ -189,6 +189,7 @@ export const RequestApprovalView = ({ onBack, user, teamApprovals, setTeamApprov
         {selectedDetail.type === 'QUOTA_ADJUSTMENT' ? (
           <QuotaAdjustmentApprovalDetail
             request={selectedDetail}
+            roleCode={user?.roleCode}
             language={language}
             onBack={() => setSelectedDetail(null)}
             onApprove={(id) => setApproveModalItem(teamApprovals.find((item) => item.id === id))}

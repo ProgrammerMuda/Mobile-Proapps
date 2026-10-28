@@ -668,7 +668,13 @@ function App() {
           language={language || 'id'}
           ledger={leaveQuotaLedger}
           userName={userSession?.name}
-          onAddAdjustment={(entry) => {
+          roleCode={userSession?.roleCode}
+          userRole={userSession?.role}
+          onAddAdjustment={(entry, employee) => {
+            if (employee) {
+              setTeamApprovals((prev) => [createAdjustmentApproval({ entry, user: { name: employee.name, unitOrDept: employee.role, nip: employee.nip, position: employee.position }, currentBalance: employee.remaining, submittedBy: `${userSession?.name} (${userSession?.role || userSession?.roleCode})` }), ...prev]);
+              return;
+            }
             setTeamApprovals((prev) => [createAdjustmentApproval({ entry, user: userSession, currentBalance: getQuotaSummary(leaveQuotaLedger).remaining }), ...prev]);
             setLeaveQuotaLedger((prev) => [entry, ...prev]);
           }}

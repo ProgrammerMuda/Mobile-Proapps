@@ -5,6 +5,7 @@
 export const ROLES = {
   BUILDING_MANAGEMENT: 'Building Management',
   TENANT_RELATION: 'Tenant Relation',
+  BUILDING_SERVICE: 'Building Service',
   TENANT: 'Tenant',
   ENGINEERING: 'Engineering',
   HOUSEKEEPING: 'Housekeeping',
@@ -37,6 +38,20 @@ export const DEMO_ACCOUNTS = [
     badgeColor: 'blue',
     description: 'Manajemen komplain tenant, pengumuman gedung, tagihan IPL, dan survei kepuasan.',
     permissions: ['complaints_handling', 'announcements', 'invoicing', 'tenant_directory'],
+  },
+  {
+    // Same menus as Tenant Relation; can also file leave-quota adjustments for other staff.
+    id: 'bs-01',
+    role: ROLES.BUILDING_SERVICE,
+    roleCode: 'BS',
+    name: 'Indra Saputra',
+    email: 'bs@proapps.id',
+    phone: '08123456707',
+    password: 'password',
+    unitOrDept: 'Building Service',
+    badgeColor: 'blue',
+    description: 'Layanan gedung, komplain tenant, pengumuman, dan administrasi kuota cuti staf.',
+    permissions: ['complaints_handling', 'announcements', 'invoicing', 'tenant_directory', 'staff_leave_quota'],
   },
   {
     id: 'tenant-01',

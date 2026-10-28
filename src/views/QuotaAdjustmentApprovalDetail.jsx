@@ -11,8 +11,12 @@ import {
   ChatText,
   Hourglass,
   UserCheck,
+  ArrowCounterClockwise,
+  WarningCircle,
+  UserCircle,
 } from '@phosphor-icons/react';
-import { ADJUST_APPROVERS, ADJUST_TYPES, dayUnit } from '../data/leaveQuota';
+import { ADJUST_APPROVERS, ADJUST_TYPES, adjustEffectText, canActOnAdjustmentStep, dayUnit, isDeductType } from '../data/leaveQuota';
+import { BalanceTrio, RestoreSourceValue } from './LeaveQuotaView';
 
 const CAPTION = '12px';
 
@@ -49,7 +53,7 @@ const STEP_STYLE = {
   skipped: { bg: '#F1F5F9', border: '#E2E8F0', color: '#94A3B8' },
 };
 
-export const QuotaAdjustmentApprovalDetail = ({ request, language, onBack, onApprove, onReject }) => {
+export const QuotaAdjustmentApprovalDetail = ({ request, roleCode, language, onBack, onApprove, onReject }) => {
   const pageRef = useRef(null);
   const isId = language === 'id';
 
@@ -60,7 +64,11 @@ export const QuotaAdjustmentApprovalDetail = ({ request, language, onBack, onApp
 
   const adjustType = ADJUST_TYPES.find((item) => item.id === request.adjustType) || ADJUST_TYPES[0];
   const isPending = request.status === 'PENDING';
-  const newBalance = request.currentBalance + request.days;
+  // Only the approver of the current step sees the action bar; others just track the status.
+  const canAct = isPending && canActOnAdjustmentStep(roleCode, request.approvalStep);
+  const isDeduct = isDeductType(request.adjustType);
+  const sign = isDeduct ? '−' : '+';
+  const newBalance = isDeduct ? request.currentBalance - request.days : request.currentBalance + request.days;
   const isFinalStep = request.approvalStep === ADJUST_APPROVERS.length;
   const cardStyle = { backgroundColor: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)', padding: '16px' };
   const cardTitle = { margin: 0, fontSize: '14px', fontWeight: 700, color: '#334155' };
@@ -85,9 +93,11 @@ export const QuotaAdjustmentApprovalDetail = ({ request, language, onBack, onApp
   const infoRows = [
     { Icon: Hash, label: isId ? 'Nomor permohonan' : 'Request number', value: <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', color: '#6D28D9' }}>{request.requestRef}</span> },
     { Icon: Scales, label: isId ? 'Jenis penyesuaian' : 'Adjustment type', value: adjustType.label[language] || adjustType.label.en },
+    request.restoreSource && { Icon: ArrowCounterClockwise, label: isId ? 'Pemotongan yang dikembalikan' : 'Restored deduction', value: <RestoreSourceValue source={request.restoreSource} language={language} /> },
+    { Icon: UserCircle, label: isId ? 'Diajukan oleh' : 'Submitted by', value: request.submittedBy || `${request.employeeName} (${isId ? 'diri sendiri' : 'self'})` },
     { Icon: CalendarBlank, label: isId ? 'Diajukan' : 'Submitted', value: request.submittedAt },
     { Icon: ChatText, label: isId ? 'Catatan' : 'Notes', value: request.reason },
-  ];
+  ].filter(Boolean);
 
   return (
     <div ref={pageRef} style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '#F8FAFC', fontFamily: 'var(--font-sans)', fontSize: '14px', color: '#334155' }}>
@@ -104,12 +114,14 @@ export const QuotaAdjustmentApprovalDetail = ({ request, language, onBack, onApp
       <div style={{ flex: 1, padding: '16px 16px 32px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <section style={{ background: 'linear-gradient(135deg, #053079 0%, #0344A8 55%, #0284C7 100%)', borderRadius: '16px', padding: '18px 16px', color: '#FFFFFF', display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative', overflow: 'hidden' }}>
           <Scales aria-hidden="true" size={120} weight="fill" style={{ position: 'absolute', right: '-18px', top: '-14px', color: 'rgba(255, 255, 255, 0.08)' }} />
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', position: 'relative' }}>
-            <span style={{ ...heroPill, backgroundColor: 'rgba(255, 255, 255, 0.16)', border: '1px solid rgba(255, 255, 255, 0.25)', color: '#FFFFFF' }}>
-              <Scales size={12} weight="bold" aria-hidden="true" />
-              {isId ? 'Penyesuaian Kuota' : 'Quota Adjustment'}
-            </span>
-            <span style={{ ...heroPill, backgroundColor: statusPill.bg, color: '#FFFFFF' }}>{statusPill.label}</span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', position: 'relative' }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+              <span style={{ ...heroPill, backgroundColor: 'rgba(255, 255, 255, 0.16)', border: '1px solid rgba(255, 255, 255, 0.25)', color: '#FFFFFF' }}>
+                <Scales size={12} weight="bold" aria-hidden="true" />
+                {isId ? 'Penyesuaian Kuota' : 'Quota Adjustment'}
+              </span>
+            </div>
+            <span style={{ ...heroPill, backgroundColor: statusPill.bg, color: '#FFFFFF', flexShrink: 0 }}>{statusPill.label}</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
@@ -120,34 +132,39 @@ export const QuotaAdjustmentApprovalDetail = ({ request, language, onBack, onApp
                 {request.employeeName.split(' ').map((part) => part[0]).slice(0, 2).join('')}
               </span>
             )}
-            <div style={{ minWidth: 0 }}>
+            <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: '1px' }}>
               <div style={{ fontSize: '15px', fontWeight: 700 }}>{request.employeeName}</div>
-              <div style={{ fontSize: CAPTION, color: 'rgba(255, 255, 255, 0.8)' }}>{request.employeeRole}</div>
+              <div style={{ fontSize: CAPTION, color: 'rgba(255, 255, 255, 0.85)' }}>
+                {request.employeePosition ? `${request.employeePosition} · ${request.employeeRole}` : request.employeeRole}
+              </div>
+              {request.employeeNip && <div style={{ fontSize: CAPTION, color: 'rgba(255, 255, 255, 0.7)' }}>NIP {request.employeeNip}</div>}
             </div>
           </div>
 
-          <p style={{ margin: 0, display: 'flex', alignItems: 'baseline', gap: '6px', color: '#86EFAC', position: 'relative' }}>
-            <strong style={{ fontSize: '40px', lineHeight: 1, fontWeight: 800, letterSpacing: '-1px' }}>+{request.days}</strong>
+          <p style={{ margin: 0, display: 'flex', alignItems: 'baseline', gap: '6px', color: isDeduct ? '#FCA5A5' : '#86EFAC', position: 'relative' }}>
+            <strong style={{ fontSize: '40px', lineHeight: 1, fontWeight: 800, letterSpacing: '-1px' }}>{sign}{request.days}</strong>
             <span style={{ fontSize: '15px', fontWeight: 600 }}>{dayUnit(request.days, language)}</span>
-            <span style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255, 255, 255, 0.85)' }}>· {adjustType.label[language] || adjustType.label.en}</span>
           </p>
         </section>
 
         <section style={cardStyle}>
           <h3 style={{ ...cardTitle, marginBottom: '12px' }}>{isId ? 'Dampak ke Saldo' : 'Balance Impact'}</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: '8px' }}>
-            <div style={{ padding: '12px', borderRadius: '12px', backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', textAlign: 'center' }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#94A3B8', lineHeight: 1.2 }}>{request.currentBalance}</div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#64748B', marginTop: '2px' }}>{isId ? 'Saldo saat diajukan' : 'Balance at request'}</div>
-            </div>
-            <span aria-label={`+${request.days}`} style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 800, backgroundColor: '#DCFCE7', color: '#15803D', border: '2px solid #BBF7D0' }}>
-              +{request.days}
-            </span>
-            <div style={{ padding: '12px', borderRadius: '12px', backgroundColor: '#EAF7FF', border: '1px solid #BAE6FD', textAlign: 'center' }}>
-              <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#053079', lineHeight: 1.2 }}>{newBalance}</div>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: '#0369A1', marginTop: '2px' }}>{isId ? 'Setelah disetujui' : 'After approval'}</div>
-            </div>
-          </div>
+          <BalanceTrio
+            before={request.currentBalance}
+            after={newBalance}
+            beforeLabel={isId ? 'Saldo saat diajukan' : 'Balance at request'}
+            afterLabel={isId ? 'Setelah disetujui' : 'After approval'}
+            sign={sign}
+            days={request.days}
+            isAddition={!isDeduct}
+          />
+          <p style={{ margin: '10px 0 0', fontSize: CAPTION, color: '#64748B', lineHeight: 1.45 }}>{adjustEffectText(adjustType.id, request.days, language)}</p>
+          {newBalance < 0 && (
+            <p style={{ margin: '10px 0 0', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px', borderRadius: '10px', backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#B91C1C', fontSize: CAPTION, lineHeight: 1.45 }}>
+              <WarningCircle size={16} weight="fill" aria-hidden="true" style={{ flexShrink: 0 }} />
+              {isId ? 'Saldo akan menjadi minus jika permohonan ini disetujui.' : 'The balance would go below zero if this request is approved.'}
+            </p>
+          )}
         </section>
 
         <section style={{ ...cardStyle, paddingBottom: '4px' }}>
@@ -195,7 +212,7 @@ export const QuotaAdjustmentApprovalDetail = ({ request, language, onBack, onApp
         </section>
       </div>
 
-      {isPending && (
+      {canAct && (
         <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#FFFFFF', padding: '12px 16px 14px', borderTop: '1px solid #E2E8F0', boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.05)', display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '10px', zIndex: 40, boxSizing: 'border-box' }}>
           <button type="button" onClick={() => onReject(request)} style={{ height: '46px', borderRadius: '12px', border: '1px solid #E2E8F0', backgroundColor: '#FFFFFF', color: '#DC2626', fontSize: '14px', fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
             <X size={18} weight="bold" />
